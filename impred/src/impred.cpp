@@ -67,7 +67,8 @@ for(int j=0; j<M; j++) {
 			if(i == 0){
 				arg1 = arg;
 				uprop1 = uprop;
-			}else {
+			}
+			if(i == 1){
 				arg3 = arg;	
 				uprop3 = uprop;
 			}
@@ -82,23 +83,24 @@ for(int j=0; j<M; j++) {
 			if(i == 0){
 				arg2 = arg;
 				uprop2 = uprop;
-			}else {
+			}
+			if(i == 1){
 				arg4 = arg;
 				uprop4 = uprop;
 			}
 			for(int h = 0; h<H2; h++){
 				logjointnew[0] = logjointnew[0] + 0.5*rL[h]*arg(h,0)-0.5*exp(arg(h,0));	
 			}
-			if(j == 0 & i == 0){
+			if((j == 0) & (i == 0)){
 				logjointnew1[0]=  logjointnew[0];  logjointold1[0]=  logjointold[0];
 			}
-			if(j == 0 & i == 1){
+			if((j == 0) & (i == 1)){
 				logjointnew2[0]=  logjointnew[0];  logjointold2[0]=  logjointold[0];
 			}
 			logjointdiff[0] = logjointnew[0] - logjointold[0];
 			logjointdiff[0] = fmin(std::exp(logjointdiff[0]), 1.0);
 			uu[0] = R::runif(0.0,1.0);
-			if(0 <= 1 {
+			if(0 <= 1){
 				if(i==0){
 					postsamples0[j] = uprop[0];	
 				}else {
