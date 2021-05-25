@@ -73,7 +73,9 @@ for(int j=0; j<M; j++) {
 				}else {
 					postsamples1[j] = uprop[1];
 				}
+				u = uprop;
 			}
+			logjointold[0] = 0.0; logjointnew[0] = 0.0;
 		}
 	}
 result = Rcpp::List::create(Rcpp::Named("samples1") = postsamples0,Rcpp::Named("samples2") = postsamples1);
