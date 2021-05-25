@@ -3,6 +3,6 @@
 
 
 
-randsetsMCMC <- function(H,A,rL,dimH,M_samp) {
-    .Call(`impred_randsetsMCMC`, H,A,rL,dimH,M_samp)
+randsetsMCMC <- function(H,A,rL,dimH,dimA,M_samp) {
+    .Call(`impred_randsetsMCMC`, H,A,rL,dimH,dimA,M_samp)
 }
