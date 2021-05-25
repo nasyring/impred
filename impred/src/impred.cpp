@@ -36,7 +36,7 @@ Rcpp::List randsetsMCMC(NumericMatrix H, NumericMatrix A, NumericVector rL, Nume
 	
 	
 	for(int h = 0; h<H1; h++){
-		U[h] = H[h];	
+		U[h] = H[h,0];	
 	}
 	
 	for(int j=0; j<M; j++) {
