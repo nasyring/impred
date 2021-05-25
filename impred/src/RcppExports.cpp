@@ -18,7 +18,7 @@ BEGIN_RCPP
     Rcpp::traits::input_parameter< NumericVector >::type dimH(dimHSEXP);
         Rcpp::traits::input_parameter< NumericVector >::type dimA(dimASEXP);
     Rcpp::traits::input_parameter< NumericVector >::type M_samp(M_sampSEXP);
-    __result = Rcpp::wrap(randsetsMCMC(H,A,rL,dimH,M_samp));
+    __result = Rcpp::wrap(randsetsMCMC(H,A,rL,dimH,dimA,M_samp));
     return __result;
 END_RCPP
 }
