@@ -46,9 +46,9 @@ Rcpp::List randsetsMCMC(NumericMatrix H, NumericMatrix A, NumericVector rL, Nume
 	U(H1+1,0) = uprop[0];
 	U(H1+2,0) = uprop[1];
 	arma::mat Ua = as<arma::mat>(U);
+	arg = Aa*Ua;
 
-
-result = Rcpp::List::create(Rcpp::Named("Aa") = Aa, Rcpp::Named("Ua") = Ua);
+result = Rcpp::List::create(Rcpp::Named("Aa") = Aa, Rcpp::Named("Ua") = Ua, Rcpp::Named("arg") = arg);
 
 	return result;
 	
