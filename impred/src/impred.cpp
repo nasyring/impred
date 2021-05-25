@@ -59,18 +59,18 @@ for(int j=0; j<M; j++) {
 			}else {
 				propsd[0] = 0.5;	
 			}
-			uprop = u;
+			uprop(u.begin(), u.end());
 			U(H1,0) = uprop[0];
 			U(H1+1,0) = uprop[1];
 			Ua = as<arma::mat>(U);
 			arg = Aa*Ua;
 			if(i == 0){
-				arg1 = arg;
-				uprop1 = uprop;
+				arg1(arg.begin(), arg.end());
+				uprop1(uprop.begin(), uprop.end());
 			}
 			if(i == 1){
-				arg3 = arg;	
-				uprop3 = uprop;
+				arg3(arg.begin(), arg.end());
+				uprop3(uprop.begin(), uprop.end());
 			}
 			for(int h = 0; h<H2; h++){
 				logjointold[0] = logjointold[0] + 0.5*rL[h]*arg(h,0)-0.5*exp(arg(h,0));	
@@ -81,12 +81,12 @@ for(int j=0; j<M; j++) {
 			Ua = as<arma::mat>(U);
 			arg = Aa*Ua;
 			if(i == 0){
-				arg2 = arg;
-				uprop2 = uprop;
+				arg2(arg.begin(), arg.end());
+				uprop2(uprop.begin(), uprop.end());
 			}
 			if(i == 1){
-				arg4 = arg;
-				uprop4 = uprop;
+				arg4(arg.begin(), arg.end());
+				uprop4(uprop.begin(), uprop.end());
 			}
 			for(int h = 0; h<H2; h++){
 				logjointnew[0] = logjointnew[0] + 0.5*rL[h]*arg(h,0)-0.5*exp(arg(h,0));	
@@ -106,7 +106,7 @@ for(int j=0; j<M; j++) {
 				}else {
 					postsamples1[j] = uprop[1];
 				}
-				u = uprop;
+				u(uprop.begin(), uprop.end());
 			}else {
 				if(i==0){
 					postsamples0[j] = u[0];	
