@@ -34,9 +34,10 @@ Rcpp::List randsetsMCMC(NumericMatrix H, NumericMatrix A, NumericVector rL, Nume
         NumericMatrix U = NumericMatrix(H2, 1, zeroes.begin());
 	arma::mat Aa = as<arma::mat>(A);
 	arma::mat arg;
+		arma::mat arg1;
 	NumericVector postsamples0(M,0.0);
 	NumericVector postsamples1(M,0.0);
-	arma::mat Ua = as<arma::mat>(U);
+	arma::mat Ua = as<arma::mat>(U);	arma::mat Ua1 = as<arma::mat>(U);
 	
 	for(int h = 0; h<H1; h++){
 		U(h,0) = H(h,0);	
