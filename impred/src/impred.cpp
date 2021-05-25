@@ -123,12 +123,12 @@ result = Rcpp::List::create(  Rcpp::Named("logjointold1") = logjointold1,
 			   Rcpp::Named("logjointnew2") = logjointnew2,
 			   Rcpp::Named("arg1") = arg1, 
 			    Rcpp::Named("uprop1") = uprop1,			   
-			    Rcpp::Named("arg1") = arg2, 
-			    Rcpp::Named("uprop1") = uprop2,			   
-			    Rcpp::Named("arg1") = arg3, 
-			    Rcpp::Named("uprop1") = uprop3,			   
-			    Rcpp::Named("arg1") = arg4, 
-			    Rcpp::Named("uprop1") = uprop4);
+			    Rcpp::Named("arg2") = arg2, 
+			    Rcpp::Named("uprop2") = uprop2,			   
+			    Rcpp::Named("arg3") = arg3, 
+			    Rcpp::Named("uprop3") = uprop3,			   
+			    Rcpp::Named("arg4") = arg4, 
+			    Rcpp::Named("uprop4") = uprop4);
 
 	return result;
 	
