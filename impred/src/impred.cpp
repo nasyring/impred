@@ -115,7 +115,7 @@ for(int j=0; j<M; j++) {
 				}else {
 					postsamples1[j] = uprop[1];
 				}
-				u(uprop.begin(), uprop.end());
+				u[0]=uprop[0];u[1]=uprop[1];
 			}else {
 				if(i==0){
 					postsamples0[j] = u[0];	
