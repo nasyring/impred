@@ -8,7 +8,7 @@ using namespace std;
 
 // randsetsMCMC
 Rcpp::List randsetsMCMC(RMatrix<double> H, RMatrix<double> A, RVector<double> rL, RVector<double> dimH, RVector<double> M_samp);
-RcppExport SEXP impred_randsetsMCMC(SEXP HSEXP, SEXP SEXPA, SEXP SEXPrL, SEXP SEXPdimH, SEXP SEXPM_samp){
+RcppExport SEXP impred_randsetsMCMC(SEXP HSEXP, SEXP ASEXP, SEXP rLSEXP, SEXP dimHSEXP, SEXP M_sampSEXP){
 BEGIN_RCPP
     Rcpp::RObject __result;
     Rcpp::RNGScope __rngScope;
