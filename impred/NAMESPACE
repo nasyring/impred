@@ -1,0 +1,5 @@
+useDynLib(impred, .registration=TRUE)
+importFrom(Rcpp, evalCpp)
+importFrom(RcppParallel, RcppParallelLibs)
+importFrom("utils", "read.table")
+exportPattern("^[[:alpha:]]+")
