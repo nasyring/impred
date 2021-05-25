@@ -13,7 +13,7 @@ using namespace std;
 
 #include <cmath>
 #include <algorithm>
-
+/*
 Rcpp::List randsetsMCMC(NumericMatrix H, NumericMatrix A, NumericVector rL, NumericVector dimH, NumericVector M_samp) {
 	
 	List result;
@@ -93,9 +93,9 @@ result = Rcpp::List::create(Rcpp::Named("samples1") = postsamples0,Rcpp::Named("
 	
 	
 }
+*/
 
 
-/*
 Rcpp::List randsetsMCMC(NumericMatrix H, NumericMatrix A, NumericVector rL, NumericVector dimH, NumericVector M_samp) {
 	
 	List result;
@@ -123,7 +123,7 @@ Rcpp::List randsetsMCMC(NumericMatrix H, NumericMatrix A, NumericVector rL, Nume
 
 for(int j=0; j<M; j++) {
 		for(int i=0; i<2; i++){
-			if( j==0 ){
+			if( i==0 ){
 				propsd[0] = 10.0;	
 			}else {
 				propsd[0] = 0.5;	
@@ -165,7 +165,7 @@ result = Rcpp::List::create(Rcpp::Named("samples1") = postsamples0,Rcpp::Named("
 	
 }
 
-*/
+
 
 
 
