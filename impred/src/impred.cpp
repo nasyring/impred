@@ -16,6 +16,7 @@ using namespace std;
 
 Rcpp::List randsetsMCMC(NumericVector H, NumericMatrix A, NumericVector rL, NumericVector dimH, NumericVector M_samp) {
 	
+	List result;
 	int M = int(M_samp[0]);
 	int H2 = int(dimH[0]+2);
 	int H1 = H2-2;
