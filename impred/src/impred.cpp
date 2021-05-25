@@ -49,8 +49,8 @@ for(int j=0; j<M; j++) {
 				propsd[0] = 0.5;	
 			}
 			uprop = u;
-			U(H1+1,0) = uprop[0];
-			U(H1+2,0) = uprop[1];
+			U(H1,0) = uprop[0];
+			U(H1+1,0) = uprop[1];
 			Ua = as<arma::mat>(U);
 			Ua1 = Ua;
 			arg = Aa*Ua;
@@ -59,8 +59,8 @@ for(int j=0; j<M; j++) {
 				logjointold[0] = logjointold[0] + 0.5*rL[h]*arg(h,0)-0.5*exp(arg(h,0));	
 			}
 			uprop[i] = R::rnorm(u[i], propsd[0]);
-			U(H1+1,0) = uprop[0];
-			U(H1+2,0) = uprop[1];
+			U(H1,0) = uprop[0];
+			U(H1+1,0) = uprop[1];
 			Ua = as<arma::mat>(U);
 			arg = Aa*Ua;
 			for(int h = 0; h<H2; h++){
