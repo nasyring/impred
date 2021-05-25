@@ -7,12 +7,12 @@ using namespace std;
 
 
 // randsetsMCMC
-Rcpp::List randsetsMCMC(NumericMatrix H, NumericMatrix A, NumericVector rL, NumericVector dimH, NumericVector M_samp);
+Rcpp::List randsetsMCMC(NumericVector H, NumericMatrix A, NumericVector rL, NumericVector dimH, NumericVector M_samp);
 RcppExport SEXP impred_randsetsMCMC(SEXP HSEXP, SEXP ASEXP, SEXP rLSEXP, SEXP dimHSEXP, SEXP M_sampSEXP){
 BEGIN_RCPP
     Rcpp::RObject __result;
     Rcpp::RNGScope __rngScope;
-    Rcpp::traits::input_parameter< NumericMatrix >::type H(HSEXP);
+    Rcpp::traits::input_parameter< NumericVector >::type H(HSEXP);
     Rcpp::traits::input_parameter< NumericMatrix >::type A(ASEXP);
     Rcpp::traits::input_parameter< NumericVector >::type rL(rLSEXP);
     Rcpp::traits::input_parameter< NumericVector >::type dimH(dimHSEXP);
