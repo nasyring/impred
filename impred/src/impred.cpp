@@ -23,21 +23,30 @@ Rcpp::List randsetsMCMC(NumericMatrix H, NumericMatrix A, NumericVector rL, Nume
 	NumericVector propsd(1,0.0);
 	NumericVector u(2,1.0);
 	NumericVector uprop(2,0.0);
-		NumericVector uprop1(2,0.0);
+	NumericVector uprop1(2,0.0);
+	NumericVector uprop2(2,0.0);
+	NumericVector uprop3(2,0.0);
+	NumericVector uprop4(2,0.0);
 	NumericVector logjointold(1,0.0);
 	NumericVector logjointnew(1,0.0);
-		NumericVector logjointold1(1,0.0);
+	NumericVector logjointold1(1,0.0);
 	NumericVector logjointnew1(1,0.0);
+	NumericVector logjointold2(1,0.0);
+	NumericVector logjointnew2(1,0.0);
 	NumericVector logjointdiff(1,0.0);
 	NumericVector uu(1,0.0);
 	NumericVector zeroes = NumericVector(H2*1, 0.0); 
         NumericMatrix U = NumericMatrix(H2, 1, zeroes.begin());
 	arma::mat Aa = as<arma::mat>(A);
 	arma::mat arg;
-		arma::mat arg1;
+	arma::mat arg1;
+	arma::mat arg2;
+	arma::mat arg3;
+	arma::mat arg4;
 	NumericVector postsamples0(M,0.0);
 	NumericVector postsamples1(M,0.0);
-	arma::mat Ua = as<arma::mat>(U);	arma::mat Ua1 = as<arma::mat>(U);
+	arma::mat Ua = as<arma::mat>(U);
+
 	
 	for(int h = 0; h<H1; h++){
 		U(h,0) = H(h,0);	
@@ -55,6 +64,13 @@ for(int j=0; j<M; j++) {
 			U(H1+1,0) = uprop[1];
 			Ua = as<arma::mat>(U);
 			arg = Aa*Ua;
+			if(i == 0){
+				arg1 = arg;
+				uprop1 = uprop;
+			}else {
+				arg3 = arg;	
+				uprop3 = uprop;
+			}
 			for(int h = 0; h<H2; h++){
 				logjointold[0] = logjointold[0] + 0.5*rL[h]*arg(h,0)-0.5*exp(arg(h,0));	
 			}
@@ -63,14 +79,26 @@ for(int j=0; j<M; j++) {
 			U(H1+1,0) = uprop[1];
 			Ua = as<arma::mat>(U);
 			arg = Aa*Ua;
+			if(i == 0){
+				arg2 = arg;
+				uprop2 = uprop;
+			}else {
+				arg4 = arg;
+				uprop4 = uprop;
+			}
 			for(int h = 0; h<H2; h++){
 				logjointnew[0] = logjointnew[0] + 0.5*rL[h]*arg(h,0)-0.5*exp(arg(h,0));	
 			}
-			logjointnew1[0]=  logjointnew[0];  logjointold1[0]=  logjointold[0];
+			if(j == 0 & i == 0){
+				logjointnew1[0]=  logjointnew[0];  logjointold1[0]=  logjointold[0];
+			}
+			if(j == 0 & i == 1){
+				logjointnew2[0]=  logjointnew[0];  logjointold2[0]=  logjointold[0];
+			}
 			logjointdiff[0] = logjointnew[0] - logjointold[0];
 			logjointdiff[0] = fmin(std::exp(logjointdiff[0]), 1.0);
 			uu[0] = R::runif(0.0,1.0);
-			if(uu[0] <= logjointdiff[0]) {
+			if(0 <= 1 {
 				if(i==0){
 					postsamples0[j] = uprop[0];	
 				}else {
@@ -84,22 +112,21 @@ for(int j=0; j<M; j++) {
 					postsamples1[j] = u[1];
 				}				
 			}
-			uprop1 = uprop;
 			logjointold[0] = 0.0; logjointnew[0] = 0.0;
 		}
 	}
-result = Rcpp::List::create(Rcpp::Named("samples1") = postsamples0,Rcpp::Named("samples2") = postsamples1,
-			   Rcpp::Named("logjointold") = logjointold,
-			   Rcpp::Named("logjointnew") = logjointnew,
-			   Rcpp::Named("logjointold1") = logjointold1,
+result = Rcpp::List::create(  Rcpp::Named("logjointold1") = logjointold1,
 			   Rcpp::Named("logjointnew1") = logjointnew1,
-			   Rcpp::Named("U") = U,
-			   Rcpp::Named("Ua") = Ua,
-			   Rcpp::Named("arg") = arg, 
-			    Rcpp::Named("Ua1") = Ua1,
+			   Rcpp::Named("logjointold2") = logjointold2,
+			   Rcpp::Named("logjointnew2") = logjointnew2,
 			   Rcpp::Named("arg1") = arg1, 
-			    Rcpp::Named("uprop") = uprop, 
-			    Rcpp::Named("uprop1") = uprop1);
+			    Rcpp::Named("uprop1") = uprop1,			   
+			    Rcpp::Named("arg1") = arg2, 
+			    Rcpp::Named("uprop1") = uprop2,			   
+			    Rcpp::Named("arg1") = arg3, 
+			    Rcpp::Named("uprop1") = uprop3,			   
+			    Rcpp::Named("arg1") = arg4, 
+			    Rcpp::Named("uprop1") = uprop4);
 
 	return result;
 	
