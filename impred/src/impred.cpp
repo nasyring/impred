@@ -43,7 +43,7 @@ Rcpp::List randsetsMCMC(NumericMatrix H, NumericMatrix A, NumericVector rL, Nume
 
 for(int j=0; j<M; j++) {
 		for(int i=0; i<1; i++){
-			if( j==0 ){
+			if( i==0 ){
 				propsd[0] = 10.0;	
 			}else {
 				propsd[0] = 0.5;	
@@ -154,6 +154,12 @@ for(int j=0; j<M; j++) {
 					postsamples1[j] = uprop[1];
 				}
 				u = uprop;
+			}else {
+				if(i==0){
+					postsamples0[j] = u[0];	
+				}else {
+					postsamples1[j] = u[1];
+				}				
 			}
 			logjointold[0] = 0.0; logjointnew[0] = 0.0;
 		}
