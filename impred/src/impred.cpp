@@ -39,11 +39,11 @@ Rcpp::List randsetsMCMC(NumericMatrix H, NumericMatrix A, NumericVector rL, Nume
 	NumericVector zeroes = NumericVector(H2*1, 0.0); 
         NumericMatrix U = NumericMatrix(H2, 1, zeroes.begin());
 	arma::mat Aa = as<arma::mat>(A);
-	arma::mat arg;
-	arma::mat arg1;
-	arma::mat arg2;
-	arma::mat arg3;
-	arma::mat arg4;
+	arma::mat arg(dA,1);
+	arma::mat arg1(dA,1);
+	arma::mat arg2(dA,1);
+	arma::mat arg3(dA,1);
+	arma::mat arg4(dA,1);
 	NumericVector postsamples0(M,0.0);
 	NumericVector postsamples1(M,0.0);
 	arma::mat Ua = as<arma::mat>(U);
@@ -66,11 +66,15 @@ for(int j=0; j<M; j++) {
 			Ua = as<arma::mat>(U);
 			arg = Aa*Ua;
 			if(i == 0){
-				arg1 = arma::mat(dA,1,arg.begin());
+				for(in k=0; k < dA; k++){
+					arg1(k,1) = arg(k,1);
+				}
 				uprop1(0) = uprop(0);uprop1(1) = uprop(1);
 			}
 			if(i == 1){
-				arg3 = arma::mat(dA,1,arg.begin());
+				for(in k=0; k < dA; k++){
+					arg3(k,1) = arg(k,1);
+				}
 				uprop3(0) = uprop(0);uprop3(1) = uprop(1);
 			}
 			for(int h = 0; h<H2; h++){
@@ -82,11 +86,15 @@ for(int j=0; j<M; j++) {
 			Ua = as<arma::mat>(U);
 			arg = Aa*Ua;
 			if(i == 0){
-				arg2 = arma::mat(dA,1,arg.begin());
+				for(in k=0; k < dA; k++){
+					arg2(k,1) = arg(k,1);
+				}
 				uprop2(0) = uprop(0);uprop2(1) = uprop(1);
 			}
 			if(i == 1){
-				arg4 = arma::mat(dA,1,arg.begin());
+				for(in k=0; k < dA; k++){
+					arg4(k,1) = arg(k,1);
+				}
 				uprop4(0) = uprop(0);uprop4(1) = uprop(1);
 			}
 			for(int h = 0; h<H2; h++){
