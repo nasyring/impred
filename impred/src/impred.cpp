@@ -27,25 +27,25 @@ Rcpp::List randsetsMCMC(NumericMatrix H, NumericMatrix A, NumericVector rL, Nume
 	NumericVector logjointnew(1,0.0);
 	NumericVector logjointdiff(1,0.0);
 	NumericVector uu(1,0.0);
-	NumericVector U(H2,0.0);
+	NumericVector zeroes = NumericVector(H2*1, 0.0); 
+        NumericMatrix U = NumericMatrix(H2, 1, zeroes.begin());
 	arma::mat Aa = as<arma::mat>(A);
-	arma::mat Ua;
 	arma::mat arg;
 	NumericVector postsamples0(M,0.0);
 	NumericVector postsamples1(M,0.0);
 	
 	
 	for(int h = 0; h<H1; h++){
-		U[h] = H(h,0);	
+		U(h,0) = H(h,0);	
 	}
 	
 	logjointold[0] = 0.0;
 	logjointnew[0] = 0.0;
 	propsd[0] = 10.0;	
 	uprop = u;
-	U[H1+1] = uprop[0];
-	U[H1+2] = uprop[1];
-	Ua = as<arma::mat>(U);
+	U(H1+1,0) = uprop[0];
+	U(H1+2,0) = uprop[1];
+	arma::mat Ua = as<arma::mat>(U);
 
 
 result = Rcpp::List::create(Rcpp::Named("Aa") = Aa, Rcpp::Named("Ua") = Ua);
