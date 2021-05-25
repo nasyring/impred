@@ -14,11 +14,12 @@ using namespace std;
 #include <cmath>
 #include <algorithm>
 
-Rcpp::List randsetsMCMC(NumericMatrix H, NumericMatrix A, NumericVector rL, NumericVector dimH, NumericVector M_samp) {
+Rcpp::List randsetsMCMC(NumericMatrix H, NumericMatrix A, NumericVector rL, NumericVector dimH, NumericVector dimA, NumericVector M_samp) {
 	
 	List result;
 	int M = int(M_samp[0]);
 	int H2 = int(dimH[0]+2);
+	int dA = int(dimA[0]);
 	int H1 = H2-2;
 	NumericVector propsd(1,0.0);
 	NumericVector u(2,1.0);
@@ -59,18 +60,18 @@ for(int j=0; j<M; j++) {
 			}else {
 				propsd[0] = 0.5;	
 			}
-			uprop(u.begin(), u.end());
+			uprop(0) = u(0);uprop(1) = u(1);
 			U(H1,0) = uprop[0];
 			U(H1+1,0) = uprop[1];
 			Ua = as<arma::mat>(U);
 			arg = Aa*Ua;
 			if(i == 0){
-				arg1(arg.begin(), arg.end());
-				uprop1(uprop.begin(), uprop.end());
+				arg1 = arma::mat(dA,1,arg.begin());
+				uprop1(0) = uprop(0);uprop1(1) = uprop(1);
 			}
 			if(i == 1){
-				arg3(arg.begin(), arg.end());
-				uprop3(uprop.begin(), uprop.end());
+				arg3 = arma::mat(dA,1,arg.begin());
+				uprop3(0) = uprop(0);uprop3(1) = uprop(1);
 			}
 			for(int h = 0; h<H2; h++){
 				logjointold[0] = logjointold[0] + 0.5*rL[h]*arg(h,0)-0.5*exp(arg(h,0));	
@@ -81,12 +82,12 @@ for(int j=0; j<M; j++) {
 			Ua = as<arma::mat>(U);
 			arg = Aa*Ua;
 			if(i == 0){
-				arg2(arg.begin(), arg.end());
-				uprop2(uprop.begin(), uprop.end());
+				arg2 = arma::mat(dA,1,arg.begin());
+				uprop2(0) = uprop(0);uprop2(1) = uprop(1);
 			}
 			if(i == 1){
-				arg4(arg.begin(), arg.end());
-				uprop4(uprop.begin(), uprop.end());
+				arg4 = arma::mat(dA,1,arg.begin());
+				uprop4(0) = uprop(0);uprop4(1) = uprop(1);
 			}
 			for(int h = 0; h<H2; h++){
 				logjointnew[0] = logjointnew[0] + 0.5*rL[h]*arg(h,0)-0.5*exp(arg(h,0));	
