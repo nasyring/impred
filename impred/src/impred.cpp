@@ -14,6 +14,8 @@ using namespace std;
 #include <cmath>
 #include <algorithm>
 
+
+/*
 Rcpp::List randsetsMCMC(NumericMatrix H, NumericMatrix A, NumericVector rL, NumericVector dimH, NumericVector dimA, NumericVector M_samp) {
 	
 	List result;
@@ -143,14 +145,15 @@ result = Rcpp::List::create(  Rcpp::Named("logjointold1") = logjointold1,
 	
 	
 }
+*/
 
 
-/*
-Rcpp::List randsetsMCMC(NumericMatrix H, NumericMatrix A, NumericVector rL, NumericVector dimH, NumericVector M_samp) {
+Rcpp::List randsetsMCMC(NumericMatrix H, NumericMatrix A, NumericVector rL, NumericVector dimH, NumericVector dimA, NumericVector M_samp) {
 	
 	List result;
 	int M = int(M_samp[0]);
 	int H2 = int(dimH[0]+2);
+	int dA = int(dimA[0]);
 	int H1 = H2-2;
 	NumericVector propsd(1,0.0);
 	NumericVector u(2,1.0);
@@ -178,7 +181,7 @@ for(int j=0; j<M; j++) {
 			}else {
 				propsd[0] = 0.5;	
 			}
-			uprop = u;
+			uprop(0) = u(0);uprop(1) = u(1);
 			U(H1,0) = uprop[0];
 			U(H1+1,0) = uprop[1];
 			Ua = as<arma::mat>(U);
@@ -203,7 +206,7 @@ for(int j=0; j<M; j++) {
 				}else {
 					postsamples1[j] = uprop[1];
 				}
-				u = uprop;
+				u(0)=uprop(0);u(1)=uprop(1);
 			}else {
 				if(i==0){
 					postsamples0[j] = u[0];	
@@ -221,7 +224,7 @@ result = Rcpp::List::create(Rcpp::Named("samples1") = postsamples0,Rcpp::Named("
 	
 }
 
-*/
+
 
 
 
