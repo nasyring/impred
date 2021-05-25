@@ -98,8 +98,8 @@ result = Rcpp::List::create(Rcpp::Named("samples1") = postsamples0,Rcpp::Named("
 			   Rcpp::Named("arg") = arg, 
 			    Rcpp::Named("Ua1") = Ua1,
 			   Rcpp::Named("arg1") = arg1, 
-			    Rcpp::Named("uprop") = uprop), 
-			    Rcpp::Named("uprop1") = uprop1));
+			    Rcpp::Named("uprop") = uprop, 
+			    Rcpp::Named("uprop1") = uprop1);
 
 	return result;
 	
