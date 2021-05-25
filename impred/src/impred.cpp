@@ -73,6 +73,8 @@ Rcpp::List randsetsMCMC(NumericVector H, NumericMatrix A, NumericVector rL, Nume
 					postsamples1[j] = uprop[1];
 				}
 			}
+		}
+	}
 result = Rcpp::List::create(Rcpp::Named("samples1") = postsamples0,Rcpp::Named("samples2") = postsamples1);
 
 	return result;
