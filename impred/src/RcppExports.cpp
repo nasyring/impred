@@ -44,7 +44,7 @@ END_RCPP
 
 static const R_CallMethodDef CallEntries[] = {
     {"impred_randsetsMCMC", (DL_FUNC) &impred_randsetsMCMC, 5},
-    {"impred_randsetspred", (DL_FUNC) &impred_randsetsMCMC, 8},
+    {"impred_randsetspred", (DL_FUNC) &impred_randsetspred, 8},
     {NULL, NULL, 0}
 };
 
