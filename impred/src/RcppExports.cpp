@@ -29,7 +29,7 @@ BEGIN_RCPP
     Rcpp::RObject __result;
     Rcpp::RNGScope __rngScope;
     Rcpp::traits::input_parameter< NumericMatrix >::type S(SSEXP);
-    Rcpp::traits::input_parameter< NumericMatrix >::type dimS(dimSSEXP);
+    Rcpp::traits::input_parameter< NumericVector >::type dimS(dimSSEXP);
     Rcpp::traits::input_parameter< NumericVector >::type nsize(nsizeSEXP);
     Rcpp::traits::input_parameter< NumericVector >::type n_i(n_iSEXP);
     Rcpp::traits::input_parameter< NumericVector >::type dimn_i(dimn_iSEXP);
