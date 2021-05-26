@@ -22,10 +22,29 @@ BEGIN_RCPP
 END_RCPP
 }
 
+// randsetspred
+Rcpp::List randsetspred(NumericMatrix S, NumericVector dimS, NumericVector nsize, NumericVector n_i, NumericVector dimn_i, NumericVector k, NumericVector U, NumericVector Ybar);
+RcppExport SEXP impred_randsetspred(SEXP SSEXP, SEXP dimSSEXP, SEXP nsizeSEXP, SEXP n_iSEXP, SEXP dimn_iSEXP, SEXP kSEXP, SEXP USEXP, SEXP YbarSEXP){
+BEGIN_RCPP
+    Rcpp::RObject __result;
+    Rcpp::RNGScope __rngScope;
+    Rcpp::traits::input_parameter< NumericMatrix >::type S(SSEXP);
+    Rcpp::traits::input_parameter< NumericMatrix >::type dimS(dimSSEXP);
+    Rcpp::traits::input_parameter< NumericVector >::type nsize(nsizeSEXP);
+    Rcpp::traits::input_parameter< NumericVector >::type n_i(n_iSEXP);
+    Rcpp::traits::input_parameter< NumericVector >::type dimn_i(dimn_iSEXP);
+    Rcpp::traits::input_parameter< NumericVector >::type k(kSEXP);
+    Rcpp::traits::input_parameter< NumericVector >::type U(USEXP);
+    Rcpp::traits::input_parameter< NumericVector >::type Ybar(YbarSEXP);
+    __result = Rcpp::wrap(randsetspred(S,dimS,nsize,n_i,dimn_i,k,U,Ybar));
+    return __result;
+END_RCPP
+}
 
 
 static const R_CallMethodDef CallEntries[] = {
     {"impred_randsetsMCMC", (DL_FUNC) &impred_randsetsMCMC, 5},
+    {"impred_randsetspred", (DL_FUNC) &impred_randsetsMCMC, 8},
     {NULL, NULL, 0}
 };
 
