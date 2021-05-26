@@ -240,8 +240,33 @@ Xdouble tol;				Acceptable tolerance
 
 }
 
+Rcpp::List sigmaSolvej(NumericVector Sampsj, NumericVector SLj, NumericVector aL, NumericVector lambdaL) {
 
-RNGScope scp;
-Rcpp::Function eigenfun("eigenfun");
+	Rcpp::Function zeroin("zeroin");	
+	List result;
+	int L = int(aL[0]);
+	NumericVector sigsolnsj(1,0.0);
+	NumericVector solnj(1,0.0);
+
+	sigsolnsj = std::exp(std::log(SLj[0])-Sampsj[1])	
+	double root_function(double x) {
+		double f = 0.0;
+		for(int k = 0; k < (L-1)l k++){
+			f += (std::log(lambdaL[k]*x+sigsolnsj)-std::log(SL[j]));
+		}
+		f += Sampsj[0];
+ 		return f;
+	}	
+	if()
+	
+	
+result = Rcpp::List::create(Rcpp::Named("") = );
+
+	return result;
+	
+	
+}
+	
+	
 
 
