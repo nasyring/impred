@@ -96,7 +96,7 @@ result = Rcpp::List::create(Rcpp::Named("samples1") = postsamples0,Rcpp::Named("
 
 Rcpp::List randsetspred(NumericMatrix S, NumericVector dimS, NumericVector nsize, NumericVector n_i, NumericVector dimn_i, NumericVector k, NumericVector U, NumericVector Ybar) {
 	
-	List result;/*
+	List result;
 	int M = int(dimS[0]);
 	int n = int(nsize[0]);
 	int dn_i = int(dimn_i[0]);
@@ -131,7 +131,7 @@ Rcpp::List randsetspred(NumericMatrix S, NumericVector dimS, NumericVector nsize
 	
 
 result = Rcpp::List::create(Rcpp::Named("randsetpred") = randsetpred);
-*/
+
 	return result;
 	
 	
