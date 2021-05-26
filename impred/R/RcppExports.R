@@ -6,3 +6,7 @@
 randsetsMCMC <- function(H,A,rL,dimH,M_samp) {
     .Call(`impred_randsetsMCMC`, H,A,rL,dimH,M_samp)
 }
+
+randsetspred <- function(S,dimS,nsize,n_i,dimn_i,k,U,Ybar) {
+    .Call(`impred_randsetspred`, S,dimS,nsize,n_i,dimn_i,k,U,Ybar)
+}
