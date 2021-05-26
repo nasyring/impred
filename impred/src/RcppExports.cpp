@@ -7,8 +7,8 @@ using namespace std;
 
 
 // randsetsMCMC
-Rcpp::List randsetsMCMC(NumericMatrix H, NumericMatrix A, NumericVector rL, NumericVector dimH,NumericVector dimA, NumericVector M_samp);
-RcppExport SEXP impred_randsetsMCMC(SEXP HSEXP, SEXP ASEXP, SEXP rLSEXP, SEXP dimHSEXP,SEXP dimASEXP, SEXP M_sampSEXP){
+Rcpp::List randsetsMCMC(NumericMatrix H, NumericMatrix A, NumericVector rL, NumericVector dimH, NumericVector M_samp);
+RcppExport SEXP impred_randsetsMCMC(SEXP HSEXP, SEXP ASEXP, SEXP rLSEXP, SEXP dimHSEXP, SEXP M_sampSEXP){
 BEGIN_RCPP
     Rcpp::RObject __result;
     Rcpp::RNGScope __rngScope;
@@ -16,9 +16,8 @@ BEGIN_RCPP
     Rcpp::traits::input_parameter< NumericMatrix >::type A(ASEXP);
     Rcpp::traits::input_parameter< NumericVector >::type rL(rLSEXP);
     Rcpp::traits::input_parameter< NumericVector >::type dimH(dimHSEXP);
-        Rcpp::traits::input_parameter< NumericVector >::type dimA(dimASEXP);
     Rcpp::traits::input_parameter< NumericVector >::type M_samp(M_sampSEXP);
-    __result = Rcpp::wrap(randsetsMCMC(H,A,rL,dimH,dimA,M_samp));
+    __result = Rcpp::wrap(randsetsMCMC(H,A,rL,dimH,M_samp));
     return __result;
 END_RCPP
 }
@@ -26,7 +25,7 @@ END_RCPP
 
 
 static const R_CallMethodDef CallEntries[] = {
-    {"impred_randsetsMCMC", (DL_FUNC) &impred_randsetsMCMC, 6},
+    {"impred_randsetsMCMC", (DL_FUNC) &impred_randsetsMCMC, 5},
     {NULL, NULL, 0}
 };
 
