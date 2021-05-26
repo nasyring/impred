@@ -108,7 +108,7 @@ Rcpp::List randsetspred(NumericMatrix S, NumericVector dimS, NumericVector nsize
 	NumericVector Uu(1,0.0);
 	NumericVector zeroes = NumericVector(M*2, 0.0); 
         NumericMatrix randsetpred = NumericMatrix(M, 2, zeroes.begin());
-	
+	/*
 	for(int j=0; j<dn_i; j++){
 		sumn_i2[0] = sumn_i2[0] + n_i[j]*n_i[j];	
 	}
@@ -128,7 +128,7 @@ Rcpp::List randsetspred(NumericMatrix S, NumericVector dimS, NumericVector nsize
 		randsetpred(j,0) = Ybar[0]+Ql[0];
 		randsetpred(j,1) = Ybar[0]+Qu[0];
 	}
-	
+	*/
 
 result = Rcpp::List::create(Rcpp::Named("randsetpred") = randsetpred);
 
