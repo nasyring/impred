@@ -52,7 +52,7 @@ BEGIN_RCPP
     Rcpp::traits::input_parameter< NumericVector >::type v(vSEXP);
     Rcpp::traits::input_parameter< NumericVector >::type y(ySEXP);
     Rcpp::traits::input_parameter< NumericVector >::type z(zSEXP);
-    Rcpp::traits::input_parameter< Function >::type f(fSEXP);
+    Rcpp::traits::input_parameter< Rcpp::NumericVector (*)(Rcpp::NumericVector, Rcpp::NumericVector, Rcpp::NumericVector, Rcpp::NumericVector, Rcpp::NumericVector) >::type f(fSEXP);
     Rcpp::traits::input_parameter< NumericVector >::type tol(tolSEXP);
     __result = Rcpp::wrap(zeroin(ax, bx, u, v, y, z, f, tol));
     return __result;
