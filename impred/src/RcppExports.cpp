@@ -78,16 +78,17 @@ END_RCPP
 }
 
 // sigmaSolvej
-Rcpp::List sigmaSolvej(NumericVector Sampsj, NumericVector SL, NumericVector aL, NumericVector lambdaL);
-RcppExport SEXP impred_sigmaSolvej(SEXP SampsjSEXP, SEXP SLSEXP, SEXP aLSEXP, SEXP lambdaLSEXP){
+Rcpp::List sigmaSolve(NumericMatrix Samps, NumericVector SL, NumericVector aL, NumericVector aM, NumericVector lambdaL);
+RcppExport SEXP impred_sigmaSolve(SEXP SampsSEXP, SEXP SLSEXP, SEXP aLSEXP,SEXP aMSEXP, SEXP lambdaLSEXP){
 BEGIN_RCPP
     Rcpp::RObject __result;
     Rcpp::RNGScope __rngScope;
-    Rcpp::traits::input_parameter< NumericVector >::type Sampsj(SampsjSEXP);
+    Rcpp::traits::input_parameter< NumericMatrix >::type Samps(SampsSEXP);
     Rcpp::traits::input_parameter< NumericVector >::type SL(SLSEXP);
     Rcpp::traits::input_parameter< NumericVector >::type aL(aLSEXP);
+        Rcpp::traits::input_parameter< NumericVector >::type aM(aMSEXP);
     Rcpp::traits::input_parameter< NumericVector >::type lambdaL(lambdaLSEXP);
-    __result = Rcpp::wrap(sigmaSolvej(Sampsj, SL, aL, lambdaL));
+    __result = Rcpp::wrap(sigmaSolve(Samps, SL, aL, aM, lambdaL));
     return __result;
 END_RCPP
 }
