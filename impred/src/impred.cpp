@@ -137,7 +137,7 @@ result = Rcpp::List::create(Rcpp::Named("randsetpred") = randsetpred);
 	
 }
 
-Rcpp:NumericVector zeroin(NumericVector ax, NumericVector bx, NumericVector u, NumericVector v, NumericVector y, NumericVector z, NumericVector(*f)(NumericVector x, NumericVector uu, NumericVector vv, NumericVector yy, NumericVector zz), NumericVector tol) {
+Rcpp::NumericVector zeroin(NumericVector ax, NumericVector bx, NumericVector u, NumericVector v, NumericVector y, NumericVector z, NumericVector(*f)(NumericVector x, NumericVector uu, NumericVector vv, NumericVector yy, NumericVector zz), NumericVector tol) {
     // code here
 /*
 double zeroin(ax,bx,f,tol)		An estimate to the root	
@@ -238,7 +238,7 @@ NumericVector a(1,0.0); NumericVector b(1,0.0); NumericVector c(1,0.0); NumericV
 
 }
 
-Rcpp:NumericVector root_function(NumericVector x, NumericVector Sampsj, NumericVector SL, NumericVector aL, NumericVector lambdaL) {
+Rcpp::NumericVector root_function(NumericVector x, NumericVector Sampsj, NumericVector SL, NumericVector aL, NumericVector lambdaL) {
 	
 	int L = int(aL[0]);
 	NumericVector sigsolnsj(1,0.0);
