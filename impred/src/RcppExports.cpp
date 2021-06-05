@@ -92,7 +92,7 @@ BEGIN_RCPP
 END_RCPP
 }
 
-
+/*
 static const R_CallMethodDef CallEntries[] = {
     {"impred_randsetsMCMC", (DL_FUNC) &impred_randsetsMCMC, 5},
     {"impred_randsetspred", (DL_FUNC) &impred_randsetspred, 8},
@@ -106,4 +106,5 @@ RcppExport void R_init_impred(DllInfo *dll) {
     R_registerRoutines(dll, NULL, CallEntries, NULL, NULL);
     R_useDynamicSymbols(dll, FALSE);
 }
-    
+
+*/
