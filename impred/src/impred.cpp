@@ -255,30 +255,36 @@ Rcpp::NumericVector root_function(NumericVector x, NumericVector Sampsj, Numeric
 
 
 
-Rcpp::List sigmaSolvej(NumericVector Sampsj, NumericVector SL, NumericVector aL, NumericVector lambdaL) {
+Rcpp::List sigmaSolve(NumericMatrix Samps, NumericVector SL, NumericVector aL, NumericVector aM, NumericVector lambdaL) {
 
 	Rcpp::Function zeroin("zeroin");
 	Rcpp::Function root_function("root_function");
 	List result;
 	int L = int(aL[0]);
+	int M = int(aM[0]);
 	NumericVector tol(1,0.0001);
 	NumericVector sigsolnsj(1,0.0);
 	NumericVector solnj(1,0.0);
 	NumericVector soln(1,99.0);
-	NumericVector solution(2,0.0);
+	NumericVector zeroes = NumericVector(M*2, 0.0); 
+        NumericMatrix solution = NumericMatrix(M, 2, zeroes.begin());
 	NumericVector u(1,0.00001);
 	NumericVector l(1,20000.0);
 	NumericVector fu(1,0.0);
 	NumericVector fl(1,0.0);
-
-	sigsolnsj[0] = std::exp(std::log(SL[L-1])-Sampsj[1]);	
-	fl = root_function(l, Sampsj, SL, aL, lambdaL);
-	fu = root_function(u, Sampsj, SL, aL, lambdaL);
-	if(fl[0]*fu[0] < 0.0) 
-	{
-		soln = zeroin(l, u, Sampsj, SL, aL, lambdaL, root_function, tol);
+	NumericVector Sampsj(2,0.0);
+	
+	for(int k = 0; k < (M-1); k++){
+		Sampsj[0] = Samps(k,0);Sampsj[1] = Samps(k,1);
+		sigsolnsj[0] = std::exp(std::log(SL[L-1])-Sampsj[1]);	
+		fl = root_function(l, Sampsj, SL, aL, lambdaL);
+		fu = root_function(u, Sampsj, SL, aL, lambdaL);
+		if(fl[0]*fu[0] < 0.0) 
+		{
+			soln = zeroin(l, u, Sampsj, SL, aL, lambdaL, root_function, tol);
+		}
+		solution(k,0) = soln[0]; solution(k,1) = sigsolnsj[0];
 	}
-	solution[0] = soln[0]; solution[1] = sigsolnsj[0];
 	
 	result = Rcpp::List::create(Rcpp::Named("solution") = solution);
 
