@@ -12,8 +12,8 @@ randsetspred <- function(S,dimS,nsize,n_i,dimn_i,k,U,Ybar) {
 }
 
 
-sigmaSolvej <- function(Sampsj, SL, aL, lambdaL) {
-    .Call(`impred_sigmaSolvej`, Sampsj, SL, aL, lambdaL)
+sigmaSolve <- function(Sampsj, SL, aL, aM, lambdaL) {
+    .Call(`impred_sigmaSolve`, Sampsj, SL, aL, aM, lambdaL)
 }
 
 zeroin <- function(ax, bx, u, v, y, z, f, tol) {
