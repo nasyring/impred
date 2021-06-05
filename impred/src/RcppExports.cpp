@@ -41,6 +41,24 @@ BEGIN_RCPP
 END_RCPP
 }
 
+Rcpp::NumericVector zeroin(NumericVector ax, NumericVector bx, NumericVector u, NumericVector v, NumericVector y, NumericVector z, NumericVector(*f)(NumericVector x, NumericVector uu, NumericVector vv, NumericVector yy, NumericVector zz), NumericVector tol);
+RcppExport SEXP impred_zeroin(SEXP axSEXP, SEXP bxSEXP, SEXP uSEXP, SEXP vSEXP, SEXP ySEXP, SEXP zSEXP, SEXP fSEXP, SEXP tolSEXP){
+BEGIN_RCPP
+    Rcpp::RObject __result;
+    Rcpp::RNGScope __rngScope;
+    Rcpp::traits::input_parameter< NumericVector >::type ax(axSEXP);
+    Rcpp::traits::input_parameter< NumericVector >::type bx(bxSEXP);
+    Rcpp::traits::input_parameter< NumericVector >::type u(uSEXP);
+    Rcpp::traits::input_parameter< NumericVector >::type v(vSEXP);
+    Rcpp::traits::input_parameter< NumericVector >::type y(ySEXP);
+    Rcpp::traits::input_parameter< NumericVector >::type z(zSEXP);
+    Rcpp::traits::input_parameter< Function >::type f(fSEXP);
+    Rcpp::traits::input_parameter< NumericVector >::type tol(tolSEXP);
+    __result = Rcpp::wrap(zeroin(ax, bx, u, v, y, z, f, tol));
+    return __result;
+END_RCPP
+}
+
 // sigmaSolvej
 Rcpp::List sigmaSolvej(NumericVector Sampsj, NumericVector SL, NumericVector aL, NumericVector lambdaL);
 RcppExport SEXP impred_sigmaSolvej(SEXP SampsjSEXP, SEXP SLSEXP, SEXP aLSEXP, SEXP lambdaLSEXP){
