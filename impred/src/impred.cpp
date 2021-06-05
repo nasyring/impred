@@ -150,7 +150,7 @@ Xdouble tol;				Acceptable tolerance
 NumericVector a(1,0.0); NumericVector b(1,0.0); NumericVector c(1,0.0); NumericVector fa(1,0.0); NumericVector fb(1,0.0); NumericVector fc(1,0.0);
 
 
-  a[0] = ax[0];  b[0] = bx[0];  fa[0] = (*f)(a, u, v, y, z)[0];  fb[0] = (*f)(b, u, v, y, z)[0];
+  a[0] = ax[0];  b[0] = bx[0];  fa = (*f)(a, u, v, y, z);  fb = (*f)(b, u, v, y, z);
   c[0] = a[0];   fc[0] = fa[0];
 
   for(;;)		/* Main iteration loop	*/
@@ -272,11 +272,11 @@ Rcpp::List sigmaSolvej(NumericVector Sampsj, NumericVector SL, NumericVector aL,
 	NumericVector fl(1,0.0);
 
 	sigsolnsj[0] = std::exp(std::log(SL[L-1])-Sampsj[1]);	
-	fl[0] = root_function(l, Sampsj, SL, aL, lambdaL)[0];
-	fu[0] = root_function(u, Sampsj, SL, aL, lambdaL)[0];
+	fl = root_function(l, Sampsj, SL, aL, lambdaL);
+	fu = root_function(u, Sampsj, SL, aL, lambdaL);
 	if(fl[0]*fu[0] < 0.0) 
 	{
-		soln[0] = zeroin(l, u, Sampsj, SL, aL, lambdaL, root_function, tol);
+		soln = zeroin(l, u, Sampsj, SL, aL, lambdaL, root_function, tol);
 	}
 	solution[0] = soln[0]; solution[1] = sigsolnsj[0];
 	
