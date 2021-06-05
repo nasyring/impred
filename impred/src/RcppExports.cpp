@@ -41,7 +41,7 @@ BEGIN_RCPP
 END_RCPP
 }
 
-Rcpp::NumericVector zeroin(NumericVector ax, NumericVector bx, NumericVector u, NumericVector v, NumericVector y, NumericVector z, NumericVector(*f)(NumericVector x, NumericVector uu, NumericVector vv, NumericVector yy, NumericVector zz), NumericVector tol);
+Rcpp::NumericVector zeroin(NumericVector ax, NumericVector bx, NumericVector u, NumericVector v, NumericVector y, NumericVector z, Function f, NumericVector tol);
 RcppExport SEXP impred_zeroin(SEXP axSEXP, SEXP bxSEXP, SEXP uSEXP, SEXP vSEXP, SEXP ySEXP, SEXP zSEXP, SEXP fSEXP, SEXP tolSEXP){
 BEGIN_RCPP
     Rcpp::RObject __result;
@@ -52,7 +52,7 @@ BEGIN_RCPP
     Rcpp::traits::input_parameter< NumericVector >::type v(vSEXP);
     Rcpp::traits::input_parameter< NumericVector >::type y(ySEXP);
     Rcpp::traits::input_parameter< NumericVector >::type z(zSEXP);
-    Rcpp::traits::input_parameter< Rcpp::NumericVector (*)(Rcpp::NumericVector, Rcpp::NumericVector, Rcpp::NumericVector, Rcpp::NumericVector, Rcpp::NumericVector) >::type f(fSEXP);
+    Rcpp::traits::input_parameter< Function >::type f(fSEXP);
     Rcpp::traits::input_parameter< NumericVector >::type tol(tolSEXP);
     __result = Rcpp::wrap(zeroin(ax, bx, u, v, y, z, f, tol));
     return __result;
@@ -78,6 +78,7 @@ END_RCPP
 static const R_CallMethodDef CallEntries[] = {
     {"impred_randsetsMCMC", (DL_FUNC) &impred_randsetsMCMC, 5},
     {"impred_randsetspred", (DL_FUNC) &impred_randsetspred, 8},
+    {"impred_zeroin", (DL_FUNC) &impred_zeroin, 8},
     {"impred_sigmaSolvej", (DL_FUNC) &impred_sigmaSolvej, 4}, 
     {NULL, NULL, 0}
 };
