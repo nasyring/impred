@@ -41,7 +41,7 @@ BEGIN_RCPP
 END_RCPP
 }
 
-
+// sigmaSolvej
 Rcpp::List sigmaSolvej(NumericVector Sampsj, NumericVector SL, NumericVector aL, NumericVector lambdaL);
 RcppExport SEXP impred_sigmaSolvej(SEXP SampsjSEXP, SEXP SLSEXP, SEXP aLSEXP, SEXP lambdaLSEXP){
 BEGIN_RCPP
