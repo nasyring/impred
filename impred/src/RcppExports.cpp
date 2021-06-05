@@ -59,6 +59,24 @@ BEGIN_RCPP
 END_RCPP
 }
 
+
+
+    
+Rcpp::NumericVector root_function(NumericVector x, NumericVector Sampsj, NumericVector SL, NumericVector aL, NumericVector lambdaL);
+RcppExport SEXP impred_root_function(SEXP xSEXP, SEXP SampsjSEXP, SEXP SLSEXP, SEXP aLSEXP, SEXP lambdaLSEXP){
+BEGIN_RCPP
+    Rcpp::RObject __result;
+    Rcpp::RNGScope __rngScope;
+    Rcpp::traits::input_parameter< NumericVector >::type x(xSEXP);
+    Rcpp::traits::input_parameter< NumericVector >::type Sampsj(SampsjSEXP);
+    Rcpp::traits::input_parameter< NumericVector >::type SL(SLSEXP);
+    Rcpp::traits::input_parameter< NumericVector >::type aL(aLSEXP);
+    Rcpp::traits::input_parameter< NumericVector >::type lambdaL(lambdaLSEXP);
+    __result = Rcpp::wrap(root_function(x, Sampsj, SL, aL, lambdaL));
+    return __result;
+END_RCPP
+}
+
 // sigmaSolvej
 Rcpp::List sigmaSolvej(NumericVector Sampsj, NumericVector SL, NumericVector aL, NumericVector lambdaL);
 RcppExport SEXP impred_sigmaSolvej(SEXP SampsjSEXP, SEXP SLSEXP, SEXP aLSEXP, SEXP lambdaLSEXP){
@@ -79,6 +97,7 @@ static const R_CallMethodDef CallEntries[] = {
     {"impred_randsetsMCMC", (DL_FUNC) &impred_randsetsMCMC, 5},
     {"impred_randsetspred", (DL_FUNC) &impred_randsetspred, 8},
     {"impred_zeroin", (DL_FUNC) &impred_zeroin, 8},
+    {"impred_root_function", (DL_FUNC) &impred_root_function, 5},
     {"impred_sigmaSolvej", (DL_FUNC) &impred_sigmaSolvej, 4}, 
     {NULL, NULL, 0}
 };
