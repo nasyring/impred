@@ -173,7 +173,7 @@ NumericVector a(1,0.0); NumericVector b(1,0.0); NumericVector c(1,0.0); NumericV
     tol_act = 2*dbl_eps*fabs(b[0]) + tol[0]/2;
     new_step = (c[0]-b[0])/2;
 
-    if( fabs(new_step) <= tol_act || fb == (double)0 )
+    if( fabs(new_step) <= tol_act || fb[0] == (double)0 )
     {
       return b;				/* Acceptable approx. is found	*/
     }
