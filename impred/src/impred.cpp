@@ -137,7 +137,7 @@ result = Rcpp::List::create(Rcpp::Named("randsetpred") = randsetpred);
 	
 }
 
-double zeroin(double ax, double bx, double(*f)(double x), double tol) {
+Rcpp:NumericVector zeroin(NumericVector ax, NumericVector bx, NumericVector u, NumericVector v, NumericVector y, NumericVector z, NumericVector(*f)(NumericVector x, NumericVector uu, NumericVector vv, NumericVector yy, NumericVector zz), NumericVector tol) {
     // code here
 /*
 double zeroin(ax,bx,f,tol)		An estimate to the root	
@@ -147,17 +147,15 @@ Xdouble (*f)(double x);			Function under investigation
 Xdouble tol;				Acceptable tolerance		
 	*/
 
-  double a,b,c;				/* Abscissae, descr. see above	*/
-  double fa;				/* f(a)				*/
-  double fb;				/* f(b)				*/
-  double fc;				/* f(c)				*/
+NumericVector a(1,0.0); NumericVector b(1,0.0); NumericVector c(1,0.0); NumericVector fa(1,0.0); NumericVector fb(1,0.0); NumericVector fc(1,0.0);
 
-  a = ax;  b = bx;  fa = (*f)(a);  fb = (*f)(b);
-  c = a;   fc = fa;
+
+  a[0] = ax[0];  b[0] = bx[0];  fa[0] = (*f)(a, u, v, y, z)[0];  fb[0] = (*f)(b, u, v, y, z)[0];
+  c[0] = a[0];   fc[0] = fa[0];
 
   for(;;)		/* Main iteration loop	*/
   {
-    double prev_step = b-a;		/* Distance from the last but one*/
+    double prev_step = b[0]-a[0];		/* Distance from the last but one*/
 					/* to the last approximation	*/
     double tol_act;			/* Actual tolerance		*/
     double p;      			/* Interpolation step is calcu- */
@@ -167,13 +165,13 @@ Xdouble tol;				Acceptable tolerance
     double new_step;      		/* Step at this iteration       */
     double dbl_eps = std::numeric_limits<double>::epsilon();
 	  
-    if( fabs(fc) < fabs(fb) )
+    if( fabs(fc[0]) < fabs(fb[0]) )
     {                         		/* Swap data for b to be the 	*/
-	a = b;  b = c;  c = a;          /* best approximation		*/
-	fa=fb;  fb=fc;  fc=fa;
+	a[0] = b[0];  b[0] = c[0];  c[0] = a[0];          /* best approximation		*/
+	fa[0]=fb[0];  fb[0]=fc[0];  fc[0]=fa[0];
     }
-    tol_act = 2*dbl_eps*fabs(b) + tol/2;
-    new_step = (c-b)/2;
+    tol_act = 2*dbl_eps*fabs(b[0]) + tol[0]/2;
+    new_step = (c[0]-b[0])/2;
 
     if( fabs(new_step) <= tol_act || fb == (double)0 )
     {
@@ -182,20 +180,20 @@ Xdouble tol;				Acceptable tolerance
 
     			/* Decide if the interpolation can be tried	*/
     if( fabs(prev_step) >= tol_act	/* If prev_step was large enough*/
-	&& fabs(fa) > fabs(fb) )	/* and was in true direction,	*/
+	&& fabs(fa[0]) > fabs(fb[0]) )	/* and was in true direction,	*/
     {					/* Interpolatiom may be tried	*/
 	register double t1,cb,t2;
-	cb = c-b;
-	if( a==c )			/* If we have only two distinct	*/
+	cb = c[0]-b[0];
+	if( a[0]==c[0] )			/* If we have only two distinct	*/
 	{				/* points linear interpolation 	*/
-	  t1 = fb/fa;			/* can only be applied		*/
+	  t1 = fb[0]/fa[0];			/* can only be applied		*/
 	  p = cb*t1;
 	  q = 1.0 - t1;
  	}
 	else				/* Quadric inverse interpolation*/
 	{
-	  q = fa/fc;  t1 = fb/fc;  t2 = fb/fa;
-	  p = t2 * ( cb*q*(q-t1) - (b-a)*(t1-1.0) );
+	  q = fa[0]/fc[0];  t1 = fb[0]/fc[0];  t2 = fb[0]/fa[0];
+	  p = t2 * ( cb*q*(q-t1) - (b[0]-a[0])*(t1-1.0) );
 	  q = (q-1.0) * (t1-1.0) * (t2-1.0);
 	}
 	if( p>(double)0 )
@@ -230,46 +228,59 @@ Xdouble tol;				Acceptable tolerance
       }
     }
 
-    a = b;  fa = fb;			/* Save the previous approx.	*/
-    b += new_step;  fb = (*f)(b);	/* Do step to a new approxim.	*/
-    if( (fb > 0 && fc > 0) || (fb < 0 && fc < 0) )
+    a[0] = b[0];  fa[0] = fb[0];			/* Save the previous approx.	*/
+    b[0] += new_step;  fb[0] = (*f)(b, u, v, y, z);	/* Do step to a new approxim.	*/
+    if( (fb[0] > 0 && fc[0] > 0) || (fb[0] < 0 && fc[0] < 0) )
     {                 			/* Adjust c for it to have a sign*/
-      c = a;  fc = fa;                  /* opposite to that of b	*/
+      c[0] = a[0];  fc[0] = fa[0];                  /* opposite to that of b	*/
     }
   }
 
 }
 
+Rcpp:NumericVector root_function(NumericVector x, NumericVector Sampsj, NumericVector SL, NumericVector aL, NumericVector lambdaL) {
+	
+	int L = int(aL[0]);
+	NumericVector sigsolnsj(1,0.0);
+	NumericVector f(1,0.0);
+	
+	sigsolnsj[0] = std::exp(std::log(SL[L-1])-Sampsj[1]);	
+	for(int k = 0; k < (L-1); k++){
+		f[0] += (std::log(lambdaL[k]*x[0]+sigsolnsj[0])-std::log(SL[k]));
+	}
+	f[0] += Sampsj[0];
+	
+	return(f);
+}
+
+
+
 Rcpp::List sigmaSolvej(NumericVector Sampsj, NumericVector SL, NumericVector aL, NumericVector lambdaL) {
 
-	Rcpp::Function zeroin("zeroin");	
+	Rcpp::Function zeroin("zeroin");
+	Rcpp::Function root_function("root_function");
 	List result;
 	int L = int(aL[0]);
+	NumericVector tol(1,0.0001);
 	NumericVector sigsolnsj(1,0.0);
 	NumericVector solnj(1,0.0);
 	NumericVector soln(1,99.0);
 	NumericVector solution(2,0.0);
-	NumericVector u(1,0.0);
-	NumericVector l(1,0.0);
+	NumericVector u(1,0.00001);
+	NumericVector l(1,20000.0);
+	NumericVector fu(1,0.0);
+	NumericVector fl(1,0.0);
 
 	sigsolnsj[0] = std::exp(std::log(SL[L-1])-Sampsj[1]);	
-	double root_function(double x) {
-		double f = 0.0;
-		for(int k = 0; k < (L-1); k++){
-			f += (std::log(lambdaL[k]*x+sigsolnsj[0])-std::log(SL[k]));
-		}
-		f += Sampsj[0];
- 		return f;
-	}	
-	l[0] = root_function(0.00001);
-	u[0] = root_function(20000.0);
-	if(l[0]*u[0] < 0.0) 
+	fl[0] = root_function(l, Sampsj, SL, aL, lambdaL)[0];
+	fu[0] = root_function(u, Sampsj, SL, aL, lambdaL)[0];
+	if(fl[0]*fu[0] < 0.0) 
 	{
-		soln[0] = zeroin(0.00001, 20000.0, root_function, 0.0001);
+		soln[0] = zeroin(l, u, Sampsj, SL, aL, lambdaL, root_function, tol);
 	}
 	solution[0] = soln[0]; solution[1] = sigsolnsj[0];
 	
-result = Rcpp::List::create(Rcpp::Named("solution") = solution);
+	result = Rcpp::List::create(Rcpp::Named("solution") = solution);
 
 	return result;
 	
