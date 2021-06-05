@@ -16,3 +16,10 @@ sigmaSolvej <- function(Sampsj, SL, aL, lambdaL) {
     .Call(`impred_sigmaSolvej`, Sampsj, SL, aL, lambdaL)
 }
 
+zeroin <- function(ax, bx, u, v, y, z, f, tol) {
+    .Call(`impred_zeroin`, ax, bx, u, v, y, z, f, tol)
+}
+
+root_function <- function(x, Sampsj, SL, aL, lambdaL) {
+    .Call(`impred_root_function`, x, Sampsj, SL, aL, lambdaL)
+}
