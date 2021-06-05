@@ -240,27 +240,36 @@ Xdouble tol;				Acceptable tolerance
 
 }
 
-Rcpp::List sigmaSolvej(NumericVector Sampsj, NumericVector SLj, NumericVector aL, NumericVector lambdaL) {
+Rcpp::List sigmaSolvej(NumericVector Sampsj, NumericVector SL, NumericVector aL, NumericVector lambdaL) {
 
 	Rcpp::Function zeroin("zeroin");	
 	List result;
 	int L = int(aL[0]);
 	NumericVector sigsolnsj(1,0.0);
 	NumericVector solnj(1,0.0);
+	NumericVector soln(1,99.0);
+	NumericVector solution(2,0.0);
+	NumericVector u(1,0.0);
+	NumericVector l(1,0.0);
 
-	sigsolnsj = std::exp(std::log(SLj[0])-Sampsj[1])	
+	sigsolnsj[0] = std::exp(std::log(SL[L-1])-Sampsj[1]);	
 	double root_function(double x) {
 		double f = 0.0;
-		for(int k = 0; k < (L-1)l k++){
-			f += (std::log(lambdaL[k]*x+sigsolnsj)-std::log(SL[j]));
+		for(int k = 0; k < (L-1); k++){
+			f += (std::log(lambdaL[k]*x+sigsolnsj[0])-std::log(SL[k]));
 		}
 		f += Sampsj[0];
  		return f;
 	}	
-	if()
+	l[0] = root_function(0.00001);
+	u[0] = root_function(20000.0);
+	if(l[0]*u[0] < 0.0) 
+	{
+		soln[0] = zeroin(0.00001, 20000.0, root_function, 0.0001);
+	}
+	solution[0] = soln[0]; solution[1] = sigsolnsj[0];
 	
-	
-result = Rcpp::List::create(Rcpp::Named("") = );
+result = Rcpp::List::create(Rcpp::Named("solution") = solution);
 
 	return result;
 	
