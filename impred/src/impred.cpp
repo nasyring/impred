@@ -229,7 +229,7 @@ NumericVector a(1,0.0); NumericVector b(1,0.0); NumericVector c(1,0.0); NumericV
     }
 
     a[0] = b[0];  fa[0] = fb[0];			/* Save the previous approx.	*/
-    b[0] += new_step;  fb[0] = (*f)(b, u, v, y, z);	/* Do step to a new approxim.	*/
+    b[0] += new_step;  fb = (*f)(b, u, v, y, z);	/* Do step to a new approxim.	*/
     if( (fb[0] > 0 && fc[0] > 0) || (fb[0] < 0 && fc[0] < 0) )
     {                 			/* Adjust c for it to have a sign*/
       c[0] = a[0];  fc[0] = fa[0];                  /* opposite to that of b	*/
