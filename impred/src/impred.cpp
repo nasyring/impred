@@ -100,7 +100,7 @@ Rcpp::List randsetspred(NumericMatrix S, NumericVector dimS, NumericVector nsize
 	int M = int(dimS[0]);
 	int n = int(nsize[0]);
 	int dn_i = int(dimn_i[0]);
-	int within = int(W[0]);
+	int w = int(W[0]);
 	NumericVector sumn_i2(1,0.0);
 	NumericVector Qsamps(M,0.0);
 	NumericVector Ql(1,0.0);
@@ -114,7 +114,7 @@ Rcpp::List randsetspred(NumericMatrix S, NumericVector dimS, NumericVector nsize
 		sumn_i2[0] = sumn_i2[0] + n_i[j]*n_i[j];	
 	}
 	
-	if(W == 1){
+	if(w == 1){
 		for(int j=0; j < M; j++){
 			Qsamps[j] = R::rnorm(0.0,1.0)*std::sqrt(S(j,0)*(1-(2*n_i[dn_i-1]/n)+(1/(n*n))*sumn_i2[0])+S(j,1)*((1/n)+1/(k[0])));	
 		}
