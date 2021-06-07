@@ -94,46 +94,50 @@ result = Rcpp::List::create(Rcpp::Named("samples1") = postsamples0,Rcpp::Named("
 
 
 
-Rcpp::List randsetspred(NumericMatrix S, NumericVector dimS, NumericVector nsize, NumericVector n_i, NumericVector dimn_i, NumericVector k, NumericVector U, NumericVector Ybar, NumericVector W) {
+Rcpp::List randsetspred(NumericMatrix S, NumericVector dimS, NumericVector nsize, NumericVector n_i, NumericVector dimn_i, NumericVector k, NumericVector U, NumericVector Ybar) {
 	
 	List result;
 	int M = int(dimS[0]);
 	int n = int(nsize[0]);
 	int dn_i = int(dimn_i[0]);
-	int w = int(W[0]);
 	NumericVector sumn_i2(1,0.0);
-	NumericVector Qsamps(M,0.0);
-	NumericVector Ql(1,0.0);
-	NumericVector Qu(1,0.0);
+	NumericVector Qsampsw(M,0.0);
+	NumericVector Qsampsn(M,0.0);
+	NumericVector Qwl(1,0.0);
+	NumericVector Qwu(1,0.0);
+	NumericVector Qnl(1,0.0);
+	NumericVector Qnu(1,0.0);
 	NumericVector Ul(1,0.0);
 	NumericVector Uu(1,0.0);
-	NumericVector zeroes = NumericVector(M*2, 0.0); 
-        NumericMatrix randsetpred = NumericMatrix(M, 2, zeroes.begin());
+	NumericVector zeroes = NumericVector(M*4, 0.0); 
+        NumericMatrix randsetpred = NumericMatrix(M, 4, zeroes.begin());
+	NumericVector Z(1,0.0);
 	
 	for(int j=0; j<dn_i; j++){
 		sumn_i2[0] = sumn_i2[0] + n_i[j]*n_i[j];	
 	}
-	
-	if(w == 1){
-		for(int j=0; j < M; j++){
-			Qsamps[j] = R::rnorm(0.0,1.0)*std::sqrt(S(j,0)*(1-(2*n_i[dn_i-1]/n)+(1/(n*n))*sumn_i2[0])+S(j,1)*((1/n)+1/(k[0])));	
-		}
-	}
-	else {
-		for(int j=0; j < M; j++){
-			Qsamps[j] = R::rnorm(0.0,1.0)*std::sqrt(S(j,0)*(1+(1/(n*n))*sumn_i2[0])+S(j,1)*((1/n)+1/(k[0])));	
-		}		
+		
+	for(int j=0; j < M; j++){
+		Z[0] = R::rnorm(0.0,1.0);
+		Qsampsw[j] = Z[0]*std::sqrt(S(j,0)*(1-(2*n_i[dn_i-1]/n)+(1/(n*n))*sumn_i2[0])+S(j,1)*((1/n)+1/(k[0])));
+		Qsampsn[j] = Z[0]*std::sqrt(S(j,0)*(1+(1/(n*n))*sumn_i2[0])+S(j,1)*((1/n)+1/(k[0])));
 	}
 
-	std::sort(Qsamps.begin(), Qsamps.end());
+
+	std::sort(Qsampsw.begin(), Qsampsw.end());
+	std::sort(Qsampsn.begin(), Qsampsn.end());
 	
 	for(int j=0; j < M; j++){
 		Ul[0] = 0.5-std::fabs(U[j]-0.5);
 		Uu[0] = 1.0-Ul[0];
-		Ql[0] = Qsamps[std::round(M*Ul[0])];
-		Qu[0] = Qsamps[std::round(M*Uu[0])];
-		randsetpred(j,0) = Ybar[0]+Ql[0];
-		randsetpred(j,1) = Ybar[0]+Qu[0];
+		Qwl[0] = Qsampsw[std::round(M*Ul[0])];
+		Qwu[0] = Qsampsw[std::round(M*Uu[0])];
+		Qnl[0] = Qsampsn[std::round(M*Ul[0])];
+		Qnu[0] = Qsampsn[std::round(M*Uu[0])];
+		randsetpred(j,0) = Ybar[0]+Qwl[0];
+		randsetpred(j,1) = Ybar[0]+Qwu[0];
+		randsetpred(j,2) = Ybar[0]+Qnl[0];
+		randsetpred(j,3) = Ybar[0]+Qnu[0];
 	}
 	
 
