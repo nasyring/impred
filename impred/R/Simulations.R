@@ -101,16 +101,16 @@ length.boot.n <- matrix(NA, K,3)
 
 # first set of bootstrap prediction intervals is for the new observation in an existing group
 for(i in 1:K){
-	response <- c(Y[,i],Y.new[i,1])
+	response <- Y[,i]
 	my.data = data.frame(response, group)
 	pdi.80 <- pred_int_boot(formula = response ~ 1 + (1|group), data = my.data, level = 0.8, R = 5000)
 	pdi.90 <- pred_int_boot(formula = response ~ 1 + (1|group), data = my.data, level = 0.9, R = 5000)
 	pdi.95 <- pred_int_boot(formula = response ~ 1 + (1|group), data = my.data, level = 0.95, R = 5000)
-	coverage.boot.w[i,3] <- ifelse((pdi.80[2]<=Y.new[i,2]) & (pdi.80[3]>=Y.new[i,2]), 1, 0)
+	coverage.boot.w[i,3] <- ifelse((pdi.80[2]<=Y.new[i,1]) & (pdi.80[3]>=Y.new[i,1]), 1, 0)
 	length.boot.w[i,3] <- pdi.80[3]-pdi.80[2]
-	coverage.boot.w[i,2] <- ifelse((pdi.90[2]<=Y.new[i,2]) & (pdi.90[3]>=Y.new[i,2]), 1, 0)
+	coverage.boot.w[i,2] <- ifelse((pdi.90[2]<=Y.new[i,1]) & (pdi.90[3]>=Y.new[i,1]), 1, 0)
 	length.boot.w[i,2] <- pdi.90[3]-pdi.90[2]
-	coverage.boot.w[i,1] <- ifelse((pdi.95[2]<=Y.new[i,2]) & (pdi.95[3]>=Y.new[i,2]), 1, 0)
+	coverage.boot.w[i,1] <- ifelse((pdi.95[2]<=Y.new[i,1]) & (pdi.95[3]>=Y.new[i,1]), 1, 0)
 	length.boot.w[i,1] <- pdi.95[3]-pdi.95[2]
 	if(i%%100 == 0) print(i)
 }
@@ -132,7 +132,7 @@ colMeans(length.boot.w)
 
 # second set of bootstrap prediction intervals is for the new observation in an existing group
 for(i in 1:K){
-	response <- c(Y[,i],Y.new[i,2])
+	response <- Y[,i]
 	my.data = data.frame(response, group)
 	pdi.80 <- pred_int_boot(formula = response ~ 1 + (1|group), data = my.data, level = 0.8, R = 5000)
 	pdi.90 <- pred_int_boot(formula = response ~ 1 + (1|group), data = my.data, level = 0.9, R = 5000)
