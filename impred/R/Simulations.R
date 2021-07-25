@@ -1,6 +1,7 @@
 ### STEP 1. load functions from the IM.R script
 
 source("IM.R")
+library(impred)
 
 ### STEP 2. simulate data sets
 
@@ -47,6 +48,9 @@ for(k in 1:K){
 coverage<-matrix(0,K,6)
 length<-coverage
 for(k in 1:K){
+	ex.data <- list(Y=Y[,k], Z=Z)
+	ex.statistics <- aov.statistics(ex.data)
+	ex.grid <- matrix(seq(from = min(ex.data$Y)-6, to = max(ex.data$Y)+6, length.out = 500),500,1)
 	# within prediction
 	plaus.max <- which.max(plaus.results[,(2*k-1)])
 	lower.plaus <- which.min(abs(.05-plaus.results[1:plaus.max,(2*k-1)]))
