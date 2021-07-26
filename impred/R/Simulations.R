@@ -89,6 +89,16 @@ for(k in 1:K){
 }
 
 
+colMeans(coverage)
+colMeans(length)
+#> colMeans(coverage)
+#[1] 0.9570 0.9130 0.8140 0.9665 0.9255 0.8285
+#> colMeans(length)
+#[1] 8.286482 6.920681 5.386182 8.306043 6.937010 5.398291
+#> 
+
+
+
 #### STEP 5: Compare to bootstrap - using Fernando's bootstrap function in predintma
 
 group.des <- c(13,13,13,13,13,13,13,13,13,13)
@@ -152,3 +162,7 @@ for(i in 1:K){
 
 colMeans(coverage.boot.n, na.rm = TRUE)
 colMeans(length.boot.n)
+
+
+
+# STEP 6: Compare to "oracle" normal dist CIs (pretending we know true variance components)
