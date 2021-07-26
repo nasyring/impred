@@ -91,11 +91,11 @@ for(k in 1:K){
 
 colMeans(coverage)
 colMeans(length)
-#> colMeans(coverage)
-#[1] 0.9570 0.9130 0.8140 0.9665 0.9255 0.8285
-#> colMeans(length)
-#[1] 8.286482 6.920681 5.386182 8.306043 6.937010 5.398291
-#> 
+> colMeans(coverage)
+[1] 0.9570 0.9130 0.8140 0.9665 0.9255 0.8285
+> colMeans(length)
+[1] 8.286482 6.920681 5.386182 8.306043 6.937010 5.398291
+> 
 
 
 
@@ -166,3 +166,73 @@ colMeans(length.boot.n)
 
 
 # STEP 6: Compare to "oracle" normal dist CIs (pretending we know true variance components)
+
+coverage.oracle.w <- matrix(NA, K,3)
+length.oracle.w <- matrix(NA, K,3)
+coverage.oracle.n <- matrix(NA, K,3)
+length.oracle.n <- matrix(NA, K,3)
+
+n_i <- c(13,13,13,13,13,13,13,13,13,13)
+std.dev <- sqrt((sigma_a2^2)*(1+(1/(n^2))*sum(n_i^2)) + (sigma_2^2)*(1/n+1/1)) 
+
+
+for(i in 1:K){
+	response <- Y[,i]
+	mY <- mean(response)
+	pdi.80 <- c(mY + qnorm(0.10)*std.dev, mY + qnorm(0.90)*std.dev)
+	pdi.90 <- c(mY + qnorm(0.05)*std.dev, mY + qnorm(0.95)*std.dev)
+	pdi.95 <- c(mY + qnorm(0.025)*std.dev, mY + qnorm(0.975)*std.dev)
+	coverage.oracle.n[i,3] <- ifelse((pdi.80[1]<=Y.new[i,2]) & (pdi.80[2]>=Y.new[i,2]), 1, 0)
+	length.oracle.n[i,3] <- pdi.80[2]-pdi.80[1]
+	coverage.oracle.n[i,2] <- ifelse((pdi.90[1]<=Y.new[i,2]) & (pdi.90[2]>=Y.new[i,2]), 1, 0)
+	length.oracle.n[i,2] <- pdi.90[2]-pdi.90[1]
+	coverage.oracle.n[i,1] <- ifelse((pdi.95[1]<=Y.new[i,2]) & (pdi.95[2]>=Y.new[i,2]), 1, 0)
+	length.oracle.n[i,1] <- pdi.95[2]-pdi.95[1]
+	if(i%%100 == 0) print(i)
+}
+
+colMeans(coverage.oracle.n)
+colMeans(length.oracle.n)
+
+#> colMeans(coverage.oracle.n)
+#[1] 0.9585 0.9095 0.8155
+#> colMeans(length.oracle.n)
+#[1] 7.880683 6.613677 5.152901
+
+n_I <- n_i[length(n_i)]
+std.dev <- sqrt((sigma_a2^2)*(1-2*(n_I/n)+(1/(n^2))*sum(n_i^2)) + (sigma_2^2)*(1/n+1/1)) 
+
+
+for(i in 1:K){
+	response <- Y[,i]
+	mY <- mean(response)
+	pdi.80 <- c(mY + qnorm(0.10)*std.dev, mY + qnorm(0.90)*std.dev)
+	pdi.90 <- c(mY + qnorm(0.05)*std.dev, mY + qnorm(0.95)*std.dev)
+	pdi.95 <- c(mY + qnorm(0.025)*std.dev, mY + qnorm(0.975)*std.dev)
+	coverage.oracle.w[i,3] <- ifelse((pdi.80[1]<=Y.new[i,1]) & (pdi.80[2]>=Y.new[i,1]), 1, 0)
+	length.oracle.w[i,3] <- pdi.80[2]-pdi.80[1]
+	coverage.oracle.w[i,2] <- ifelse((pdi.90[1]<=Y.new[i,1]) & (pdi.90[2]>=Y.new[i,1]), 1, 0)
+	length.oracle.w[i,2] <- pdi.90[2]-pdi.90[1]
+	coverage.oracle.w[i,1] <- ifelse((pdi.95[1]<=Y.new[i,1]) & (pdi.95[2]>=Y.new[i,1]), 1, 0)
+	length.oracle.w[i,1] <- pdi.95[2]-pdi.95[1]
+	if(i%%100 == 0) print(i)
+}
+
+
+colMeans(coverage.oracle.w)
+colMeans(length.oracle.w)
+
+#> colMeans(coverage.oracle.w)
+#[1] 0.9475 0.8965 0.7980
+#> colMeans(length.oracle.w)
+#[1] 7.878733 6.612041 5.151626
+
+
+
+
+
+
+
+
+
+
