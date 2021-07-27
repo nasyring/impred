@@ -91,11 +91,11 @@ for(k in 1:K){
 
 colMeans(coverage)
 colMeans(length)
-> colMeans(coverage)
-[1] 0.9570 0.9130 0.8140 0.9665 0.9255 0.8285
-> colMeans(length)
-[1] 8.286482 6.920681 5.386182 8.306043 6.937010 5.398291
-> 
+#> colMeans(coverage)
+#[1] 0.9570 0.9130 0.8140 0.9665 0.9255 0.8285
+#> colMeans(length)
+#[1] 8.286482 6.920681 5.386182 8.306043 6.937010 5.398291
+#> 
 
 
 
@@ -132,15 +132,15 @@ for(i in 1:K){
 colMeans(coverage.boot.w, na.rm = TRUE)
 colMeans(length.boot.w)
 
-> colMeans(coverage.boot[1:500,])
-[1] 0.552 0.484 0.372
-> colMeans(length.boot[1:500,])
-[1] 2.918202 2.467598 1.929513
+#> colMeans(coverage.boot[1:500,])
+#[1] 0.552 0.484 0.372
+#> colMeans(length.boot[1:500,])
+#[1] 2.918202 2.467598 1.929513
 
-> colMeans(coverage.boot, na.rm = TRUE)
-[1] 0.5262631 0.4532266 0.3621811
-> colMeans(length.boot, na.rm = TRUE)
-[1] 2.926005 2.473079 1.934625
+#> colMeans(coverage.boot, na.rm = TRUE)
+#[1] 0.5262631 0.4532266 0.3621811
+#> colMeans(length.boot, na.rm = TRUE)
+#[1] 2.926005 2.473079 1.934625
 
 
 
