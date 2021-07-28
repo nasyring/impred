@@ -2,6 +2,7 @@
 
 source("IM.R")
 library(impred)
+library(predintma)
 
 ### STEP 2. simulate data sets
 
