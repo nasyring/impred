@@ -350,14 +350,21 @@ rand.sets.R <- function(sig02, U, k, aov.data, aov.statistics){
 ## output: a list containing 'plauses' an M x 1 vector of proportions, plausibilites for each value in vals
 ##		and 'vals', the input
 
-pl.0 <- function(vals, rand.sets){
-	M <- nrow(rand.sets)
-	pl.0.val <- function(val, rand.sets){
-		plaus <- sum((val > rand.sets[,1])*(val < rand.sets[,2]))/M
+pl.0 <- function(vals, randsets){
+	M <- nrow(randsets)
+	pl.0.val <- function(val, randsets){
+		plaus <- sum((val > randsets[,1])*(val < randsets[,2]))/M
 		return(plaus)
 	}
-	return(list(plauses.w = apply(vals,1,pl.0.val, rand.sets = rand.sets[,1:2]), plauses.n = apply(vals,1,pl.0.val, rand.sets = rand.sets[,3:4]),
-		plauses.T = apply(vals,1,pl.0.val, rand.sets = rand.sets[,5:6]), vals = vals))
+	pl.0.val.T <- function(val, randsets){
+		randsets1<-randsets[,1];randsets2<-randsets[,2]
+		none.na<- (1-apply(matrix(cbind(is.na(randsets1), is.na(randsets2)), M, 2),1,any))
+		M <-	sum(none.na)
+		plaus <- sum(((val > randsets1)*(val < randsets2))[none.na==1])/M
+		return(plaus)
+	}
+	return(list(plauses.w = apply(vals,1,pl.0.val, randsets = randsets[,1:2]), plauses.n = apply(vals,1,pl.0.val, randsets = randsets[,3:4]),
+		plauses.T = apply(vals,1,pl.0.val.T, randsets = randsets[,5:6]), vals = vals))
 }
 
 plot.plaus <- function(pl.0){
@@ -382,14 +389,14 @@ plot.plaus <- function(pl.0){
 ##		contour for the mean of the next k responses.
 
 
-apply.plaus <- function(sig02, U, k, aov.data, aov.statistics, vals){
+apply.plaus <- function(sig02, U, k, ex.data, ex.statistics, vals){
 	N <- nrow(sig02)
 	L <- length(vals)
 	all.plaus.w <- matrix(NA, N, L)
 	all.plaus.n <- matrix(NA, N, L)
 	all.plaus.T <- matrix(NA, N, L)
 	for(j in 1:N){
-		pl.j <- pl.0(vals, rand.sets(sig02[j,], U, k, aov.data, aov.statistics))
+		pl.j <- pl.0(vals, rand.sets(sig02[j,], U, k, ex.data, ex.statistics))
 		all.plaus.w[j,] <- pl.j$plauses.w
 		all.plaus.n[j,] <- pl.j$plauses.n
 		all.plaus.T[j,] <- pl.j$plauses.T
