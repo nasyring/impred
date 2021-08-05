@@ -103,14 +103,17 @@ Rcpp::List randsetspred(NumericMatrix S, NumericVector dimS, NumericVector nsize
 	NumericVector sumn_i2(1,0.0);
 	NumericVector Qsampsw(M,0.0);
 	NumericVector Qsampsn(M,0.0);
+	NumericVector QsampsT(M,0.0);
 	NumericVector Qwl(1,0.0);
 	NumericVector Qwu(1,0.0);
 	NumericVector Qnl(1,0.0);
 	NumericVector Qnu(1,0.0);
+	NumericVector QTl(1,0.0);
+	NumericVector QTu(1,0.0);
 	NumericVector Ul(1,0.0);
 	NumericVector Uu(1,0.0);
-	NumericVector zeroes = NumericVector(M*4, 0.0); 
-        NumericMatrix randsetpred = NumericMatrix(M, 4, zeroes.begin());
+	NumericVector zeroes = NumericVector(M*6, 0.0); 
+        NumericMatrix randsetpred = NumericMatrix(M, 6, zeroes.begin());
 	NumericVector Z(1,0.0);
 	
 	for(int j=0; j<dn_i; j++){
@@ -121,11 +124,13 @@ Rcpp::List randsetspred(NumericMatrix S, NumericVector dimS, NumericVector nsize
 		Z[0] = R::rnorm(0.0,1.0);
 		Qsampsw[j] = Z[0]*std::sqrt(S(j,0)*(1-(2*n_i[dn_i-1]/n)+(1/(n*n))*sumn_i2[0])+S(j,1)*((1/n)+1/(k[0])));
 		Qsampsn[j] = Z[0]*std::sqrt(S(j,0)*(1+(1/(n*n))*sumn_i2[0])+S(j,1)*((1/n)+1/(k[0])));
+		QsampsT[j] = Z[0]*std::sqrt(S(j,0)*(1+(1/(n*n))*sumn_i2[0])+S(j,1)*(1/n));
 	}
 
 
 	std::sort(Qsampsw.begin(), Qsampsw.end());
 	std::sort(Qsampsn.begin(), Qsampsn.end());
+	std::sort(QsampsT.begin(), QsampsT.end());
 	
 	for(int j=0; j < M; j++){
 		Ul[0] = 0.5-std::fabs(U[j]-0.5);
@@ -134,10 +139,15 @@ Rcpp::List randsetspred(NumericMatrix S, NumericVector dimS, NumericVector nsize
 		Qwu[0] = Qsampsw[std::round(M*Uu[0])];
 		Qnl[0] = Qsampsn[std::round(M*Ul[0])];
 		Qnu[0] = Qsampsn[std::round(M*Uu[0])];
+		QTl[0] = QsampsT[std::round(M*Ul[0])];
+		QTu[0] = QsampsT[std::round(M*Uu[0])];
 		randsetpred(j,0) = Ybar[0]+Qwl[0];
 		randsetpred(j,1) = Ybar[0]+Qwu[0];
 		randsetpred(j,2) = Ybar[0]+Qnl[0];
 		randsetpred(j,3) = Ybar[0]+Qnu[0];
+		randsetpred(j,4) = Ybar[0]+QTl[0];
+		randsetpred(j,5) = Ybar[0]+QTu[0];
+
 	}
 	
 
