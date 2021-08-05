@@ -119,6 +119,7 @@ nonconformity.plaus.grid <- function(grid, y){
 #### Looping through K simulated data sets
 results <- list( oracle = matrix(NA, K, 18) , stdt = matrix(NA, K, 18), im = matrix(NA, K, 18), conf = matrix(NA, K, 6)  )
 for(k in 1:K){
+	then = proc.time()
 
 	#### The data and quantities to be predicted for the kth run
 	response <- Y[,k]
@@ -210,15 +211,17 @@ for(k in 1:K){
 
 	ex.data <- list(Y=response, Z=Z)
 	ex.statistics <- aov.statistics(ex.data)
-	ex.grid.size <- 500
-	ex.grid <- matrix(seq(from = min(ex.data$Y)-6, to = max(ex.data$Y)+6, length.out = ex.grid.size),ex.grid.size,1)
-	sig.grid = as.matrix(expand.grid(seq(from = 0.01, to = 7, length.out = 14), seq(from = 0.01, to = 7, length.out = 14)))
+	ex.grid.size <- 300
+	ex.grid <- matrix(seq(from = min(ex.data$Y)-2, to = max(ex.data$Y)+2, length.out = ex.grid.size),ex.grid.size,1)
+	sig.grid = as.matrix(expand.grid(seq(from = 0.05, to = 2, length.out = 5), seq(from = 0.05, to = 2, length.out = 5)))
 	ex.grid.plauses <-  apply.plaus(sig.grid, matrix(runif(10000),10000,1), 1, ex.data, ex.statistics, ex.grid)
 	
+	
+
 	plaus.max.new <- which.max(ex.grid.plauses$fused.plaus.n)	
-	im.pdi.new.80 <- c(ex.grid[which.min(abs(0.100-ex.grid.plauses$fused.plaus.n[1:plaus.max.new]))], ex.grid[which.min(abs(0.900-ex.grid.plauses$fused.plaus.n[(plaus.max.new+1):ex.grid.size]))])
-	im.pdi.new.90 <- c(ex.grid[which.min(abs(0.050-ex.grid.plauses$fused.plaus.n[1:plaus.max.new]))], ex.grid[which.min(abs(0.950-ex.grid.plauses$fused.plaus.n[(plaus.max.new+1):ex.grid.size]))])
-	im.pdi.new.95 <- c(ex.grid[which.min(abs(0.025-ex.grid.plauses$fused.plaus.n[1:plaus.max.new]))], ex.grid[which.min(abs(0.975-ex.grid.plauses$fused.plaus.n[(plaus.max.new+1):ex.grid.size]))])
+	im.pdi.new.80 <- c(ex.grid[which.min(abs(0.100-ex.grid.plauses$fused.plaus.n[1:plaus.max.new]))], ex.grid[plaus.max.new+which.min(abs(0.100-ex.grid.plauses$fused.plaus.n[(plaus.max.new+1):ex.grid.size]))])
+	im.pdi.new.90 <- c(ex.grid[which.min(abs(0.050-ex.grid.plauses$fused.plaus.n[1:plaus.max.new]))], ex.grid[plaus.max.new+which.min(abs(0.050-ex.grid.plauses$fused.plaus.n[(plaus.max.new+1):ex.grid.size]))])
+	im.pdi.new.95 <- c(ex.grid[which.min(abs(0.025-ex.grid.plauses$fused.plaus.n[1:plaus.max.new]))], ex.grid[plaus.max.new+which.min(abs(0.025-ex.grid.plauses$fused.plaus.n[(plaus.max.new+1):ex.grid.size]))])
 
 	results$im[k,1] <- ifelse(im.pdi.new.80[1]<=Y.star.new & im.pdi.new.80[2]>=Y.star.new, 1, 0)
 	results$im[k,2] <- im.pdi.new.80[2]-im.pdi.new.80[1]
@@ -228,9 +231,9 @@ for(k in 1:K){
 	results$im[k,6] <- im.pdi.new.95[2]-im.pdi.new.95[1]
 
 	plaus.max.exs <- which.max(ex.grid.plauses$fused.plaus.w)	
-	im.pdi.exs.80 <- c(ex.grid[which.min(abs(0.100-ex.grid.plauses$fused.plaus.w[1:plaus.max.exs]))], ex.grid[which.min(abs(0.900-ex.grid.plauses$fused.plaus.w[(plaus.max.exs+1):ex.grid.size]))])
-	im.pdi.exs.90 <- c(ex.grid[which.min(abs(0.050-ex.grid.plauses$fused.plaus.w[1:plaus.max.exs]))], ex.grid[which.min(abs(0.950-ex.grid.plauses$fused.plaus.w[(plaus.max.exs+1):ex.grid.size]))])
-	im.pdi.exs.95 <- c(ex.grid[which.min(abs(0.025-ex.grid.plauses$fused.plaus.w[1:plaus.max.exs]))], ex.grid[which.min(abs(0.975-ex.grid.plauses$fused.plaus.w[(plaus.max.exs+1):ex.grid.size]))])
+	im.pdi.exs.80 <- c(ex.grid[which.min(abs(0.100-ex.grid.plauses$fused.plaus.w[1:plaus.max.exs]))], ex.grid[plaus.max.exs+which.min(abs(0.100-ex.grid.plauses$fused.plaus.w[(plaus.max.exs+1):ex.grid.size]))])
+	im.pdi.exs.90 <- c(ex.grid[which.min(abs(0.050-ex.grid.plauses$fused.plaus.w[1:plaus.max.exs]))], ex.grid[plaus.max.exs+which.min(abs(0.050-ex.grid.plauses$fused.plaus.w[(plaus.max.exs+1):ex.grid.size]))])
+	im.pdi.exs.95 <- c(ex.grid[which.min(abs(0.025-ex.grid.plauses$fused.plaus.w[1:plaus.max.exs]))], ex.grid[plaus.max.exs+which.min(abs(0.025-ex.grid.plauses$fused.plaus.w[(plaus.max.exs+1):ex.grid.size]))])
 
 	results$im[k,7] <- ifelse(im.pdi.exs.80[1]<=Y.star.exs & im.pdi.exs.80[2]>=Y.star.exs, 1, 0)
 	results$im[k,8] <- im.pdi.exs.80[2]-im.pdi.exs.80[1]
@@ -240,9 +243,9 @@ for(k in 1:K){
 	results$im[k,12] <- im.pdi.exs.95[2]-im.pdi.exs.95[1]
 
 	plaus.max.theta <- which.max(ex.grid.plauses$fused.plaus.T)	
-	im.pdi.theta.80 <- c(ex.grid[which.min(abs(0.100-ex.grid.plauses$fused.plaus.T[1:plaus.max.theta]))], ex.grid[which.min(abs(0.900-ex.grid.plauses$fused.plaus.T[(plaus.max.theta+1):ex.grid.size]))])
-	im.pdi.theta.90 <- c(ex.grid[which.min(abs(0.050-ex.grid.plauses$fused.plaus.T[1:plaus.max.theta]))], ex.grid[which.min(abs(0.950-ex.grid.plauses$fused.plaus.T[(plaus.max.theta+1):ex.grid.size]))])
-	im.pdi.theta.95 <- c(ex.grid[which.min(abs(0.025-ex.grid.plauses$fused.plaus.T[1:plaus.max.theta]))], ex.grid[which.min(abs(0.975-ex.grid.plauses$fused.plaus.T[(plaus.max.theta+1):ex.grid.size]))])
+	im.pdi.theta.80 <- c(ex.grid[which.min(abs(0.100-ex.grid.plauses$fused.plaus.T[1:plaus.max.theta]))], ex.grid[plaus.max.theta+which.min(abs(0.100-ex.grid.plauses$fused.plaus.T[(plaus.max.theta+1):ex.grid.size]))])
+	im.pdi.theta.90 <- c(ex.grid[which.min(abs(0.050-ex.grid.plauses$fused.plaus.T[1:plaus.max.theta]))], ex.grid[plaus.max.theta+which.min(abs(0.050-ex.grid.plauses$fused.plaus.T[(plaus.max.theta+1):ex.grid.size]))])
+	im.pdi.theta.95 <- c(ex.grid[which.min(abs(0.025-ex.grid.plauses$fused.plaus.T[1:plaus.max.theta]))], ex.grid[plaus.max.theta+which.min(abs(0.025-ex.grid.plauses$fused.plaus.T[(plaus.max.theta+1):ex.grid.size]))])
 
 	results$im[k,13] <- ifelse(im.pdi.theta.80[1]<=theta.star & im.pdi.theta.80[2]>=theta.star, 1, 0)
 	results$im[k,14] <- im.pdi.theta.80[2]-im.pdi.theta.80[1]
@@ -258,7 +261,7 @@ for(k in 1:K){
 	grid.new <- seq(from = mean.response	 - 6, to = mean.response + 6, length.out = grid.new.size)
 	conformal.plaus.new <- nonconformity.plaus.grid(grid.new, response)
 	conf.plaus.max.new <- which.max(conformal.plaus.new)	 
-	conf.pdi.new <- c(grid.new[which.min(abs(pred.alpha.new-conformal.plaus.new[1:conf.plaus.max.new]))], grid.new[which.min(abs((1-pred.alpha.new)-conformal.plaus.new[(conf.plaus.max.new+1):grid.new.size]))])
+	conf.pdi.new <- c(grid.new[which.min(abs(pred.alpha.new-conformal.plaus.new[1:conf.plaus.max.new]))], grid.new[conf.plaus.max.new+which.min(abs(pred.alpha.new-conformal.plaus.new[(conf.plaus.max.new+1):grid.new.size]))])
 
 	results$conf[k,1] <- ifelse(conf.pdi.new[1]<=Y.star.new & conf.pdi.new[2]>=Y.star.new, 1, 0)
 	results$conf[k,2] <- conf.pdi.new[2]-conf.pdi.new[1]
@@ -267,7 +270,7 @@ for(k in 1:K){
 	grid.exs <- seq(from = mean.response.last.group	 - 6, to = mean.response.last.group + 6, length.out = grid.exs.size)
 	conformal.plaus.exs <- nonconformity.plaus.grid(grid.exs, response.last.group)
 	conf.plaus.max.exs <- which.max(conformal.plaus.exs)	
-	conf.pdi.exs <- c(grid.exs[which.min(abs(pred.alpha.exs-conformal.plaus.exs[1:conf.plaus.max.exs]))], grid.exs[which.min(abs((1-pred.alpha.exs)-conformal.plaus.exs[(conf.plaus.max.exs+1):grid.exs.size]))])
+	conf.pdi.exs <- c(grid.exs[which.min(abs(pred.alpha.exs-conformal.plaus.exs[1:conf.plaus.max.exs]))], grid.exs[conf.plaus.max.exs+which.min(abs(pred.alpha.exs-conformal.plaus.exs[(conf.plaus.max.exs+1):grid.exs.size]))])
 
 	results$conf[k,3] <- ifelse(conf.pdi.exs[1]<=Y.star.exs & conf.pdi.exs[2]>=Y.star.exs, 1, 0)
 	results$conf[k,4] <- conf.pdi.exs[2]-conf.pdi.exs[1]
@@ -276,11 +279,11 @@ for(k in 1:K){
 	grid.theta <- seq(from = mean.averages	 - 6, to = mean.averages + 6, length.out = grid.theta.size)
 	conformal.plaus.theta <- nonconformity.plaus.grid(grid.theta, response.group.averages)
 	conf.plaus.max.theta <- which.max(conformal.plaus.theta)	
-	conf.pdi.theta <- c(grid.theta[which.min(abs(pred.alpha.theta-conformal.plaus.theta[1:conf.plaus.max.theta]))], grid.theta[which.min(abs((1-pred.alpha.theta)-conformal.plaus.theta[(conf.plaus.max.theta+1):grid.theta.size]))])
+	conf.pdi.theta <- c(grid.theta[which.min(abs(pred.alpha.theta-conformal.plaus.theta[1:conf.plaus.max.theta]))], grid.theta[conf.plaus.max.theta+which.min(abs(pred.alpha.theta-conformal.plaus.theta[(conf.plaus.max.theta+1):grid.theta.size]))])
 
 	results$conf[k,5] <- ifelse(conf.pdi.theta[1]<=theta.star & conf.pdi.theta[2]>=theta.star, 1, 0)
 	results$conf[k,6] <- conf.pdi.theta[2]-conf.pdi.theta[1]
 
-
-	if(k%%10==0) print(k)
+	oof <- proc.time() - then
+	if(k%%10==0) print(c(k, oof[1]))
 }
