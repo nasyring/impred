@@ -1,239 +1,286 @@
-### STEP 1. load functions from the IM.R script
 
-source("IM.R")
-library(impred)
-library(predintma)
 
-### STEP 2. simulate data sets
 
-set.seed(54321) # for reproducibility, however, the use of c++ means we cannot perfectly reproduce runs because we cannot set the seed used in MCMC sampling inside c++
+#source("IM.R")
+
+
+######################################################################################### SIMULATING DATA
+
+### 
+#
+#	Notes:  The following simulation settings are used in the paper
+#		1. mu = 0, sigma_a^2 = 0.1, sigma^2 = 1.0, balanced design 5 groups of 6 
+#		2. mu = 0, sigma_a^2 = 0.5, sigma^2 = 0.5, balanced design 5 groups of 6
+#		3. mu = 0, sigma_a^2 = 1.0, sigma^2 = 0.1, balanced design 5 groups of 6
+#		4. mu = 0, sigma_a^2 = 0.1, sigma^2 = 1.0, balanced design 10 groups of 12
+#		5. mu = 0, sigma_a^2 = 0.5, sigma^2 = 0.5, balanced design 10 groups of 12
+#		6. mu = 0, sigma_a^2 = 1.0, sigma^2 = 0.1, balanced design 10 groups of 12
+#		7. mu = 0, sigma_a^2 = 0.1, sigma^2 = 1.0, unbalanced design 5 groups of (4,4,4,6,12)
+#		8. mu = 0, sigma_a^2 = 0.5, sigma^2 = 0.5, unbalanced design 5 groups of (4,4,4,6,12)
+#		9. mu = 0, sigma_a^2 = 1.0, sigma^2 = 0.1, unbalanced design 5 groups of (4,4,4,6,12)	
+#	     10. mu = 0, sigma_a^2 = 0.1, sigma^2 = 1.0, unbalanced design 10 groups of (4,4,7,11,13,16,16,16,16,17)
+#	     11. mu = 0, sigma_a^2 = 0.5, sigma^2 = 0.5, unbalanced design 10 groups of (4,4,7,11,13,16,16,16,16,17)
+#	     12. mu = 0, sigma_a^2 = 1.0, sigma^2 = 0.1, unbalanced design 10 groups of (4,4,7,11,13,16,16,16,16,17)
+#
+###
+
+# setting the seed will not result in perfect replication of simulation results
+# because it does not affect random number generation within c++ functions used by impred package 
+set.seed(852021)
+# Number of data sets to be simulated
 K <- 2000
-Z.1 <- make.Z(c(13,13,13,13,13,13,13,13,13,14,1)) # this creates a design matrix for the model with the associated group structure.  This particular setup has 10 groups of 13 observations, plus two new observations we want to predict, one in an existing group and one in a new group
-n.1 <- sum(c(13,13,13,13,13,13,13,13,13,14,1))
-n <- n.1-2  # 130 total data points, and two unobserved points we will predict
-Z <- Z.1[1:n,1:(ncol(Z.1)-1)]	# the design matrix taking out the new observations
-sigma_a2 <- 0.1	# within group standard deviation
-sigma_2 <- 2	# across group standard deviation
-mu <- 6	# mean parameter
-Y.mat <- matrix(0,n.1,K)	# generating matrix of data plus two new observations
+# Design matrix for ANOVA model including two observations to be used as "true" predicted values
+# one additional value is within the last group and one additional value is in a new group
+des <- c(6,6,6,6,6)
+I <- length(des)
+des.pred <- c(6,6,6,6,7,1)
+Z <- make.Z(des)
+Z.1 <- make.Z(des.pred) 
+n.1 <- sum(des.pred)
+# number of observations is two less than number of generated responses
+n <- n.1-2  
+# design matrix of the observed data
+Z <- Z.1[1:n,1:(ncol(Z.1)-1)]	
+# across/between group variance
+sigma2_a <- 0.1
+# across/between response variance
+sigma2 <- 1.0
+# mean parameter	
+mu <- 0	
+# matrix of simulated responses and matrix of simulated new group means
+Y.mat <- matrix(NA,n.1,K)	
+theta.new <- matrix(NA,K,1)
 for(i in 1:K){
-	Y.mat[,i] <- sample.Y(Z.1, sigma_a2, sigma_2, mu)
+	Y.mat[,i] <- sample.Y(Z.1, sqrt(sigma2_a), sqrt(sigma2), mu)
+	theta.new[i,] <- rnorm(1, mu, sqrt(sigma2_a))
 }
-Y <- Y.mat[1:n,]	# keeping just the n observations
-Y.new <- t(Y.mat[(n+1):n.1,])	# picking out just the 2 new obs for prediction
+# matrix of responses without held-out new values to be predicted
+Y <- Y.mat[1:n,]	
+# matrix of values representing "true" predictions, first column are within existing group, last column are new group
+Y.new <- t(Y.mat[(n+1):n.1,])	
 
 
-### STEP 3. compute fused plausibility curves for each data set
+########################################################################################## CONSTRUCTING PREDICTIONS
 
-plaus.results <- matrix(0,500,2*K)	# we have a total of K data sets of size n each along with 2 new obs to predict for each of the K data sets
+#### MLE estimation functions used for Higgins-type plug-in Student t prediction intervals
 
-# looping through all K sets and computing IM predictive plausibility curves for our two predictions: one within group and one new group
+neg.log.lik <- function(par, y, Z){
+	n<-length(y)
+	mu <- par[1]; sigma2_a <- exp(par[2]); sigma2 <- exp(par[3])
+	Sigma <- sigma2_a*(Z%*%t(Z))+diag(sigma2, n)
+	Sigma.inv <- solve(Sigma)
+	M<-matrix(y-rep(mu,n), n, 1)
+	return(log(abs(det(Sigma)))+(t(M)%*%Sigma.inv%*%M))
+}
+
+MLE <- function(y, Z){
+	par <- c(mu, sigma2_a, sigma2)
+	return(optim(par, neg.log.lik, y=y, Z=Z))
+} 
+
+
+#### Functions for conformal prediction
+
+pred.lvl.new <- (1/(n+1))*floor(0.90*(n+1))
+pred.alpha.new <- (1-pred.lvl.new)/2
+
+n.I <- des[I]
+pred.lvl.exs <- (1/(n.I+1))*floor(0.90*(n.I+1))
+pred.alpha.exs <- (1-pred.lvl.exs)/2
+
+pred.lvl.theta <- (1/(I+1))*floor(0.90*(I+1))
+pred.alpha.theta <- (1-pred.lvl.theta)/2
+
+
+nonconformity <- function(y, x) abs(mean(y)-x)
+nonconformity.i <- function(i, y){
+	x<-y[i]
+	y<-y[-i]
+	return(nonconformity(y,x))
+}
+nonconformity.all <- function(y){
+	n<-length(y)
+	return(apply(matrix(1:n,n,1),1,nonconformity, y=y))
+}
+nonconformity.plaus <- function(x, y){
+	yx<-c(y,x)
+	n<-length(yx)
+	nonconformities <- nonconformity.all(yx)
+	nonconformity.x <- nonconformity(y,x)
+	plaus <- (1/n)*sum(nonconformities>=nonconformity.x)
+}
+nonconformity.plaus.grid <- function(grid, y){
+	return(apply(matrix(grid, length(grid), 1), 1, nonconformity.plaus, y=y))
+}
+
+
+
+
+#### Looping through K simulated data sets
+results <- list( oracle = matrix(NA, K, 18) , stdt = matrix(NA, K, 18), im = matrix(NA, K, 18), conf = matrix(NA, K, 6)  )
 for(k in 1:K){
-	time <- proc.time()
-	ex.data <- list(Y=Y[,k], Z=Z)
+
+	#### The data and quantities to be predicted for the kth run
+	response <- Y[,k]
+	response.last.group <- response[(n-des[I]+1):n,1]
+	response.group.averages <- (Z%*%response)/des
+	mean.response <- mean(response)
+	mean.response.last.group <- mean(response.last.group)
+	mean.averages <- mean(response.group.averages)
+	Y.star.exs <- Y.new[k,1]
+	Y.star.new <- Y.new[k,2]
+	theta.star <- theta.new[k,1]
+
+	#### Predictions using "Oracle" --- true model parameters
+	oracle.std.dev.new <- sqrt((sigma2_a)*(1+(1/(n^2))*sum(des^2)) + (sigma2)*(1/n+1/1)) 
+	oracle.std.dev.exs <- sqrt((sigma2_a)*(1+(1/(n^2))*sum(des^2)) + (sigma2)*(1/n+1/1)) 
+
+	oracle.pdi.new.80 <-  c(mu + qnorm(0.10)*oracle.std.dev.new, mu + qnorm(0.90)*oracle.std.dev.new)
+	oracle.pdi.new.90 <-  c(mu + qnorm(0.05)*oracle.std.dev.new, mu + qnorm(0.95)*oracle.std.dev.new)
+	oracle.pdi.new.95 <-  c(mu + qnorm(0.025)*oracle.std.dev.new, mu + qnorm(0.975)*oracle.std.dev.new)
+	
+	results$oracle[k,1] <- ifelse(oracle.pdi.new.80[1]<=Y.star.new & oracle.pdi.new.80[2]>=Y.star.new, 1, 0)
+	results$oracle[k,2] <- oracle.pdi.new.80[2]-oracle.pdi.new.80[1]
+	results$oracle[k,3] <- ifelse(oracle.pdi.new.90[1]<=Y.star.new & oracle.pdi.new.90[2]>=Y.star.new, 1, 0)
+	results$oracle[k,4] <- oracle.pdi.new.90[2]-oracle.pdi.new.90[1]
+	results$oracle[k,5] <- ifelse(oracle.pdi.new.95[1]<=Y.star.new & oracle.pdi.new.95[2]>=Y.star.new, 1, 0)
+	results$oracle[k,6] <- oracle.pdi.new.95[2]-oracle.pdi.new.95[1]
+
+	oracle.pdi.exs.80 <-  c(mu + qnorm(0.10)*oracle.std.dev.exs, mu + qnorm(0.90)*oracle.std.dev.exs)
+	oracle.pdi.exs.90 <-  c(mu + qnorm(0.05)*oracle.std.dev.exs, mu + qnorm(0.95)*oracle.std.dev.exs)
+	oracle.pdi.exs.95 <-  c(mu + qnorm(0.025)*oracle.std.dev.exs, mu + qnorm(0.975)*oracle.std.dev.exs)
+
+	results$oracle[k,7] <- ifelse(oracle.pdi.exs.80[1]<=Y.star.exs & oracle.pdi.exs.80[2]>=Y.star.exs, 1, 0)
+	results$oracle[k,8] <- oracle.pdi.exs.80[2]-oracle.pdi.exs.80[1]
+	results$oracle[k,9] <- ifelse(oracle.pdi.exs.90[1]<=Y.star.exs & oracle.pdi.exs.90[2]>=Y.star.exs, 1, 0)
+	results$oracle[k,10] <- oracle.pdi.exs.90[2]-oracle.pdi.exs.90[1]
+	results$oracle[k,11] <- ifelse(oracle.pdi.exs.95[1]<=Y.star.exs & oracle.pdi.exs.95[2]>=Y.star.exs, 1, 0)
+	results$oracle[k,12] <- oracle.pdi.exs.95[2]-oracle.pdi.exs.95[1]
+
+	oracle.pdi.theta.80 <-  c(mu + qnorm(0.10)*sqrt(sigma2_a), mu + qnorm(0.90)*sqrt(sigma2_a))
+	oracle.pdi.theta.90 <-  c(mu + qnorm(0.05)*sqrt(sigma2_a), mu + qnorm(0.95)*sqrt(sigma2_a))
+	oracle.pdi.theta.95 <-  c(mu + qnorm(0.025)*sqrt(sigma2_a), mu + qnorm(0.975)*sqrt(sigma2_a))
+
+	results$oracle[k,13] <- ifelse(oracle.pdi.theta.80[1]<=theta.star & oracle.pdi.theta.80[2]>=theta.star, 1, 0)
+	results$oracle[k,14] <- oracle.pdi.theta.80[2]-oracle.pdi.theta.80[1]
+	results$oracle[k,15] <- ifelse(oracle.pdi.theta.90[1]<=theta.star & oracle.pdi.theta.90[2]>=theta.star, 1, 0)
+	results$oracle[k,16] <- oracle.pdi.theta.90[2]-oracle.pdi.theta.90[1]
+	results$oracle[k,17] <- ifelse(oracle.pdi.theta.95[1]<=theta.star & oracle.pdi.theta.95[2]>=theta.star, 1, 0)
+	results$oracle[k,18] <- oracle.pdi.theta.95[2]-oracle.pdi.theta.95[1]
+
+
+	#### Predictions using Higgins-type plug-in Student t prediction intervals 
+
+	mles <- MLE(response,Z)
+	stdt.pdi.new.80 <- qt(c(0.10, 0.90), df = n-1)*sqrt(exp(mles$par[2])*(1+(1/(n^2))*sum(des^2))+exp(mles$par[3])*(1/n+1))+mles$par[1]
+	stdt.pdi.new.90 <- qt(c(0.05, 0.95), df = n-1)*sqrt(exp(mles$par[2])*(1+(1/(n^2))*sum(des^2))+exp(mles$par[3])*(1/n+1))+mles$par[1]
+	stdt.pdi.new.95 <- qt(c(0.025, 0.975), df = n-1)*sqrt(exp(mles$par[2])*(1+(1/(n^2))*sum(des^2))+exp(mles$par[3])*(1/n+1))+mles$par[1]	
+
+	results$stdt[k,1] <- ifelse(stdt.pdi.new.80[1]<=Y.star.new & stdt.pdi.new.80[2]>=Y.star.new, 1, 0)
+	results$stdt[k,2] <- stdt.pdi.new.80[2]-stdt.pdi.new.80[1]
+	results$stdt[k,3] <- ifelse(stdt.pdi.new.90[1]<=Y.star.new & stdt.pdi.new.90[2]>=Y.star.new, 1, 0)
+	results$stdt[k,4] <- stdt.pdi.new.90[2]-stdt.pdi.new.90[1]
+	results$stdt[k,5] <- ifelse(stdt.pdi.new.95[1]<=Y.star.new & stdt.pdi.new.95[2]>=Y.star.new, 1, 0)
+	results$stdt[k,6] <- stdt.pdi.new.95[2]-stdt.pdi.new.95[1]
+
+	stdt.pdi.exs.80 <- qt(c(0.100, 0.900), df = n-1)*sqrt(exp(mles$par[2])*(1-2*(I/n)+(1/(n^2))*sum(des^2))+exp(mles$par[3])*(1/n+1))+mles$par[1]
+	stdt.pdi.exs.90 <- qt(c(0.050, 0.950), df = n-1)*sqrt(exp(mles$par[2])*(1-2*(I/n)+(1/(n^2))*sum(des^2))+exp(mles$par[3])*(1/n+1))+mles$par[1]
+	stdt.pdi.exs.95 <- qt(c(0.025, 0.975), df = n-1)*sqrt(exp(mles$par[2])*(1-2*(I/n)+(1/(n^2))*sum(des^2))+exp(mles$par[3])*(1/n+1))+mles$par[1]
+
+	results$stdt[k,7] <- ifelse(stdt.pdi.exs.80[1]<=Y.star.exs & stdt.pdi.exs.80[2]>=Y.star.exs, 1, 0)
+	results$stdt[k,8] <- stdt.pdi.exs.80[2]-stdt.pdi.exs.80[1]
+	results$stdt[k,9] <- ifelse(stdt.pdi.exs.90[1]<=Y.star.exs & stdt.pdi.exs.90[2]>=Y.star.exs, 1, 0)
+	results$stdt[k,10] <- stdt.pdi.exs.90[2]-stdt.pdi.exs.90[1]
+	results$stdt[k,11] <- ifelse(stdt.pdi.exs.95[1]<=Y.star.exs & stdt.pdi.exs.95[2]>=Y.star.exs, 1, 0)
+	results$stdt[k,12] <- stdt.pdi.exs.95[2]-stdt.pdi.exs.95[1]
+
+	stdt.pdi.theta.80 <- qt(c(0.100, 0.900), df = n-1)*sqrt(exp(mles$par[2])*(1+(1/(n^2))*sum(des^2))+exp(mles$par[3])*(1/n))+mles$par[1]
+	stdt.pdi.theta.90 <- qt(c(0.050, 0.950), df = n-1)*sqrt(exp(mles$par[2])*(1+(1/(n^2))*sum(des^2))+exp(mles$par[3])*(1/n))+mles$par[1]
+	stdt.pdi.theta.95 <- qt(c(0.025, 0.975), df = n-1)*sqrt(exp(mles$par[2])*(1+(1/(n^2))*sum(des^2))+exp(mles$par[3])*(1/n))+mles$par[1]
+
+	results$stdt[k,13] <- ifelse(stdt.pdi.theta.80[1]<=theta.star & stdt.pdi.theta.80[2]>=theta.star, 1, 0)
+	results$stdt[k,14] <- stdt.pdi.theta.80[2]-stdt.pdi.theta.80[1]
+	results$stdt[k,15] <- ifelse(stdt.pdi.theta.90[1]<=theta.star & stdt.pdi.theta.90[2]>=theta.star, 1, 0)
+	results$stdt[k,16] <- stdt.pdi.theta.90[2]-stdt.pdi.theta.90[1]
+	results$stdt[k,17] <- ifelse(stdt.pdi.theta.95[1]<=theta.star & stdt.pdi.theta.95[2]>=theta.star, 1, 0)
+	results$stdt[k,18] <- stdt.pdi.theta.95[2]-stdt.pdi.theta.95[1]
+
+
+	#### Predictions using Inferential Model
+
+	ex.data <- list(Y=response, Z=Z)
 	ex.statistics <- aov.statistics(ex.data)
-	ex.grid <- matrix(seq(from = min(ex.data$Y)-6, to = max(ex.data$Y)+6, length.out = 500),500,1)
+	ex.grid.size <- 500
+	ex.grid <- matrix(seq(from = min(ex.data$Y)-6, to = max(ex.data$Y)+6, length.out = ex.grid.size),ex.grid.size,1)
 	sig.grid = as.matrix(expand.grid(seq(from = 0.01, to = 7, length.out = 14), seq(from = 0.01, to = 7, length.out = 14)))
 	ex.grid.plauses <-  apply.plaus(sig.grid, matrix(runif(10000),10000,1), 1, ex.data, ex.statistics, ex.grid)
-	plaus.results[,(2*k-1)] <- ex.grid.plauses$fused.plaus.w
-	plaus.results[,(2*k)] <- ex.grid.plauses$fused.plaus.n
-	time2 <- proc.time() - time
-	print(c(k, time2))
+	
+	plaus.max.new <- which.max(ex.grid.plauses$fused.plaus.n)	
+	im.pdi.new.80 <- c(ex.grid[which.min(abs(0.100-ex.grid.plauses$fused.plaus.n[1:plaus.max.new]))], ex.grid[which.min(abs(0.900-ex.grid.plauses$fused.plaus.n[(plaus.max.new+1):ex.grid.size]))])
+	im.pdi.new.90 <- c(ex.grid[which.min(abs(0.050-ex.grid.plauses$fused.plaus.n[1:plaus.max.new]))], ex.grid[which.min(abs(0.950-ex.grid.plauses$fused.plaus.n[(plaus.max.new+1):ex.grid.size]))])
+	im.pdi.new.95 <- c(ex.grid[which.min(abs(0.025-ex.grid.plauses$fused.plaus.n[1:plaus.max.new]))], ex.grid[which.min(abs(0.975-ex.grid.plauses$fused.plaus.n[(plaus.max.new+1):ex.grid.size]))])
+
+	results$im[k,1] <- ifelse(im.pdi.new.80[1]<=Y.star.new & im.pdi.new.80[2]>=Y.star.new, 1, 0)
+	results$im[k,2] <- im.pdi.new.80[2]-im.pdi.new.80[1]
+	results$im[k,3] <- ifelse(im.pdi.new.90[1]<=Y.star.new & im.pdi.new.90[2]>=Y.star.new, 1, 0)
+	results$im[k,4] <- im.pdi.new.90[2]-im.pdi.new.90[1]
+	results$im[k,5] <- ifelse(im.pdi.new.95[1]<=Y.star.new & im.pdi.new.95[2]>=Y.star.new, 1, 0)
+	results$im[k,6] <- im.pdi.new.95[2]-im.pdi.new.95[1]
+
+	plaus.max.exs <- which.max(ex.grid.plauses$fused.plaus.w)	
+	im.pdi.exs.80 <- c(ex.grid[which.min(abs(0.100-ex.grid.plauses$fused.plaus.w[1:plaus.max.exs]))], ex.grid[which.min(abs(0.900-ex.grid.plauses$fused.plaus.w[(plaus.max.exs+1):ex.grid.size]))])
+	im.pdi.exs.90 <- c(ex.grid[which.min(abs(0.050-ex.grid.plauses$fused.plaus.w[1:plaus.max.exs]))], ex.grid[which.min(abs(0.950-ex.grid.plauses$fused.plaus.w[(plaus.max.exs+1):ex.grid.size]))])
+	im.pdi.exs.95 <- c(ex.grid[which.min(abs(0.025-ex.grid.plauses$fused.plaus.w[1:plaus.max.exs]))], ex.grid[which.min(abs(0.975-ex.grid.plauses$fused.plaus.w[(plaus.max.exs+1):ex.grid.size]))])
+
+	results$im[k,7] <- ifelse(im.pdi.exs.80[1]<=Y.star.exs & im.pdi.exs.80[2]>=Y.star.exs, 1, 0)
+	results$im[k,8] <- im.pdi.exs.80[2]-im.pdi.exs.80[1]
+	results$im[k,9] <- ifelse(im.pdi.exs.90[1]<=Y.star.exs & im.pdi.exs.90[2]>=Y.star.exs, 1, 0)
+	results$im[k,10] <- im.pdi.exs.90[2]-im.pdi.exs.90[1]
+	results$im[k,11] <- ifelse(im.pdi.exs.95[1]<=Y.star.exs & im.pdi.exs.95[2]>=Y.star.exs, 1, 0)
+	results$im[k,12] <- im.pdi.exs.95[2]-im.pdi.exs.95[1]
+
+	plaus.max.theta <- which.max(ex.grid.plauses$fused.plaus.T)	
+	im.pdi.theta.80 <- c(ex.grid[which.min(abs(0.100-ex.grid.plauses$fused.plaus.T[1:plaus.max.theta]))], ex.grid[which.min(abs(0.900-ex.grid.plauses$fused.plaus.T[(plaus.max.theta+1):ex.grid.size]))])
+	im.pdi.theta.90 <- c(ex.grid[which.min(abs(0.050-ex.grid.plauses$fused.plaus.T[1:plaus.max.theta]))], ex.grid[which.min(abs(0.950-ex.grid.plauses$fused.plaus.T[(plaus.max.theta+1):ex.grid.size]))])
+	im.pdi.theta.95 <- c(ex.grid[which.min(abs(0.025-ex.grid.plauses$fused.plaus.T[1:plaus.max.theta]))], ex.grid[which.min(abs(0.975-ex.grid.plauses$fused.plaus.T[(plaus.max.theta+1):ex.grid.size]))])
+
+	results$im[k,13] <- ifelse(im.pdi.theta.80[1]<=theta.star & im.pdi.theta.80[2]>=theta.star, 1, 0)
+	results$im[k,14] <- im.pdi.theta.80[2]-im.pdi.theta.80[1]
+	results$im[k,15] <- ifelse(im.pdi.theta.90[1]<=theta.star & im.pdi.theta.90[2]>=theta.star, 1, 0)
+	results$im[k,16] <- im.pdi.theta.90[2]-im.pdi.theta.90[1]
+	results$im[k,17] <- ifelse(im.pdi.theta.95[1]<=theta.star & im.pdi.theta.95[2]>=theta.star, 1, 0)
+	results$im[k,18] <- im.pdi.theta.95[2]-im.pdi.theta.95[1]
+
+
+	#### Conformal Prediction
+
+	grid.new.size <- 480
+	grid.new <- seq(from = mean.response	 - 6, to = mean.response + 6, length.out = grid.new.size)
+	conformal.plaus.new <- nonconformity.plaus.grid(grid.new, response)
+	conf.plaus.max.new <- which.max(conformal.plaus.new)	 
+	conf.pdi.new <- c(grid.new[which.min(abs(pred.alpha.new-conformal.plaus.new[1:conf.plaus.max.new]))], grid.new[which.min(abs((1-pred.alpha.new)-conformal.plaus.new[(conf.plaus.max.new+1):grid.new.size]))])
+
+	results$conf[k,1] <- ifelse(conf.pdi.new[1]<=Y.star.new & conf.pdi.new[2]>=Y.star.new, 1, 0)
+	results$conf[k,2] <- conf.pdi.new[2]-conf.pdi.new[1]
+
+	grid.exs.size <- 480
+	grid.exs <- seq(from = mean.response.last.group	 - 6, to = mean.response.last.group + 6, length.out = grid.exs.size)
+	conformal.plaus.exs <- nonconformity.plaus.grid(grid.exs, response.last.group)
+	conf.plaus.max.exs <- which.max(conformal.plaus.exs)	
+	conf.pdi.exs <- c(grid.exs[which.min(abs(pred.alpha.exs-conformal.plaus.exs[1:conf.plaus.max.exs]))], grid.exs[which.min(abs((1-pred.alpha.exs)-conformal.plaus.exs[(conf.plaus.max.exs+1):grid.exs.size]))])
+
+	results$conf[k,3] <- ifelse(conf.pdi.exs[1]<=Y.star.exs & conf.pdi.exs[2]>=Y.star.exs, 1, 0)
+	results$conf[k,4] <- conf.pdi.exs[2]-conf.pdi.exs[1]
+
+	grid.theta.size <- 480
+	grid.theta <- seq(from = mean.averages	 - 6, to = mean.averages + 6, length.out = grid.theta.size)
+	conformal.plaus.theta <- nonconformity.plaus.grid(grid.theta, response.group.averages)
+	conf.plaus.max.theta <- which.max(conformal.plaus.theta)	
+	conf.pdi.theta <- c(grid.theta[which.min(abs(pred.alpha.theta-conformal.plaus.theta[1:conf.plaus.max.theta]))], grid.theta[which.min(abs((1-pred.alpha.theta)-conformal.plaus.theta[(conf.plaus.max.theta+1):grid.theta.size]))])
+
+	results$conf[k,5] <- ifelse(conf.pdi.theta[1]<=theta.star & conf.pdi.theta[2]>=theta.star, 1, 0)
+	results$conf[k,6] <- conf.pdi.theta[2]-conf.pdi.theta[1]
+
+
+	if(k%%10==0) print(k)
 }
-
-
-### STEP 4. check coverage of prediction intervals
-
-# looping through all K data sets and computing prediction intervals at 95%, 90%, and 80% from our IMs for our 2 predictions each
-
-coverage<-matrix(0,K,6)
-length<-coverage
-for(k in 1:K){
-	ex.data <- list(Y=Y[,k], Z=Z)
-	ex.statistics <- aov.statistics(ex.data)
-	ex.grid <- matrix(seq(from = min(ex.data$Y)-6, to = max(ex.data$Y)+6, length.out = 500),500,1)
-	# within prediction
-	plaus.max <- which.max(plaus.results[,(2*k-1)])
-	lower.plaus <- which.min(abs(.05-plaus.results[1:plaus.max,(2*k-1)]))
-	upper.plaus <- which.min(abs(.05-plaus.results[(plaus.max+1):500,(2*k-1)])) +plaus.max 
-	pi.95 <- c(ex.grid[lower.plaus], ex.grid[upper.plaus])
-	coverage[k,1] <- ifelse((pi.95[1]<=Y.new[k,1]) & (pi.95[2]>=Y.new[k,1]), 1, 0)
-	length[k,1] <- pi.95[2]-pi.95[1]
-	lower.plaus <- which.min(abs(.1-plaus.results[1:plaus.max,(2*k-1)]))
-	upper.plaus <- which.min(abs(.1-plaus.results[(plaus.max+1):500,(2*k-1)])) +plaus.max 
-	pi.90 <- c(ex.grid[lower.plaus], ex.grid[upper.plaus])
-	coverage[k,2] <- ifelse((pi.90[1]<=Y.new[k,1]) & (pi.90[2]>=Y.new[k,1]), 1, 0)
-	length[k,2] <- pi.90[2]-pi.90[1]	
-	lower.plaus <- which.min(abs(.2-plaus.results[1:plaus.max,(2*k-1)]))
-	upper.plaus <- which.min(abs(.2-plaus.results[(plaus.max+1):500,(2*k-1)]))+plaus.max 
-	pi.80 <- c(ex.grid[lower.plaus], ex.grid[upper.plaus])
-	coverage[k,3] <- ifelse((pi.80[1]<=Y.new[k,1]) & (pi.80[2]>=Y.new[k,1]), 1, 0)
-	length[k,3] <- pi.80[2]-pi.80[1]
-
-	# new prediction
-	plaus.max <- which.max(plaus.results[,2*k])
-	lower.plaus <- which.min(abs(.05-plaus.results[1:plaus.max,2*k]))
-	upper.plaus <- which.min(abs(.05-plaus.results[(plaus.max+1):500,2*k])) +plaus.max 
-	pi.95 <- c(ex.grid[lower.plaus], ex.grid[upper.plaus])
-	coverage[k,4] <- ifelse((pi.95[1]<=Y.new[k,2]) & (pi.95[2]>=Y.new[k,2]), 1, 0)
-	length[k,4] <- pi.95[2]-pi.95[1]
-	lower.plaus <- which.min(abs(.1-plaus.results[1:plaus.max,2*k]))
-	upper.plaus <- which.min(abs(.1-plaus.results[(plaus.max+1):500,2*k])) +plaus.max 
-	pi.90 <- c(ex.grid[lower.plaus], ex.grid[upper.plaus])
-	coverage[k,5] <- ifelse((pi.90[1]<=Y.new[k,2]) & (pi.90[2]>=Y.new[k,2]), 1, 0)
-	length[k,5] <- pi.90[2]-pi.90[1]	
-	lower.plaus <- which.min(abs(.2-plaus.results[1:plaus.max,2*k]))
-	upper.plaus <- which.min(abs(.2-plaus.results[(plaus.max+1):500,2*k]))+plaus.max 
-	pi.80 <- c(ex.grid[lower.plaus], ex.grid[upper.plaus])
-	coverage[k,6] <- ifelse((pi.80[1]<=Y.new[k,2]) & (pi.80[2]>=Y.new[k,2]), 1, 0)
-	length[k,6] <- pi.80[2]-pi.80[1]
-}
-
-
-colMeans(coverage)
-colMeans(length)
-#> colMeans(coverage)
-#[1] 0.9570 0.9130 0.8140 0.9665 0.9255 0.8285
-#> colMeans(length)
-#[1] 8.286482 6.920681 5.386182 8.306043 6.937010 5.398291
-#> 
-
-
-
-#### STEP 5: Compare to bootstrap - using Fernando's bootstrap function in predintma
-
-group.des <- c(13,13,13,13,13,13,13,13,13,13)
-k <- length(group.des)
-group <- c()
-for(j in 1:k){
-	group <- c(group, rep(j,group.des[j])) 
-}
-coverage.boot.w <- matrix(NA, K,3)
-length.boot.w <- matrix(NA, K,3)
-coverage.boot.n <- matrix(NA, K,3)
-length.boot.n <- matrix(NA, K,3)
-
-
-# first set of bootstrap prediction intervals is for the new observation in an existing group
-for(i in 1:K){
-	response <- Y[,i]
-	my.data = data.frame(response, group)
-	pdi.80 <- pred_int_boot(formula = response ~ 1 + (1|group), data = my.data, level = 0.8, R = 5000)
-	pdi.90 <- pred_int_boot(formula = response ~ 1 + (1|group), data = my.data, level = 0.9, R = 5000)
-	pdi.95 <- pred_int_boot(formula = response ~ 1 + (1|group), data = my.data, level = 0.95, R = 5000)
-	coverage.boot.w[i,3] <- ifelse((pdi.80[2]<=Y.new[i,1]) & (pdi.80[3]>=Y.new[i,1]), 1, 0)
-	length.boot.w[i,3] <- pdi.80[3]-pdi.80[2]
-	coverage.boot.w[i,2] <- ifelse((pdi.90[2]<=Y.new[i,1]) & (pdi.90[3]>=Y.new[i,1]), 1, 0)
-	length.boot.w[i,2] <- pdi.90[3]-pdi.90[2]
-	coverage.boot.w[i,1] <- ifelse((pdi.95[2]<=Y.new[i,1]) & (pdi.95[3]>=Y.new[i,1]), 1, 0)
-	length.boot.w[i,1] <- pdi.95[3]-pdi.95[2]
-	if(i%%100 == 0) print(i)
-}
-
-colMeans(coverage.boot.w, na.rm = TRUE)
-colMeans(length.boot.w)
-
-#> colMeans(coverage.boot[1:500,])
-#[1] 0.552 0.484 0.372
-#> colMeans(length.boot[1:500,])
-#[1] 2.918202 2.467598 1.929513
-
-#> colMeans(coverage.boot, na.rm = TRUE)
-#[1] 0.5262631 0.4532266 0.3621811
-#> colMeans(length.boot, na.rm = TRUE)
-#[1] 2.926005 2.473079 1.934625
-
-
-
-# second set of bootstrap prediction intervals is for the new observation in an existing group
-for(i in 1:K){
-	response <- Y[,i]
-	my.data = data.frame(response, group)
-	pdi.80 <- pred_int_boot(formula = response ~ 1 + (1|group), data = my.data, level = 0.8, R = 5000)
-	pdi.90 <- pred_int_boot(formula = response ~ 1 + (1|group), data = my.data, level = 0.9, R = 5000)
-	pdi.95 <- pred_int_boot(formula = response ~ 1 + (1|group), data = my.data, level = 0.95, R = 5000)
-	coverage.boot.n[i,3] <- ifelse((pdi.80[2]<=Y.new[i,2]) & (pdi.80[3]>=Y.new[i,2]), 1, 0)
-	length.boot.n[i,3] <- pdi.80[3]-pdi.80[2]
-	coverage.boot.n[i,2] <- ifelse((pdi.90[2]<=Y.new[i,2]) & (pdi.90[3]>=Y.new[i,2]), 1, 0)
-	length.boot.n[i,2] <- pdi.90[3]-pdi.90[2]
-	coverage.boot.n[i,1] <- ifelse((pdi.95[2]<=Y.new[i,2]) & (pdi.95[3]>=Y.new[i,2]), 1, 0)
-	length.boot.n[i,1] <- pdi.95[3]-pdi.95[2]
-	if(i%%100 == 0) print(i)
-}
-
-colMeans(coverage.boot.n, na.rm = TRUE)
-colMeans(length.boot.n)
-
-
-
-# STEP 6: Compare to "oracle" normal dist CIs (pretending we know true variance components)
-
-coverage.oracle.w <- matrix(NA, K,3)
-length.oracle.w <- matrix(NA, K,3)
-coverage.oracle.n <- matrix(NA, K,3)
-length.oracle.n <- matrix(NA, K,3)
-
-n_i <- c(13,13,13,13,13,13,13,13,13,13)
-std.dev <- sqrt((sigma_a2^2)*(1+(1/(n^2))*sum(n_i^2)) + (sigma_2^2)*(1/n+1/1)) 
-
-
-for(i in 1:K){
-	response <- Y[,i]
-	mY <- mean(response)
-	pdi.80 <- c(mY + qnorm(0.10)*std.dev, mY + qnorm(0.90)*std.dev)
-	pdi.90 <- c(mY + qnorm(0.05)*std.dev, mY + qnorm(0.95)*std.dev)
-	pdi.95 <- c(mY + qnorm(0.025)*std.dev, mY + qnorm(0.975)*std.dev)
-	coverage.oracle.n[i,3] <- ifelse((pdi.80[1]<=Y.new[i,2]) & (pdi.80[2]>=Y.new[i,2]), 1, 0)
-	length.oracle.n[i,3] <- pdi.80[2]-pdi.80[1]
-	coverage.oracle.n[i,2] <- ifelse((pdi.90[1]<=Y.new[i,2]) & (pdi.90[2]>=Y.new[i,2]), 1, 0)
-	length.oracle.n[i,2] <- pdi.90[2]-pdi.90[1]
-	coverage.oracle.n[i,1] <- ifelse((pdi.95[1]<=Y.new[i,2]) & (pdi.95[2]>=Y.new[i,2]), 1, 0)
-	length.oracle.n[i,1] <- pdi.95[2]-pdi.95[1]
-	if(i%%100 == 0) print(i)
-}
-
-colMeans(coverage.oracle.n)
-colMeans(length.oracle.n)
-
-#> colMeans(coverage.oracle.n)
-#[1] 0.9585 0.9095 0.8155
-#> colMeans(length.oracle.n)
-#[1] 7.880683 6.613677 5.152901
-
-n_I <- n_i[length(n_i)]
-std.dev <- sqrt((sigma_a2^2)*(1-2*(n_I/n)+(1/(n^2))*sum(n_i^2)) + (sigma_2^2)*(1/n+1/1)) 
-
-
-for(i in 1:K){
-	response <- Y[,i]
-	mY <- mean(response)
-	pdi.80 <- c(mY + qnorm(0.10)*std.dev, mY + qnorm(0.90)*std.dev)
-	pdi.90 <- c(mY + qnorm(0.05)*std.dev, mY + qnorm(0.95)*std.dev)
-	pdi.95 <- c(mY + qnorm(0.025)*std.dev, mY + qnorm(0.975)*std.dev)
-	coverage.oracle.w[i,3] <- ifelse((pdi.80[1]<=Y.new[i,1]) & (pdi.80[2]>=Y.new[i,1]), 1, 0)
-	length.oracle.w[i,3] <- pdi.80[2]-pdi.80[1]
-	coverage.oracle.w[i,2] <- ifelse((pdi.90[1]<=Y.new[i,1]) & (pdi.90[2]>=Y.new[i,1]), 1, 0)
-	length.oracle.w[i,2] <- pdi.90[2]-pdi.90[1]
-	coverage.oracle.w[i,1] <- ifelse((pdi.95[1]<=Y.new[i,1]) & (pdi.95[2]>=Y.new[i,1]), 1, 0)
-	length.oracle.w[i,1] <- pdi.95[2]-pdi.95[1]
-	if(i%%100 == 0) print(i)
-}
-
-
-colMeans(coverage.oracle.w)
-colMeans(length.oracle.w)
-
-#> colMeans(coverage.oracle.w)
-#[1] 0.9475 0.8965 0.7980
-#> colMeans(length.oracle.w)
-#[1] 7.878733 6.612041 5.151626
-
-
-
-
-
-
-
-
-
-
