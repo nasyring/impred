@@ -17,9 +17,6 @@ library(matlib)
 library(lme4)
 #install.packages('merDeriv')
 library(merDeriv)
-library(devtools)
-install_github("nasyring/impred", subdir = "impred")	# c++ functions
-library(impred)
 
 ############ Functions
 
@@ -359,7 +356,8 @@ pl.0 <- function(vals, rand.sets){
 		plaus <- sum((val > rand.sets[,1])*(val < rand.sets[,2]))/M
 		return(plaus)
 	}
-	return(list(plauses.w = apply(vals,1,pl.0.val, rand.sets = rand.sets[,1:2]), plauses.n = apply(vals,1,pl.0.val, rand.sets = rand.sets[,3:4]), vals = vals))
+	return(list(plauses.w = apply(vals,1,pl.0.val, rand.sets = rand.sets[,1:2]), plauses.n = apply(vals,1,pl.0.val, rand.sets = rand.sets[,3:4]),
+		plauses.T = apply(vals,1,pl.0.val, rand.sets = rand.sets[,5:6]), vals = vals))
 }
 
 plot.plaus <- function(pl.0){
@@ -389,14 +387,17 @@ apply.plaus <- function(sig02, U, k, aov.data, aov.statistics, vals){
 	L <- length(vals)
 	all.plaus.w <- matrix(NA, N, L)
 	all.plaus.n <- matrix(NA, N, L)
+	all.plaus.T <- matrix(NA, N, L)
 	for(j in 1:N){
 		pl.j <- pl.0(vals, rand.sets(sig02[j,], U, k, aov.data, aov.statistics))
 		all.plaus.w[j,] <- pl.j$plauses.w
 		all.plaus.n[j,] <- pl.j$plauses.n
+		all.plaus.T[j,] <- pl.j$plauses.T
 	}
 	fused.plaus.w <- apply(all.plaus.w, 2, max)
 	fused.plaus.n <- apply(all.plaus.n, 2, max)
-	return(list(all.plaus.w = all.plaus.w, all.plaus.n = all.plaus.n, fused.plaus.w = fused.plaus.w, fused.plaus.n = fused.plaus.n))
+	fused.plaus.T <- apply(all.plaus.T, 2, max)
+	return(list(all.plaus.w = all.plaus.w, all.plaus.n = all.plaus.n, all.plaus.T = all.plaus.T, fused.plaus.w = fused.plaus.w, fused.plaus.n = fused.plaus.n, fused.plaus.T = fused.plaus.T))
 }
 
 
