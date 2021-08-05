@@ -123,7 +123,7 @@ for(k in 1:K){
 	#### The data and quantities to be predicted for the kth run
 	response <- Y[,k]
 	response.last.group <- response[(n-des[I]+1):n]
-	response.group.averages <- (Z%*%matrix(response,n,1))/des
+	response.group.averages <- (t(Z)%*%matrix(response,n,1))/des
 	mean.response <- mean(response)
 	mean.response.last.group <- mean(response.last.group)
 	mean.averages <- mean(response.group.averages)
