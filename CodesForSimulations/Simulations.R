@@ -303,6 +303,11 @@ for(k in 1:K){
 	results$boot[k,17] <- ifelse(boot.pdi.theta.95[1]<=theta.star & boot.pdi.theta.95[2]>=theta.star, 1, 0)
 	results$boot[k,18] <- boot.pdi.theta.95[2]-boot.pdi.theta.95[1]
 
+	### Bayes
+	
+	fm1 <- stan_lmer(repsonse ~ 1 + (1 | group), data = my.data)
+	fm1.pdi0 <- posterior_epred(fm1, newdata = data.frame(group = "new-trial"), re.form = NULL)
+	fm1.pdi <- quantile(fm1.pdi0, probs = c(0.025, 0.975))
 
 
 	#### Conformal Prediction
