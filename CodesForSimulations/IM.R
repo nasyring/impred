@@ -11,12 +11,7 @@
 
 ############ Dependent Packages
 
-#install.packages('matlib')
-library(matlib)
-#install.packages('lme4')
-library(lme4)
-#install.packages('merDeriv')
-library(merDeriv)
+# matlib, lme4, merDeriv
 
 ############ Functions
 
