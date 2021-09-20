@@ -7,6 +7,6 @@ Author: Nicholas Syring
 Maintainer: Nicholas Syring <nasyrin@gmail.com>
 Description:  im prediction  
 License: GPL (>= 3) 
-Imports: Rcpp (>= 0.12.16), RcppParallel (>= 4.4.0)
+Imports: Rcpp (>= 0.12.16), RcppParallel (>= 4.4.0), matlib, lme4, merDeriv
 LinkingTo: Rcpp, RcppArmadillo, RcppParallel
 SystemRequirements: GNU make
