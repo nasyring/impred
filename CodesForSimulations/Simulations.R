@@ -78,6 +78,13 @@ MLE <- function(y, Z){
 	return(optim(par, neg.log.lik, y=y, Z=Z))
 } 
 
+### Functions for bootstrap
+
+group <- c()
+for(j in 1:I){
+	group <- c(group, rep(j,des[j])) 
+}
+
 
 #### Functions for conformal prediction
 
@@ -117,7 +124,7 @@ nonconformity.plaus.grid <- function(grid, y){
 
 
 #### Looping through K simulated data sets
-results <- list( oracle = matrix(NA, K, 18) , stdt = matrix(NA, K, 18), im = matrix(NA, K, 18), conf = matrix(NA, K, 6)  )
+results <- list( oracle = matrix(NA, K, 18) , stdt = matrix(NA, K, 18), im = matrix(NA, K, 18), boot = matrix(NA, K, 18), conf = matrix(NA, K, 6)  )
 for(k in 1:K){
 	then = proc.time()
 
@@ -253,6 +260,49 @@ for(k in 1:K){
 	results$im[k,16] <- im.pdi.theta.90[2]-im.pdi.theta.90[1]
 	results$im[k,17] <- ifelse(im.pdi.theta.95[1]<=theta.star & im.pdi.theta.95[2]>=theta.star, 1, 0)
 	results$im[k,18] <- im.pdi.theta.95[2]-im.pdi.theta.95[1]
+	
+	### Non-parametric bootstrap
+	
+	
+	boot.pdi.new.80 <- quantile(reponse, c(0.1, 0.9))
+	boot.pdi.new.90 <- quantile(reponse, c(0.05, 0.95))
+	boot.pdi.new.95 <- quantile(reponse, c(0.025, 0.975))
+	
+	results$boot[k,1] <- ifelse(boot.pdi.new.80[1]<=Y.star.new & boot.pdi.new.80[2]>=Y.star.new, 1, 0)
+	results$boot[k,2] <- boot.pdi.new.80[2]-boot.pdi.new.80[1]
+	results$boot[k,3] <- ifelse(boot.pdi.new.90[1]<=Y.star.new & boot.pdi.new.90[2]>=Y.star.new, 1, 0)
+	results$boot[k,4] <- boot.pdi.new.90[2]-boot.pdi.new.90[1]
+	results$boot[k,5] <- ifelse(boot.pdi.new.95[1]<=Y.star.new & boot.pdi.new.95[2]>=Y.star.new, 1, 0)
+	results$boot[k,6] <- boot.pdi.new.95[2]-boot.pdi.new.95[1]
+	
+	
+	
+	boot.pdi.exs.80 <- quantile(reponse.last.group, c(0.1, 0.9))
+	boot.pdi.exs.90 <- quantile(reponse.last.group, c(0.05, 0.95))
+	boot.pdi.exs.95 <- quantile(reponse.last.group, c(0.025, 0.975))
+	
+	results$boot[k,7] <- ifelse(boot.pdi.exs.80[1]<=Y.star.exs & boot.pdi.exs.80[2]>=Y.star.exs, 1, 0)
+	results$boot[k,8] <- boot.pdi.exs.80[2]-boot.pdi.exs.80[1]
+	results$boot[k,9] <- ifelse(boot.pdi.exs.90[1]<=Y.star.exs & boot.pdi.exs.90[2]>=Y.star.exs, 1, 0)
+	results$boot[k,10] <- boot.pdi.exs.90[2]-boot.pdi.exs.90[1]
+	results$boot[k,11] <- ifelse(boot.pdi.exs.95[1]<=Y.star.exs & boot.pdi.exs.95[2]>=Y.star.exs, 1, 0)
+	results$boot[k,12] <- boot.pdi.exs.95[2]-boot.pdi.exs.95[1]
+	
+	
+	
+	my.data = data.frame(response, group)
+	pdi.boot <- pred_int_boot(formula = response ~ 1 + (1|group), data = my.data, level = c(0.8,0.9,0.95), R = 5000)
+	boot.pdi.theta.80 <- c(pdi.boot[2], pdi.boot[5])
+	boot.pdi.theta.90 <- c(pdi.boot[3], pdi.boot[6])
+	boot.pdi.theta.95 <- c(pdi.boot[4], pdi.boot[7])
+	
+	results$boot[k,13] <- ifelse(pdi.theta.80[1]<=theta.star & im.pdi.theta.80[2]>=theta.star, 1, 0)
+	results$boot[k,14] <- boot.pdi.theta.80[2]-boot.pdi.theta.80[1]
+	results$boot[k,15] <- ifelse(boot.pdi.theta.90[1]<=theta.star & boot.pdi.theta.90[2]>=theta.star, 1, 0)
+	results$boot[k,16] <- boot.pdi.theta.90[2]-boot.pdi.theta.90[1]
+	results$boot[k,17] <- ifelse(boot.pdi.theta.95[1]<=theta.star & boot.pdi.theta.95[2]>=theta.star, 1, 0)
+	results$boot[k,18] <- boot.pdi.theta.95[2]-boot.pdi.theta.95[1]
+
 
 
 	#### Conformal Prediction
@@ -287,3 +337,6 @@ for(k in 1:K){
 	oof <- proc.time() - then
 	if(k%%10==0) print(c(k, oof[1]))
 }
+
+
+colMeans(results$im)
