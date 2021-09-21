@@ -124,7 +124,7 @@ nonconformity.plaus.grid <- function(grid, y){
 
 
 #### Looping through K simulated data sets
-results <- list( oracle = matrix(NA, K, 18) , stdt = matrix(NA, K, 18), im = matrix(NA, K, 18), boot = matrix(NA, K, 18), conf = matrix(NA, K, 6)  )
+results <- list( oracle = matrix(NA, K, 18) , stdt = matrix(NA, K, 18), im = matrix(NA, K, 18), boot = matrix(NA, K, 18), boot.para = matrix(NA, K, 18), bayes.default = matrix(NA, K, 18), bayes.cauchy = matrix(NA, K, 18),bayes.oracle = matrix(NA, K, 18), conf = matrix(NA, K, 6)  )
 for(k in 1:K){
 	then = proc.time()
 
@@ -264,9 +264,15 @@ for(k in 1:K){
 	### Non-parametric bootstrap
 	
 	
-	boot.pdi.new.80 <- quantile(reponse, c(0.1, 0.9))
-	boot.pdi.new.90 <- quantile(reponse, c(0.05, 0.95))
-	boot.pdi.new.95 <- quantile(reponse, c(0.025, 0.975))
+	boot.response.predictions <- rep(NA, 1000)
+	for(b in 1:1000){
+		boot.responses <- sample(response, n, replace = TRUE)
+		boot.response.predictions[b] <- sample(boot.responses, 1)
+	}
+	
+	boot.pdi.new.80 <- quantile(boot.response.predictions, c(0.1, 0.9))
+	boot.pdi.new.90 <- quantile(boot.response.predictions, c(0.05, 0.95))
+	boot.pdi.new.95 <- quantile(boot.response.predictions, c(0.025, 0.975))
 	
 	results$boot[k,1] <- ifelse(boot.pdi.new.80[1]<=Y.star.new & boot.pdi.new.80[2]>=Y.star.new, 1, 0)
 	results$boot[k,2] <- boot.pdi.new.80[2]-boot.pdi.new.80[1]
@@ -275,11 +281,15 @@ for(k in 1:K){
 	results$boot[k,5] <- ifelse(boot.pdi.new.95[1]<=Y.star.new & boot.pdi.new.95[2]>=Y.star.new, 1, 0)
 	results$boot[k,6] <- boot.pdi.new.95[2]-boot.pdi.new.95[1]
 	
+	boot.response.last.group.predictions <- rep(NA, 1000)
+	for(b in 1:1000){
+		boot.group.responses <- sample(response.last.group, des[I], replace = TRUE)
+		boot.response.last.group.predictions[b] <- sample(boot.group.responses, 1)
+	}
 	
-	
-	boot.pdi.exs.80 <- quantile(reponse.last.group, c(0.1, 0.9))
-	boot.pdi.exs.90 <- quantile(reponse.last.group, c(0.05, 0.95))
-	boot.pdi.exs.95 <- quantile(reponse.last.group, c(0.025, 0.975))
+	boot.pdi.exs.80 <- quantile(boot.response.last.group.predictions, c(0.1, 0.9))
+	boot.pdi.exs.90 <- quantile(boot.response.last.group.predictions, c(0.05, 0.95))
+	boot.pdi.exs.95 <- quantile(boot.response.last.group.predictions, c(0.025, 0.975))
 	
 	results$boot[k,7] <- ifelse(boot.pdi.exs.80[1]<=Y.star.exs & boot.pdi.exs.80[2]>=Y.star.exs, 1, 0)
 	results$boot[k,8] <- boot.pdi.exs.80[2]-boot.pdi.exs.80[1]
@@ -287,9 +297,7 @@ for(k in 1:K){
 	results$boot[k,10] <- boot.pdi.exs.90[2]-boot.pdi.exs.90[1]
 	results$boot[k,11] <- ifelse(boot.pdi.exs.95[1]<=Y.star.exs & boot.pdi.exs.95[2]>=Y.star.exs, 1, 0)
 	results$boot[k,12] <- boot.pdi.exs.95[2]-boot.pdi.exs.95[1]
-	
-	
-	
+		
 	my.data = data.frame(response, group)
 	pdi.boot <- pred_int_boot(formula = response ~ 1 + (1|group), data = my.data, level = c(0.8,0.9,0.95), R = 5000)
 	boot.pdi.theta.80 <- c(pdi.boot[2], pdi.boot[5])
@@ -303,12 +311,188 @@ for(k in 1:K){
 	results$boot[k,17] <- ifelse(boot.pdi.theta.95[1]<=theta.star & boot.pdi.theta.95[2]>=theta.star, 1, 0)
 	results$boot[k,18] <- boot.pdi.theta.95[2]-boot.pdi.theta.95[1]
 
-	### Bayes
-	
-	fm1 <- stan_lmer(repsonse ~ 1 + (1 | group), data = my.data)
-	fm1.pdi0 <- posterior_epred(fm1, newdata = data.frame(group = "new-trial"), re.form = NULL)
-	fm1.pdi <- quantile(fm1.pdi0, probs = c(0.025, 0.975))
 
+	### Parametric bootstrap
+	
+	lmer.model <- lmer(response ~ 1 + (1 | group), data = my.data)
+	
+	para.boot.theta.func <- function(lmer.model){
+			return(rnorm(1,0,summary(lmer.model)$varcor[[1]][1]))
+	}
+	para.boot.new.func <- function(lmer.model){
+			return(rnorm(1,summary(lmer.model)$coef[1],sqrt((summary(lmer.model)$varcor[[1]][1])^2 + (summary(lmer.model)$sigma)^2)))	
+	}
+	para.boot.exs.func <- function(lmer.model){
+			return(rnorm(1,mean(residuals(lmer.model)[(n-des[I]+1):n])+summary(lmer.model)$coef[1], summary(lmer.model)$sigma))
+	}
+	
+	para.boot.theta <- bootMer(lmer.model, para.boot.theta.func, nsim = 1000, type = 'parametric')
+	para.boot.new <- bootMer(lmer.model, para.boot.new.func, nsim = 1000, type = 'parametric')
+	para.boot.exs <- bootMer(lmer.model, para.boot.exs.func, nsim = 1000, type = 'parametric')
+	
+	para.boot.pdi.new.80 <- quantile(para.boot.new$t, c(0.1, 0.9))
+	para.boot.pdi.new.90 <- quantile(para.boot.new$t, c(0.05, 0.95))
+	para.boot.pdi.new.95 <- quantile(para.boot.new$t, c(0.025, 0.975))
+	
+	para.boot.pdi.exs.80 <- quantile(para.boot.exs$t, c(0.1, 0.9))
+	para.boot.pdi.exs.90 <- quantile(para.boot.exs$t, c(0.05, 0.95))
+	para.boot.pdi.exs.95 <- quantile(para.boot.exs$t, c(0.025, 0.975))
+	
+	para.boot.pdi.theta.80 <- quantile(para.boot.theta$t, c(0.1, 0.9))
+	para.boot.pdi.theta.90 <- quantile(para.boot.theta$t, c(0.05, 0.95))
+	para.boot.pdi.theta.95 <- quantile(para.boot.theta$t, c(0.025, 0.975))
+	
+	results$para.boot[k,1] <- ifelse(para.boot.pdi.new.80[1]<=Y.star.new & para.boot.pdi.new.80[2]>=Y.star.new, 1, 0)
+	results$para.boot[k,2] <- para.boot.pdi.new.80[2]-para.boot.pdi.new.80[1]
+	results$para.boot[k,3] <- ifelse(para.boot.pdi.new.90[1]<=Y.star.new & para.boot.pdi.new.90[2]>=Y.star.new, 1, 0)
+	results$para.boot[k,4] <- para.boot.pdi.new.90[2]-para.boot.pdi.new.90[1]
+	results$para.boot[k,5] <- ifelse(para.boot.pdi.new.95[1]<=Y.star.new & para.boot.pdi.new.95[2]>=Y.star.new, 1, 0)
+	results$para.boot[k,6] <- para.boot.pdi.new.95[2]-para.boot.pdi.new.95[1]
+
+	results$para.boot[k,7] <- ifelse(para.boot.pdi.exs.80[1]<=Y.star.exs & para.boot.pdi.exs.80[2]>=Y.star.exs, 1, 0)
+	results$para.boot[k,8] <- para.boot.pdi.exs.80[2]-para.boot.pdi.exs.80[1]
+	results$para.boot[k,9] <- ifelse(para.boot.pdi.exs.90[1]<=Y.star.exs & para.boot.pdi.exs.90[2]>=Y.star.exs, 1, 0)
+	results$para.boot[k,10] <- para.boot.pdi.exs.90[2]-para.boot.pdi.exs.90[1]
+	results$para.boot[k,11] <- ifelse(para.boot.pdi.exs.95[1]<=Y.star.exs & para.boot.pdi.exs.95[2]>=Y.star.exs, 1, 0)
+	results$para.boot[k,12] <- para.boot.pdi.exs.95[2]-para.boot.pdi.exs.95[1]
+
+	results$para.boot[k,13] <- ifelse(pdi.theta.80[1]<=theta.star & im.pdi.theta.80[2]>=theta.star, 1, 0)
+	results$para.boot[k,14] <- para.boot.pdi.theta.80[2]-para.boot.pdi.theta.80[1]
+	results$para.boot[k,15] <- ifelse(para.boot.pdi.theta.90[1]<=theta.star & para.boot.pdi.theta.90[2]>=theta.star, 1, 0)
+	results$para.boot[k,16] <- para.boot.pdi.theta.90[2]-para.boot.pdi.theta.90[1]
+	results$para.boot[k,17] <- ifelse(para.boot.pdi.theta.95[1]<=theta.star & para.boot.pdi.theta.95[2]>=theta.star, 1, 0)
+	results$para.boot[k,18] <- para.boot.pdi.theta.95[2]-para.boot.pdi.theta.95[1]	
+	
+	
+	### Bayes - default stan
+	
+	bayes.default.posterior <- stan_lmer(response ~ 1 + (1 | group), data = my.data)
+	bayes.default.theta <- posterior_epred(bayes.default.posterior, newdata = data.frame(group = I+1), re.form = NULL,allow_new_levels = TRUE)
+	bayes.default.pdi.theta.80 <- quantile(bayes.default.theta, probs = c(0.1, 0.8))
+	bayes.default.pdi.theta.90 <- quantile(bayes.default.theta, probs = c(0.05, 0.95))
+	bayes.default.pdi.theta.95 <- quantile(bayes.default.theta, probs = c(0.025, 0.975))
+
+	bayes.default.new <- posterior_predict(bayes.default.posterior, newdata = data.frame(group = I+1), re.form = NULL,allow_new_levels = TRUE)
+	bayes.default.pdi.new.80 <- quantile(bayes.default.new, probs = c(0.1, 0.8))
+	bayes.default.pdi.new.90 <- quantile(bayes.default.new, probs = c(0.05, 0.95))
+	bayes.default.pdi.new.95 <- quantile(bayes.default.new, probs = c(0.025, 0.975))
+
+	bayes.default.exs <- posterior_predict(bayes.default.posterior, newdata = data.frame(group = I), re.form = NULL)
+	bayes.default.pdi.exs.80 <- quantile(bayes.default.exs, probs = c(0.1, 0.8))
+	bayes.default.pdi.exs.90 <- quantile(bayes.default.exs, probs = c(0.05, 0.95))
+	bayes.default.pdi.exs.95 <- quantile(bayes.default.exs, probs = c(0.025, 0.975))
+
+	results$bayes.default[k,1] <- ifelse(bayes.default.pdi.new.80[1]<=Y.star.new & bayes.default.pdi.new.80[2]>=Y.star.new, 1, 0)
+	results$bayes.default[k,2] <- bayes.default.pdi.new.80[2]-bayes.default.pdi.new.80[1]
+	results$bayes.default[k,3] <- ifelse(bayes.default.pdi.new.90[1]<=Y.star.new & bayes.default.pdi.new.90[2]>=Y.star.new, 1, 0)
+	results$bayes.default[k,4] <- bayes.default.pdi.new.90[2]-bayes.default.pdi.new.90[1]
+	results$bayes.default[k,5] <- ifelse(bayes.default.pdi.new.95[1]<=Y.star.new & bayes.default.pdi.new.95[2]>=Y.star.new, 1, 0)
+	results$bayes.default[k,6] <- bayes.default.pdi.new.95[2]-bayes.default.pdi.new.95[1]
+
+	results$bayes.default[k,7] <- ifelse(bayes.default.pdi.exs.80[1]<=Y.star.exs & bayes.default.pdi.exs.80[2]>=Y.star.exs, 1, 0)
+	results$bayes.default[k,8] <- bayes.default.pdi.exs.80[2]-bayes.default.pdi.exs.80[1]
+	results$bayes.default[k,9] <- ifelse(bayes.default.pdi.exs.90[1]<=Y.star.exs & bayes.default.pdi.exs.90[2]>=Y.star.exs, 1, 0)
+	results$bayes.default[k,10] <- bayes.default.pdi.exs.90[2]-bayes.default.pdi.exs.90[1]
+	results$bayes.default[k,11] <- ifelse(bayes.default.pdi.exs.95[1]<=Y.star.exs & bayes.default.pdi.exs.95[2]>=Y.star.exs, 1, 0)
+	results$bayes.default[k,12] <- bayes.default.pdi.exs.95[2]-bayes.default.pdi.exs.95[1]
+
+	results$bayes.default[k,13] <- ifelse(pdi.theta.80[1]<=theta.star & im.pdi.theta.80[2]>=theta.star, 1, 0)
+	results$bayes.default[k,14] <- bayes.default.pdi.theta.80[2]-bayes.default.pdi.theta.80[1]
+	results$bayes.default[k,15] <- ifelse(bayes.default.pdi.theta.90[1]<=theta.star & bayes.default.pdi.theta.90[2]>=theta.star, 1, 0)
+	results$bayes.default[k,16] <- bayes.default.pdi.theta.90[2]-bayes.default.pdi.theta.90[1]
+	results$bayes.default[k,17] <- ifelse(bayes.default.pdi.theta.95[1]<=theta.star & bayes.default.pdi.theta.95[2]>=theta.star, 1, 0)
+	results$bayes.default[k,18] <- bayes.default.pdi.theta.95[2]-bayes.default.pdi.theta.95[1]
+	
+	
+	### Bayes - half cauchy
+	
+	pr1 <-  brms::prior(cauchy(0, 1), class = "sd") + 
+  	brms::prior(cauchy(0, 1), class = "sigma")
+	bayes.cauchy.posterior <- brm(response ~ 1 + (1 | group), data = my.data, prior = pr1)
+
+	bayes.cauchy.theta <- posterior_epred(bayes.cauchy.posterior, newdata = data.frame(group = I+1), re.form = NULL,allow_new_levels = TRUE)	
+	bayes.cauchy.pdi.theta.80 <- quantile(bayes.cauchy.theta, probs = c(0.1, 0.8))
+	bayes.cauchy.pdi.theta.90 <- quantile(bayes.cauchy.theta, probs = c(0.05, 0.95))
+	bayes.cauchy.pdi.theta.95 <- quantile(bayes.cauchy.theta, probs = c(0.025, 0.975))
+	
+	bayes.cauchy.new <- posterior_predict(bayes.cauchy.posterior, newdata = data.frame(group = I+1), re.form = NULL,allow_new_levels = TRUE)	
+	bayes.cauchy.pdi.new.80 <- quantile(bayes.cauchy.new, probs = c(0.1, 0.8))
+	bayes.cauchy.pdi.new.90 <- quantile(bayes.cauchy.new, probs = c(0.05, 0.95))
+	bayes.cauchy.pdi.new.95 <- quantile(bayes.cauchy.new, probs = c(0.025, 0.975))
+
+	bayes.cauchy.exs <- posterior_predict(bayes.cauchy.posterior, newdata = data.frame(group = I), re.form = NULL)	
+	bayes.cauchy.pdi.exs.80 <- quantile(bayes.cauchy.exs, probs = c(0.1, 0.8))
+	bayes.cauchy.pdi.exs.90 <- quantile(bayes.cauchy.exs, probs = c(0.05, 0.95))
+	bayes.cauchy.pdi.exs.95 <- quantile(bayes.cauchy.exs, probs = c(0.025, 0.975))
+	
+	results$bayes.cauchy[k,1] <- ifelse(bayes.cauchy.pdi.new.80[1]<=Y.star.new & bayes.cauchy.pdi.new.80[2]>=Y.star.new, 1, 0)
+	results$bayes.cauchy[k,2] <- bayes.cauchy.pdi.new.80[2]-bayes.cauchy.pdi.new.80[1]
+	results$bayes.cauchy[k,3] <- ifelse(bayes.cauchy.pdi.new.90[1]<=Y.star.new & bayes.cauchy.pdi.new.90[2]>=Y.star.new, 1, 0)
+	results$bayes.cauchy[k,4] <- bayes.cauchy.pdi.new.90[2]-bayes.cauchy.pdi.new.90[1]
+	results$bayes.cauchy[k,5] <- ifelse(bayes.cauchy.pdi.new.95[1]<=Y.star.new & bayes.cauchy.pdi.new.95[2]>=Y.star.new, 1, 0)
+	results$bayes.cauchy[k,6] <- bayes.cauchy.pdi.new.95[2]-bayes.cauchy.pdi.new.95[1]
+
+	results$bayes.cauchy[k,7] <- ifelse(bayes.cauchy.pdi.exs.80[1]<=Y.star.exs & bayes.cauchy.pdi.exs.80[2]>=Y.star.exs, 1, 0)
+	results$bayes.cauchy[k,8] <- bayes.cauchy.pdi.exs.80[2]-bayes.cauchy.pdi.exs.80[1]
+	results$bayes.cauchy[k,9] <- ifelse(bayes.cauchy.pdi.exs.90[1]<=Y.star.exs & bayes.cauchy.pdi.exs.90[2]>=Y.star.exs, 1, 0)
+	results$bayes.cauchy[k,10] <- bayes.cauchy.pdi.exs.90[2]-bayes.cauchy.pdi.exs.90[1]
+	results$bayes.cauchy[k,11] <- ifelse(bayes.cauchy.pdi.exs.95[1]<=Y.star.exs & bayes.cauchy.pdi.exs.95[2]>=Y.star.exs, 1, 0)
+	results$bayes.cauchy[k,12] <- bayes.cauchy.pdi.exs.95[2]-bayes.cauchy.pdi.exs.95[1]
+
+	results$bayes.cauchy[k,13] <- ifelse(pdi.theta.80[1]<=theta.star & im.pdi.theta.80[2]>=theta.star, 1, 0)
+	results$bayes.cauchy[k,14] <- bayes.cauchy.pdi.theta.80[2]-bayes.cauchy.pdi.theta.80[1]
+	results$bayes.cauchy[k,15] <- ifelse(bayes.cauchy.pdi.theta.90[1]<=theta.star & bayes.cauchy.pdi.theta.90[2]>=theta.star, 1, 0)
+	results$bayes.cauchy[k,16] <- bayes.cauchy.pdi.theta.90[2]-bayes.cauchy.pdi.theta.90[1]
+	results$bayes.cauchy[k,17] <- ifelse(bayes.cauchy.pdi.theta.95[1]<=theta.star & bayes.cauchy.pdi.theta.95[2]>=theta.star, 1, 0)
+	results$bayes.cauchy[k,18] <- bayes.cauchy.pdi.theta.95[2]-bayes.cauchy.pdi.theta.95[1]
+	
+	
+	
+	
+	### Bayes - half cauchy, median is truth (sort of oracle)
+	
+	
+	pr1 <-  brms::prior(cauchy(0, sqrt(sigma2_a)), class = "sd") + 
+  	brms::prior(cauchy(0, sqrt(sigma2)), class = "sigma")
+	bayes.oracle.posterior <- brm(response ~ 1 + (1 | group), data = my.data, prior = pr1)
+	
+	bayes.oracle.theta <- posterior_epred(bayes.oracle.posterior, newdata = data.frame(group = I+1), re.form = NULL,allow_new_levels = TRUE)	
+	bayes.oracle.pdi.theta.80 <- quantile(bayes.oracle.theta, probs = c(0.1, 0.8))
+	bayes.oracle.pdi.theta.90 <- quantile(bayes.oracle.theta, probs = c(0.05, 0.95))
+	bayes.oracle.pdi.theta.95 <- quantile(bayes.oracle.theta, probs = c(0.025, 0.975))
+	
+	bayes.oracle.new <- posterior_predict(bayes.oracle.posterior, newdata = data.frame(group = I+1), re.form = NULL,allow_new_levels = TRUE)	
+	bayes.oracle.pdi.new.80 <- quantile(bayes.oracle.new, probs = c(0.1, 0.8))
+	bayes.oracle.pdi.new.90 <- quantile(bayes.oracle.new, probs = c(0.05, 0.95))
+	bayes.oracle.pdi.new.95 <- quantile(bayes.oracle.new, probs = c(0.025, 0.975))
+
+	bayes.oracle.exs <- posterior_predict(bayes.oracle.posterior, newdata = data.frame(group = I), re.form = NULL)	
+	bayes.oracle.pdi.exs.80 <- quantile(bayes.oracle.exs, probs = c(0.1, 0.8))
+	bayes.oracle.pdi.exs.90 <- quantile(bayes.oracle.exs, probs = c(0.05, 0.95))
+	bayes.oracle.pdi.exs.95 <- quantile(bayes.oracle.exs, probs = c(0.025, 0.975))
+	
+	results$bayes.oracle[k,1] <- ifelse(bayes.oracle.pdi.new.80[1]<=Y.star.new & bayes.oracle.pdi.new.80[2]>=Y.star.new, 1, 0)
+	results$bayes.oracle[k,2] <- bayes.oracle.pdi.new.80[2]-bayes.oracle.pdi.new.80[1]
+	results$bayes.oracle[k,3] <- ifelse(bayes.oracle.pdi.new.90[1]<=Y.star.new & bayes.oracle.pdi.new.90[2]>=Y.star.new, 1, 0)
+	results$bayes.oracle[k,4] <- bayes.oracle.pdi.new.90[2]-bayes.oracle.pdi.new.90[1]
+	results$bayes.oracle[k,5] <- ifelse(bayes.oracle.pdi.new.95[1]<=Y.star.new & bayes.oracle.pdi.new.95[2]>=Y.star.new, 1, 0)
+	results$bayes.oracle[k,6] <- bayes.oracle.pdi.new.95[2]-bayes.oracle.pdi.new.95[1]
+
+	results$bayes.oracle[k,7] <- ifelse(bayes.oracle.pdi.exs.80[1]<=Y.star.exs & bayes.oracle.pdi.exs.80[2]>=Y.star.exs, 1, 0)
+	results$bayes.oracle[k,8] <- bayes.oracle.pdi.exs.80[2]-bayes.oracle.pdi.exs.80[1]
+	results$bayes.oracle[k,9] <- ifelse(bayes.oracle.pdi.exs.90[1]<=Y.star.exs & bayes.oracle.pdi.exs.90[2]>=Y.star.exs, 1, 0)
+	results$bayes.oracle[k,10] <- bayes.oracle.pdi.exs.90[2]-bayes.oracle.pdi.exs.90[1]
+	results$bayes.oracle[k,11] <- ifelse(bayes.oracle.pdi.exs.95[1]<=Y.star.exs & bayes.oracle.pdi.exs.95[2]>=Y.star.exs, 1, 0)
+	results$bayes.oracle[k,12] <- bayes.oracle.pdi.exs.95[2]-bayes.oracle.pdi.exs.95[1]
+
+	results$bayes.oracle[k,13] <- ifelse(pdi.theta.80[1]<=theta.star & im.pdi.theta.80[2]>=theta.star, 1, 0)
+	results$bayes.oracle[k,14] <- bayes.oracle.pdi.theta.80[2]-bayes.oracle.pdi.theta.80[1]
+	results$bayes.oracle[k,15] <- ifelse(bayes.oracle.pdi.theta.90[1]<=theta.star & bayes.oracle.pdi.theta.90[2]>=theta.star, 1, 0)
+	results$bayes.oracle[k,16] <- bayes.oracle.pdi.theta.90[2]-bayes.oracle.pdi.theta.90[1]
+	results$bayes.oracle[k,17] <- ifelse(bayes.oracle.pdi.theta.95[1]<=theta.star & bayes.oracle.pdi.theta.95[2]>=theta.star, 1, 0)
+	results$bayes.oracle[k,18] <- bayes.oracle.pdi.theta.95[2]-bayes.oracle.pdi.theta.95[1]
+	
+	
 
 	#### Conformal Prediction
 
