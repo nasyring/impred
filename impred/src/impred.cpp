@@ -99,11 +99,12 @@ Rcpp::List randsetspred(NumericMatrix S, NumericVector dimS, NumericVector nsize
 	List result;
 	int M = int(dimS[0]);
 	int n = int(nsize[0]);
+	int index = int(1);
 	int dn_i = int(dimn_i[0]);
 	NumericVector sumn_i2(1,0.0);
-	NumericVector Qsampsw(M,0.0);
-	NumericVector Qsampsn(M,0.0);
-	NumericVector QsampsT(M,0.0);
+	NumericVector Qsampsw(10000,0.0);
+	NumericVector Qsampsn(10000,0.0);
+	NumericVector QsampsT(10000,0.0);
 	NumericVector Qwl(1,0.0);
 	NumericVector Qwu(1,0.0);
 	NumericVector Qnl(1,0.0);
@@ -112,19 +113,20 @@ Rcpp::List randsetspred(NumericMatrix S, NumericVector dimS, NumericVector nsize
 	NumericVector QTu(1,0.0);
 	NumericVector Ul(1,0.0);
 	NumericVector Uu(1,0.0);
-	NumericVector zeroes = NumericVector(M*6, 0.0); 
-        NumericMatrix randsetpred = NumericMatrix(M, 6, zeroes.begin());
+	NumericVector zeroes = NumericVector(10000*6, 0.0); 
+        NumericMatrix randsetpred = NumericMatrix(10000, 6, zeroes.begin());
 	NumericVector Z(1,0.0);
 	
 	for(int j=0; j<dn_i; j++){
 		sumn_i2[0] = sumn_i2[0] + n_i[j]*n_i[j];	
 	}
 		
-	for(int j=0; j < M; j++){
+	for(int j=0; j < 10000; j++){
 		Z[0] = R::rnorm(0.0,1.0);
-		Qsampsw[j] = Z[0]*std::sqrt(S(j,0)*(1-(2*n_i[dn_i-1]/n)+(1/(n*n))*sumn_i2[0])+S(j,1)*((1/n)+1/(k[0])));
-		Qsampsn[j] = Z[0]*std::sqrt(S(j,0)*(1+(1/(n*n))*sumn_i2[0])+S(j,1)*((1/n)+1/(k[0])));
-		QsampsT[j] = Z[0]*std::sqrt(S(j,0)*(1+(1/(n*n))*sumn_i2[0])+S(j,1)*(1/n));
+		index = rand() % M;
+		Qsampsw[j] = Z[0]*std::sqrt(S(index,0)*(1-(2*n_i[dn_i-1]/n)+(1/(n*n))*sumn_i2[0])+S(index,1)*((1/n)+1/(k[0])));
+		Qsampsn[j] = Z[0]*std::sqrt(S(index,0)*(1+(1/(n*n))*sumn_i2[0])+S(index,1)*((1/n)+1/(k[0])));
+		QsampsT[j] = Z[0]*std::sqrt(S(index,0)*(1+(1/(n*n))*sumn_i2[0])+S(index,1)*(1/n));
 	}
 
 
@@ -132,7 +134,7 @@ Rcpp::List randsetspred(NumericMatrix S, NumericVector dimS, NumericVector nsize
 	std::sort(Qsampsn.begin(), Qsampsn.end());
 	std::sort(QsampsT.begin(), QsampsT.end());
 	
-	for(int j=0; j < M; j++){
+	for(int j=0; j < 10000; j++){
 		Ul[0] = 0.5-std::fabs(U[j]-0.5);
 		Uu[0] = 1.0-Ul[0];
 		Qwl[0] = Qsampsw[std::round(M*Ul[0])];
