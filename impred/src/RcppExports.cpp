@@ -41,6 +41,27 @@ BEGIN_RCPP
 END_RCPP
 }
 
+Rcpp::List randsetspreddens(NumericMatrix sigsampdens, NumericVector dimS, NumericVector nsize, NumericVector n_i, NumericVector dimn_i, NumericVector k, NumericVector Ybar, NumericVector predgrid, NumericVector dim_predgrid, NumericVector localpt, NumericVector logdenslocalpt);
+RcppExport SEXP impred_randsetspreddens(SEXP sigsampdensSEXP, SEXP dimSSEXP, SEXP nsizeSEXP, SEXP n_iSEXP, SEXP dimn_iSEXP, SEXP kSEXP, SEXP YbarSEXP, SEXP predgridSEXP, SEXP dim_predgridSEXP, SEXP localptSEXP, SEXP logdenslocalptSEXP){
+BEGIN_RCPP
+    Rcpp::RObject __result;
+    Rcpp::RNGScope __rngScope;
+    Rcpp::traits::input_parameter< NumericMatrix >::type sigsampdens(sigsampdensSEXP);
+    Rcpp::traits::input_parameter< NumericVector >::type dimS(dimSSEXP);
+    Rcpp::traits::input_parameter< NumericVector >::type nsize(nsizeSEXP);
+    Rcpp::traits::input_parameter< NumericVector >::type n_i(n_iSEXP);
+    Rcpp::traits::input_parameter< NumericVector >::type dimn_i(dimn_iSEXP);
+    Rcpp::traits::input_parameter< NumericVector >::type k(kSEXP);
+    Rcpp::traits::input_parameter< NumericVector >::type Ybar(YbarSEXP);
+    Rcpp::traits::input_parameter< NumericVector >::type predgridSEXP(predgridSEXP);
+    Rcpp::traits::input_parameter< NumericVector >::type dim_predgrid(dim_predgridSEXP);
+    Rcpp::traits::input_parameter< NumericVector >::type localpt(localptSEXP);
+    Rcpp::traits::input_parameter< NumericVector >::type logdenslocalpt(logdenslocalptSEXP);
+    __result = Rcpp::wrap(randsetspreddens(sigsampdens,dimS,nsize,n_i,dimn_i,k,Ybar,predgrid,dim_predgrid,localpt,logdenslocalpt));
+    return __result;
+END_RCPP
+}
+
 Rcpp::NumericVector zeroin(NumericVector ax, NumericVector bx, NumericVector u, NumericVector v, NumericVector y, NumericVector z, Function f, NumericVector tol);
 RcppExport SEXP impred_zeroin(SEXP axSEXP, SEXP bxSEXP, SEXP uSEXP, SEXP vSEXP, SEXP ySEXP, SEXP zSEXP, SEXP fSEXP, SEXP tolSEXP){
 BEGIN_RCPP
