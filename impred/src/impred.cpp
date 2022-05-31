@@ -162,6 +162,73 @@ result = Rcpp::List::create(Rcpp::Named("randsetpred") = randsetpred);
 	
 	
 }
+
+
+
+
+Rcpp::List randsetspreddens(NumericMatrix sigsampdens, NumericVector dimS, NumericVector nsize, NumericVector n_i, NumericVector dimn_i, NumericVector k, NumericVector Ybar, NumericVector predgrid, NumericVector dim_predgrid, NumericVector localpt, NumericVector logdenslocalpt) {
+	
+	List result;
+	int M = int(dimS[0]);
+	int n = int(nsize[0]);
+	int dn_i = int(dimn_i[0]);
+	int L = int(dim_predgrid[0]);
+	NumericVector sumn_i2(1,0.0);
+	NumericVector solnw(L, 0.0);
+	NumericVector solnn(L, 0.0);
+	NumericVector solnT(L, 0.0);
+	NumericVector denssolnw(L, 0.0);
+	NumericVector denssolnn(L, 0.0);
+	NumericVector denssolnT(L, 0.0);
+	NumericVector denssamp(M, 0.0);
+	NumericVector Z(1, 0.0);
+	NumericVector localplausesw(L, 0.0);NumericVector localplausesn(L, 0.0);NumericVector localplausesT(L, 0.0);
+	
+	for(int j=0; j<dn_i; j++){
+		sumn_i2[0] = sumn_i2[0] + n_i[j]*n_i[j];	
+	}
+	
+	for(int j=0; j<L; j++){
+		solnw[j] = (predgrid[j]-Ybar[0])/std::sqrt(localpt[0]*(1-(2*n_i[dn_i-1]/n)+(1/(n*n))*sumn_i2[0])+localpt[1]*((1/n)+1/(k[0])));
+		denssolnw[j] = logdenslocalpt[0] + R::dnorm(solnw[j], 0.0,1.0,1);
+		solnn[j] = (predgrid[j]-Ybar[0])/std::sqrt(localpt[0]*(1+(1/(n*n))*sumn_i2[0])+localpt[1]*((1/n)+1/(k[0])));
+		denssolnn[j] = logdenslocalpt[0] + R::dnorm(solnn[j], 0.0,1.0,1);
+		solnT[j] = (predgrid[j]-Ybar[0])/std::sqrt(localpt[0]*(1+(1/(n*n))*sumn_i2[0])+localpt[1]*(1/n));
+		denssolnT[j] = logdenslocalpt[0] + R::dnorm(solnT[j], 0.0,1.0,1);
+	}
+	
+	for(int j=0; j<M; j++){
+		Z[0] = R::rnorm(0.0,1.0);
+		denssamp[j] = sigsampdens[j] + R::dnorm(Z[0], 0.0, 1.0, 1);
+		for(int k = 0; k<L; k++){
+			if(denssolnw[j] > denssamp[j]){
+				localplausesw[k] = localplausesw[k]+(1.0/M); 	
+			}
+			if(denssolnn[j] > denssamp[j]){
+				localplausesn[k] = localplausesn[k]+(1.0/M); 	
+			}
+			if(denssolnT[j] > denssamp[j]){
+				localplausesT[k] = localplausesT[k]+(1.0/M); 	
+			}
+		}
+	}
+	
+	
+
+result = Rcpp::List::create(Rcpp::Named("localplausesw") = localplausesw,Rcpp::Named("localplausesn") = localplausesn, Rcpp::Named("localplausesT") = localplausesT);
+
+	return result;
+	
+	
+}
+
+
+
+
+
+
+
+
 //NumericVector(*f)(NumericVector x, NumericVector uu, NumericVector vv, NumericVector yy, NumericVector zz)
 Rcpp::NumericVector zeroin(NumericVector ax, NumericVector bx, NumericVector u, NumericVector v, NumericVector y, NumericVector z, Function f , NumericVector tol) {
     // code here
