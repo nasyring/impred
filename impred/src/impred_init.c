@@ -13,7 +13,6 @@ extern SEXP impred_zeroin(SEXP, SEXP, SEXP, SEXP, SEXP, SEXP, SEXP, SEXP);
 extern SEXP impred_root_function(SEXP, SEXP, SEXP, SEXP, SEXP);
 
 
-randsetspreddens(NumericMatrix sigsampdens, NumericVector dimS, NumericVector nsize, NumericVector n_i, NumericVector dimn_i, NumericVector k, NumericVector Ybar, NumericVector predgrid, NumericVector dim_predgrid, NumericVector localpt, NumericVector logdenslocalpt)
 
 static const R_CallMethodDef CallEntries[] = {
     {"impred_randsetsMCMC", (DL_FUNC) &impred_randsetsMCMC, 5},
