@@ -36,6 +36,7 @@ Rcpp::List randsetsMCMC(NumericMatrix H, NumericMatrix A, NumericVector rL, Nume
 	arma::mat arg;
 	NumericVector postsamples0(M,0.0);
 	NumericVector postsamples1(M,0.0);
+	NumericVector postsamplesdens(M,0.0);
 	arma::mat Ua = as<arma::mat>(U);
 	
 	for(int h = 0; h<H1; h++){
@@ -75,17 +76,19 @@ for(int j=0; j<M; j++) {
 					postsamples1[j] = uprop[1];
 				}
 				u(0)=uprop(0);u(1)=uprop(1);
+				postsamplesdens[j] = logjointnew[0];
 			}else {
 				if(i==0){
 					postsamples0[j] = u[0];	
 				}else {
 					postsamples1[j] = u[1];
-				}				
+				}
+				postsamplesdens[j] = logjointold[0];
 			}
 			logjointold[0] = 0.0; logjointnew[0] = 0.0;
 		}
 	}
-result = Rcpp::List::create(Rcpp::Named("samples1") = postsamples0,Rcpp::Named("samples2") = postsamples1);
+result = Rcpp::List::create(Rcpp::Named("samples1") = postsamples0,Rcpp::Named("samples2") = postsamples1,Rcpp::Named("logdens") = postsamplesdens);
 
 	return result;
 	
