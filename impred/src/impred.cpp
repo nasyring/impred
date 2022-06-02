@@ -163,6 +163,78 @@ result = Rcpp::List::create(Rcpp::Named("randsetpred") = randsetpred);
 	
 }
 
+Rcpp::List randsetspred3(NumericMatrix S, NumericVector dimS, NumericVector nsize, NumericVector n_i, NumericVector dimn_i, NumericVector k, NumericVector U, NumericVector Ybar, NumericVector sig0) {
+	
+	List result;
+	int M = int(dimS[0]);
+	int n = int(nsize[0]);
+	int index = int(1);
+	int dn_i = int(dimn_i[0]);
+	NumericVector sumn_i2(1,0.0);
+	NumericVector Qsampsw(10000,0.0);
+	NumericVector Qsampsn(10000,0.0);
+	NumericVector QsampsT(10000,0.0);
+	NumericVector Qwl(1,0.0);
+	NumericVector Qwu(1,0.0);
+	NumericVector Qnl(1,0.0);
+	NumericVector Qnu(1,0.0);
+	NumericVector QTl(1,0.0);
+	NumericVector QTu(1,0.0);
+	NumericVector Ul(1,0.0);
+	NumericVector Uu(1,0.0);
+	NumericVector zeroes = NumericVector(10000*10, 0.0); 
+        NumericMatrix randsetpred = NumericMatrix(10000, 10, zeroes.begin());
+	NumericVector Z(1,0.0);
+	NumericVector sa0(10000,0.0);NumericVector s0(10000,0.0);
+	
+	for(int j=0; j<dn_i; j++){
+		sumn_i2[0] = sumn_i2[0] + n_i[j]*n_i[j];	
+	}
+		
+	for(int j=0; j < 10000; j++){
+		Z[0] = R::rnorm(0.0,1.0);
+		index = rand() % M;
+		Qsampsw[j] = Z[0]*std::sqrt(S(index,0)*(1-(2*n_i[dn_i-1]/n)+(1/(n*n))*sumn_i2[0])+S(index,1)*((1/n)+1/(k[0])));
+		Qsampsn[j] = Z[0]*std::sqrt(S(index,0)*(1+(1/(n*n))*sumn_i2[0])+S(index,1)*((1/n)+1/(k[0])));
+		QsampsT[j] = Z[0]*std::sqrt(S(index,0)*(1+(1/(n*n))*sumn_i2[0])+S(index,1)*(1/n));
+		sa0[j] = S(index,0);s0[j] = S(index,1);
+	}
+
+	std::sort(sa0.begin(), sa0.end());
+	std::sort(s0.begin(), s0.end());
+	std::sort(Qsampsw.begin(), Qsampsw.end());
+	std::sort(Qsampsn.begin(), Qsampsn.end());
+	std::sort(QsampsT.begin(), QsampsT.end());
+	
+	for(int j=0; j < 10000; j++){
+		Ul[0] = 0.5-std::fabs(U[j]-0.5);
+		Uu[0] = 1.0-Ul[0];
+		Qwl[0] = Qsampsw[std::round(10000*Ul[0])];
+		Qwu[0] = Qsampsw[std::round(10000*Uu[0])];
+		Qnl[0] = Qsampsn[std::round(10000*Ul[0])];
+		Qnu[0] = Qsampsn[std::round(10000*Uu[0])];
+		QTl[0] = QsampsT[std::round(10000*Ul[0])];
+		QTu[0] = QsampsT[std::round(10000*Uu[0])];
+		randsetpred(j,0) = Ybar[0]+Qwl[0];
+		randsetpred(j,1) = Ybar[0]+Qwu[0];
+		randsetpred(j,2) = Ybar[0]+Qnl[0];
+		randsetpred(j,3) = Ybar[0]+Qnu[0];
+		randsetpred(j,4) = Ybar[0]+QTl[0];
+		randsetpred(j,5) = Ybar[0]+QTu[0];
+		randsetpred(j,6) = sa0[std::round(10000*Ul[0])];
+		randsetpred(j,7) = sa0[std::round(10000*Uu[0])];
+		randsetpred(j,8) = s0[std::round(10000*Ul[0])];
+		randsetpred(j,9) = s0[std::round(10000*Uu[0])];
+	}
+	
+
+result = Rcpp::List::create(Rcpp::Named("randsetpred") = randsetpred);
+
+	return result;
+	
+	
+}
+
 
 
 
