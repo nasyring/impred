@@ -53,7 +53,7 @@ BEGIN_RCPP
     Rcpp::traits::input_parameter< NumericVector >::type dimn_i(dimn_iSEXP);
     Rcpp::traits::input_parameter< NumericVector >::type k(kSEXP);
     Rcpp::traits::input_parameter< NumericVector >::type Ybar(YbarSEXP);
-    Rcpp::traits::input_parameter< NumericVector >::type predgridSEXP(predgridSEXP);
+    Rcpp::traits::input_parameter< NumericVector >::type predgrid(predgridSEXP);
     Rcpp::traits::input_parameter< NumericVector >::type dim_predgrid(dim_predgridSEXP);
     Rcpp::traits::input_parameter< NumericVector >::type localpt(localptSEXP);
     Rcpp::traits::input_parameter< NumericVector >::type logdenslocalpt(logdenslocalptSEXP);
