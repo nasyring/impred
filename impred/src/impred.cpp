@@ -201,13 +201,13 @@ Rcpp::List randsetspreddens(NumericVector sigsampdens, NumericVector dimS, Numer
 		Z[0] = R::rnorm(0.0,1.0);
 		denssamp[j] = sigsampdens[j] + R::dnorm(Z[0], 0.0, 1.0, 1);
 		for(int k = 0; k<L; k++){
-			if(denssolnw[j] > denssamp[j]){
+			if(denssolnw[k] > denssamp[j]){
 				localplausesw[k] = localplausesw[k]+(1.0/M); 	
 			}
-			if(denssolnn[j] > denssamp[j]){
+			if(denssolnn[k] > denssamp[j]){
 				localplausesn[k] = localplausesn[k]+(1.0/M); 	
 			}
-			if(denssolnT[j] > denssamp[j]){
+			if(denssolnT[k] > denssamp[j]){
 				localplausesT[k] = localplausesT[k]+(1.0/M); 	
 			}
 		}
