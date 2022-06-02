@@ -128,7 +128,7 @@ aov.statistics <- function(aov.data){
 ##		which is assumed to be the last group in the aov.data structure.  The second interval corresponds to a "out-of-experiment"
 ##		prediction for mean of k new responses from a new group.
 
-rand.sets <- function(sig02, U, k, aov.data, aov.statistics){
+rand.sets <- function(sig02, U, k, aov.data, aov.statistics, predgrid){
 	Y <- aov.data$Y
 	Z <- aov.data$Z
 	n_i <- colSums(Z)
@@ -193,6 +193,11 @@ rand.sets <- function(sig02, U, k, aov.data, aov.statistics){
 		sigma.solns <- sigma.solve(samps)
 	}
 	rand.sets.pred <- randsetspred(sigma.solns, dim(sigma.solns), n, n_i, length(n_i), k, U, mean(Y))$randsetpred
+	Omega1 <- sum(log(S.L[1:(L-1)])) - sum(log(lambda.L[1:(L-1)]*sigma_a02 + sigma_02))
+	Omega2 <- log(S.L[L]) - log(sigma_02)
+	matprod <- A.inv%*%matrix(c(H,Omega1, Omega2), L+2,1)
+	dens <- sum(0.5*r.L*matprod-0.5*exp(matprod))
+	densplaus <- randsetspreddens(sigma.solns, dim(sigma.solns), n, n_i, length(n_i), k, mean(Y), predgrid, length(predgrid), c(sigma_a02, sigma_02), dens)
 	return(rand.sets.pred)
 }
 
