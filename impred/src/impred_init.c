@@ -18,7 +18,7 @@ extern SEXP impred_root_function(SEXP, SEXP, SEXP, SEXP, SEXP);
 static const R_CallMethodDef CallEntries[] = {
     {"impred_randsetsMCMC", (DL_FUNC) &impred_randsetsMCMC, 5},
     {"impred_randsetspred", (DL_FUNC) &impred_randsetspred, 8},
-    {"impred_randsetspred3", (DL_FUNC) &impred_randsetspred3, 9},
+    {"impred_randsetspred3", (DL_FUNC) &impred_randsetspred3, 8},
     {"impred_randsetspreddens", (DL_FUNC) &impred_randsetspreddens, 11},
     {"impred_sigmaSolve", (DL_FUNC) &impred_sigmaSolve, 5}, 
     {"impred_zeroin", (DL_FUNC) &impred_zeroin, 8},
