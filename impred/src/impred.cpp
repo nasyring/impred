@@ -163,7 +163,7 @@ result = Rcpp::List::create(Rcpp::Named("randsetpred") = randsetpred);
 	
 }
 
-Rcpp::List randsetspred3(NumericMatrix S, NumericVector dimS, NumericVector nsize, NumericVector n_i, NumericVector dimn_i, NumericVector k, NumericVector U, NumericVector Ybar, NumericVector sig0) {
+Rcpp::List randsetspred3(NumericMatrix S, NumericVector dimS, NumericVector nsize, NumericVector n_i, NumericVector dimn_i, NumericVector k, NumericVector U, NumericVector Ybar) {
 	
 	List result;
 	int M = int(dimS[0]);
