@@ -166,7 +166,7 @@ result = Rcpp::List::create(Rcpp::Named("randsetpred") = randsetpred);
 
 
 
-Rcpp::List randsetspreddens(NumericMatrix sigsampdens, NumericVector dimS, NumericVector nsize, NumericVector n_i, NumericVector dimn_i, NumericVector k, NumericVector Ybar, NumericVector predgrid, NumericVector dim_predgrid, NumericVector localpt, NumericVector logdenslocalpt) {
+Rcpp::List randsetspreddens(NumericVector sigsampdens, NumericVector dimS, NumericVector nsize, NumericVector n_i, NumericVector dimn_i, NumericVector k, NumericVector Ybar, NumericVector predgrid, NumericVector dim_predgrid, NumericVector localpt, NumericVector logdenslocalpt) {
 	
 	List result;
 	int M = int(dimS[0]);
