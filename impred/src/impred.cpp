@@ -197,7 +197,7 @@ Rcpp::List randsetspred3(NumericMatrix S, NumericVector dimS, NumericVector nsiz
 		Qsampsw[j] = Z[0]*std::sqrt(S(index,0)*(1-(2*n_i[dn_i-1]/n)+(1/(n*n))*sumn_i2[0])+S(index,1)*((1/n)+1/(k[0])));
 		Qsampsn[j] = Z[0]*std::sqrt(S(index,0)*(1+(1/(n*n))*sumn_i2[0])+S(index,1)*((1/n)+1/(k[0])));
 		QsampsT[j] = Z[0]*std::sqrt(S(index,0)*(1+(1/(n*n))*sumn_i2[0])+S(index,1)*(1/n));
-		sa0[j] = S(index,0);s0[j] = S(index,1);
+		sa0[j] = S(j,0);s0[j] = S(j,1);
 	}
 
 	std::sort(sa0.begin(), sa0.end());
