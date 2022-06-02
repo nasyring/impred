@@ -41,12 +41,12 @@ BEGIN_RCPP
 END_RCPP
 }
 
-Rcpp::List randsetspreddens(NumericMatrix sigsampdens, NumericVector dimS, NumericVector nsize, NumericVector n_i, NumericVector dimn_i, NumericVector k, NumericVector Ybar, NumericVector predgrid, NumericVector dim_predgrid, NumericVector localpt, NumericVector logdenslocalpt);
+Rcpp::List randsetspreddens(NumericVector sigsampdens, NumericVector dimS, NumericVector nsize, NumericVector n_i, NumericVector dimn_i, NumericVector k, NumericVector Ybar, NumericVector predgrid, NumericVector dim_predgrid, NumericVector localpt, NumericVector logdenslocalpt);
 RcppExport SEXP impred_randsetspreddens(SEXP sigsampdensSEXP, SEXP dimSSEXP, SEXP nsizeSEXP, SEXP n_iSEXP, SEXP dimn_iSEXP, SEXP kSEXP, SEXP YbarSEXP, SEXP predgridSEXP, SEXP dim_predgridSEXP, SEXP localptSEXP, SEXP logdenslocalptSEXP){
 BEGIN_RCPP
     Rcpp::RObject __result;
     Rcpp::RNGScope __rngScope;
-    Rcpp::traits::input_parameter< NumericMatrix >::type sigsampdens(sigsampdensSEXP);
+    Rcpp::traits::input_parameter< NumericVector >::type sigsampdens(sigsampdensSEXP);
     Rcpp::traits::input_parameter< NumericVector >::type dimS(dimSSEXP);
     Rcpp::traits::input_parameter< NumericVector >::type nsize(nsizeSEXP);
     Rcpp::traits::input_parameter< NumericVector >::type n_i(n_iSEXP);
