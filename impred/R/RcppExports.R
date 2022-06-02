@@ -11,6 +11,10 @@ randsetspred <- function(S,dimS,nsize,n_i,dimn_i,k,U,Ybar) {
     .Call(`impred_randsetspred`, S,dimS,nsize,n_i,dimn_i,k,U,Ybar)
 }
 
+randsetspred3 <- function(S,dimS,nsize,n_i,dimn_i,k,U,Ybar) {
+    .Call(`impred_randsetspred3`, S,dimS,nsize,n_i,dimn_i,k,U,Ybar)
+}
+
 
 randsetspreddens <- function(sigsampdens, dimS, nsize, n_i, dimn_i, k, Ybar, predgrid, dim_predgrid, localpt, logdenslocalpt) {
     .Call(`impred_randsetspreddens`, sigsampdens, dimS, nsize, n_i, dimn_i, k, Ybar, predgrid, dim_predgrid, localpt, logdenslocalpt)    
