@@ -205,7 +205,7 @@ Rcpp::List genIM(NumericVector Y, NumericMatrix Z, NumericVector thetaseq, Numer
 					for(int q = 0; q < n; q++){
 						lik[0] = lik[0] - log(chSigma(q,q));
 					}
-					lik[0] = lik[0] - 0.5 * n * log(2 * M_PI) - 0.5 * rss(0,0);
+					lik[0] = lik[0] - 0.5 * n * log(2 * M_PI) - 0.5 * rss(0,0) + R::dnorm(thetaseq[i], museq[j], std::sqrt(saseq[k]), 1);
 					data_lik[i] = std::max(data_lik[i], lik[0]);
 				}
 			}
