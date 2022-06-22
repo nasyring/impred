@@ -41,20 +41,19 @@ BEGIN_RCPP
 END_RCPP
 }
 
-Rcpp::List randsetspred3(NumericMatrix S, NumericVector dimS, NumericVector nsize, NumericVector n_i, NumericVector dimn_i, NumericVector k, NumericVector U, NumericVector Ybar);
-RcppExport SEXP impred_randsetspred3(SEXP SSEXP, SEXP dimSSEXP, SEXP nsizeSEXP, SEXP n_iSEXP, SEXP dimn_iSEXP, SEXP kSEXP, SEXP USEXP, SEXP YbarSEXP){
+Rcpp::List genIM(NumericVector Y, arma::mat Z, NumericVector thetaseq, NumericVector museq, NumericVector saseq, NumericVector seseq, NumericVector M);
+RcppExport SEXP impred_denIM(SEXP YSEXP, SEXP ZSEXP, SEXP thetaseqSEXP, SEXP museqSEXP, SEXP saseqSEXP, SEXP seseqSEXP, SEXP MSEXP){
 BEGIN_RCPP
     Rcpp::RObject __result;
     Rcpp::RNGScope __rngScope;
-    Rcpp::traits::input_parameter< NumericMatrix >::type S(SSEXP);
-    Rcpp::traits::input_parameter< NumericVector >::type dimS(dimSSEXP);
-    Rcpp::traits::input_parameter< NumericVector >::type nsize(nsizeSEXP);
-    Rcpp::traits::input_parameter< NumericVector >::type n_i(n_iSEXP);
-    Rcpp::traits::input_parameter< NumericVector >::type dimn_i(dimn_iSEXP);
-    Rcpp::traits::input_parameter< NumericVector >::type k(kSEXP);
-    Rcpp::traits::input_parameter< NumericVector >::type U(USEXP);
-    Rcpp::traits::input_parameter< NumericVector >::type Ybar(YbarSEXP);
-    __result = Rcpp::wrap(randsetspred3(S,dimS,nsize,n_i,dimn_i,k,U,Ybar));
+    Rcpp::traits::input_parameter< NumericMatrix >::type Y(YSEXP);
+    Rcpp::traits::input_parameter< NumericVector >::type Z(ZSEXP);
+    Rcpp::traits::input_parameter< NumericVector >::type thetaseq(thetaseqSEXP);
+    Rcpp::traits::input_parameter< NumericVector >::type museq(museqSEXP);
+    Rcpp::traits::input_parameter< NumericVector >::type saseq(saseqSEXP);
+    Rcpp::traits::input_parameter< NumericVector >::type seseq(seseqSEXP);
+    Rcpp::traits::input_parameter< NumericVector >::type M(MSEXP);
+    __result = Rcpp::wrap(genIM( Y,  Z, thetaseq,  museq,  saseq, seseq,  M));
     return __result;
 END_RCPP
 }
