@@ -163,7 +163,7 @@ result = Rcpp::List::create(Rcpp::Named("randsetpred") = randsetpred);
 	
 }
 
-Rcpp::List genIM(NumericVector Y, arma::mat Z, NumericVector thetaseq, NumericVector museq, NumericVector saseq, NumericVector seseq, NumericVector M) {
+Rcpp::List genIM(NumericVector Y, NumericMatrix Z, NumericVector thetaseq, NumericVector museq, NumericVector saseq, NumericVector seseq, NumericVector M) {
 	
 	List result;
 	int n = Y.length();
@@ -176,6 +176,7 @@ Rcpp::List genIM(NumericVector Y, arma::mat Z, NumericVector thetaseq, NumericVe
 	arma::vec ym; ym.zeroes(n);
 	NumericVector data_lik(s_t, -1000000000.0);
 	NumericVector sim_lik(s_t, 0.0);
+	arma::mat ZZ = as<arma::mat>(Z); 
 	arma::mat Sigma; Sigma.zeroes(n,n);
 	arma::mat Sigma_a; Sigma_a.zeroes(n,n);
 	arma::mat I_n; I_n.zeroes(n,n);
@@ -193,7 +194,7 @@ Rcpp::List genIM(NumericVector Y, arma::mat Z, NumericVector thetaseq, NumericVe
 				for(int t = 0; t < s_par; t++){
 					for(int q = 0; q < n; q++){
 						for(int r = 0; r<n; r++){
-							Sigma(q,r) = Z(q,r)*saseq[k] + I_n(q,r)*seseq[t];	
+							Sigma(q,r) = ZZ(q,r)*saseq[k] + I_n(q,r)*seseq[t];	
 						}
 					}
 					z = arma::chol(Sigma) * ym;
