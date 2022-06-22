@@ -171,7 +171,7 @@ Rcpp::List genIM(NumericVector Y, NumericMatrix Z, NumericVector thetaseq, Numer
 	int s_par = museq.length();
 	int s_t = thetaseq.length();
 	
-	NumericVector U(n+1,0.0); NumericVector sim_lik(m,0.0); NumericVector proptheta(s_t,0.0);NumericVector tempproptheta(1,0.0);
+	NumericVector U(n+1,0.0); NumericVector sim_lik(m,0.0);NumericVector sim_lik_tmp(1,0.0); NumericVector proptheta(s_t,0.0);NumericVector tempproptheta(1,0.0);
 	NumericVector lik(1, 0.0);
 	arma::vec z; z.zeros(n);
 	arma::vec ym; ym.zeros(n);
@@ -185,7 +185,8 @@ Rcpp::List genIM(NumericVector Y, NumericMatrix Z, NumericVector thetaseq, Numer
 	
 	for(int q = 0; q < m; q++){
 		U = Rcpp::rnorm(n+1,0.0,1.0);
-		sim_lik[q] = cumsum(Rcpp::dnorm(U,0.0,1.0));
+		sim_lik_tmp = cumsum(Rcpp::dnorm(U,0.0,1.0));
+		sim_lik[q] = sim_lik_tmp[0];
 	}
 	
 	
