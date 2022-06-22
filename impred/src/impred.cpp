@@ -178,6 +178,7 @@ Rcpp::List genIM(NumericVector Y, NumericMatrix Z, NumericVector thetaseq, Numer
 	NumericVector sim_lik(s_t, 0.0);
 	arma::mat ZZ = as<arma::mat>(Z); 
 	arma::mat Sigma; Sigma.zeros(n,n);
+	arma::mat chSigma; arma::mat tmp; arma::mat rss; 
 	arma::mat Sigma_a; Sigma_a.zeros(n,n);
 	arma::mat I_n; I_n.zeros(n,n);
 	for(int i = 0; i < n; i++){
@@ -197,10 +198,14 @@ Rcpp::List genIM(NumericVector Y, NumericMatrix Z, NumericVector thetaseq, Numer
 							Sigma(q,r) = ZZ(q,r)*saseq[k] + I_n(q,r)*seseq[t];	
 						}
 					}
-					z = arma::chol(Sigma) * ym;
+					chSigma = arma::chol(Sigma);
+					tmp = solve(trimatu(chSigma), ym);
+					rss = dot(tmp,tmp);
+					lik[0] = 0.0;
 					for(int q = 0; q < n; q++){
-						lik[0] = lik[0] + R::dnorm(z(q),0.0,1.0,1);
+						lik[0] = lik[0] - log(chSigma(q,q));
 					}
+					lik[0] = lik[0] - 0.5 * n * log(2 * M_PI) - 0.5 * rss(0,0);
 					data_lik[i] = std::max(data_lik[i], lik[0]);
 				}
 			}
@@ -209,7 +214,7 @@ Rcpp::List genIM(NumericVector Y, NumericMatrix Z, NumericVector thetaseq, Numer
 	}
 	
 	
-	result = Rcpp::List::create(Rcpp::Named("lik") = lik, Rcpp::Named("z") = z, Rcpp::Named("ym") = ym, Rcpp::Named("data_lik") = data_lik, Rcpp::Named("Sigma") = Sigma);
+	result = Rcpp::List::create(Rcpp::Named("lik") = lik, Rcpp::Named("rss") = rss, Rcpp::Named("ym") = ym, Rcpp::Named("data_lik") = data_lik, Rcpp::Named("Sigma") = Sigma);
 
 	return result;
 	
