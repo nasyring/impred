@@ -163,72 +163,52 @@ result = Rcpp::List::create(Rcpp::Named("randsetpred") = randsetpred);
 	
 }
 
-Rcpp::List randsetspred3(NumericMatrix S, NumericVector dimS, NumericVector nsize, NumericVector n_i, NumericVector dimn_i, NumericVector k, NumericVector U, NumericVector Ybar) {
+Rcpp::List genIM(NumericVector Y, arma::mat Z, NumericVector thetaseq, NumericVector museq, NumericVector saseq, NumericVector seseq, NumericVector M) {
 	
 	List result;
-	int M = int(dimS[0]);
-	int n = int(nsize[0]);
-	int index = int(1);
-	int dn_i = int(dimn_i[0]);
-	NumericVector sumn_i2(1,0.0);
-	NumericVector Qsampsw(10000,0.0);
-	NumericVector Qsampsn(10000,0.0);
-	NumericVector QsampsT(10000,0.0);
-	NumericVector Qwl(1,0.0);
-	NumericVector Qwu(1,0.0);
-	NumericVector Qnl(1,0.0);
-	NumericVector Qnu(1,0.0);
-	NumericVector QTl(1,0.0);
-	NumericVector QTu(1,0.0);
-	NumericVector Ul(1,0.0);
-	NumericVector Uu(1,0.0);
-	NumericVector zeroes = NumericVector(10000*10, 0.0); 
-        NumericMatrix randsetpred = NumericMatrix(10000, 10, zeroes.begin());
-	NumericVector Z(1,0.0);
-	NumericVector sa0(10000,0.0);NumericVector s0(10000,0.0);
+	int n = Y.length();
+	int m = round(M[0]);
+	int s_par = museq.length();
+	int s_t = thetaseq.length();
 	
-	for(int j=0; j<dn_i; j++){
-		sumn_i2[0] = sumn_i2[0] + n_i[j]*n_i[j];	
+	NumericVector lik(1, 0.0);
+	arma::vec z; z.zeroes(n);
+	arma::vec ym; ym.zeroes(n);
+	NumericVector data_lik(s_t, -1000000000.0);
+	NumericVector sim_lik(s_t, 0.0);
+	arma::mat Sigma; Sigma.zeroes(n,n);
+	arma::mat Sigma_a; Sigma_a.zeroes(n,n);
+	arma::mat I_n; I_n.zeroes(n,n);
+	for(int i = 0; i < n; i++){
+		I_n(i,i) = 1.0;
 	}
+	
+	
+	for(int i = 0; i < s_t; i++){
+		for(int j = 0; j < s_par; j++){
+			for(int q = 0; q < n; q++){
+				ym(q) = y[q] - museq[j];	
+			}
+			for(int k = 0; k < s_par; k++){
+				for(int t = 0; t < s_par; t++){
+					for(int q = 0; q < n; q++){
+						for(int r = 0; r<n; r++){
+							Sigma(q,r) = Z(q,r)*saseq[k] + I_n(q,r)*seseq[t];	
+						}
+					}
+					z = arma::chol(Sigma) * ym;
+					for(int q = 0; q < n; q++){
+						lik[0] = lik[0] + R::dnorm(z(q),0.0,1.0,1);
+					}
+					data_lik[i] = std::max(data_lik[i], lik[0]);
+				}
+			}
+		}
 		
-	for(int j=0; j < 10000; j++){
-		Z[0] = R::rnorm(0.0,1.0);
-		index = rand() % M;
-		Qsampsw[j] = Z[0]*std::sqrt(S(index,0)*(1-(2*n_i[dn_i-1]/n)+(1/(n*n))*sumn_i2[0])+S(index,1)*((1/n)+1/(k[0])));
-		Qsampsn[j] = Z[0]*std::sqrt(S(index,0)*(1+(1/(n*n))*sumn_i2[0])+S(index,1)*((1/n)+1/(k[0])));
-		QsampsT[j] = Z[0]*std::sqrt(S(index,0)*(1+(1/(n*n))*sumn_i2[0])+S(index,1)*(1/n));
-		sa0[j] = S(j,0);s0[j] = S(j,1);
-	}
-
-	std::sort(sa0.begin(), sa0.end());
-	std::sort(s0.begin(), s0.end());
-	std::sort(Qsampsw.begin(), Qsampsw.end());
-	std::sort(Qsampsn.begin(), Qsampsn.end());
-	std::sort(QsampsT.begin(), QsampsT.end());
-	
-	for(int j=0; j < 10000; j++){
-		Ul[0] = 0.5-std::fabs(U[j]-0.5);
-		Uu[0] = 1.0-Ul[0];
-		Qwl[0] = Qsampsw[std::round(10000*Ul[0])];
-		Qwu[0] = Qsampsw[std::round(10000*Uu[0])];
-		Qnl[0] = Qsampsn[std::round(10000*Ul[0])];
-		Qnu[0] = Qsampsn[std::round(10000*Uu[0])];
-		QTl[0] = QsampsT[std::round(10000*Ul[0])];
-		QTu[0] = QsampsT[std::round(10000*Uu[0])];
-		randsetpred(j,0) = Ybar[0]+Qwl[0];
-		randsetpred(j,1) = Ybar[0]+Qwu[0];
-		randsetpred(j,2) = Ybar[0]+Qnl[0];
-		randsetpred(j,3) = Ybar[0]+Qnu[0];
-		randsetpred(j,4) = Ybar[0]+QTl[0];
-		randsetpred(j,5) = Ybar[0]+QTu[0];
-		randsetpred(j,6) = sa0[std::round(10000*Ul[0])];
-		randsetpred(j,7) = sa0[std::round(10000*Uu[0])];
-		randsetpred(j,8) = s0[std::round(10000*Ul[0])];
-		randsetpred(j,9) = s0[std::round(10000*Uu[0])];
 	}
 	
-
-result = Rcpp::List::create(Rcpp::Named("randsetpred") = randsetpred);
+	
+	result = Rcpp::List::create(Rcpp::Named("lik") = lik, Rcpp::Named("z") = z, Rcpp::Named("ym") = ym, Rcpp::Named("data_lik") = data_lik, Rcpp::Named("Sigma") = Sigma);
 
 	return result;
 	
