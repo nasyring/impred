@@ -171,16 +171,24 @@ Rcpp::List genIM(NumericVector Y, NumericMatrix Z, NumericVector thetaseq, Numer
 	int s_par = museq.length();
 	int s_t = thetaseq.length();
 	
+	NumericVector U(n+1,0.0); NumericVector sim_lik(m,0.0); NumericVector proptheta(s_t,0.0);NumericVector tempproptheta(1,0.0);
 	NumericVector lik(1, 0.0);
 	arma::vec z; z.zeros(n);
 	arma::vec ym; ym.zeros(n);
 	NumericVector data_lik(s_t, -1000000000.0);
-	NumericVector sim_lik(s_t, 0.0);
 	arma::mat ZZ = as<arma::mat>(Z); 
 	arma::mat Sigma; Sigma.zeros(n,n);
 	arma::mat chSigma; arma::mat tmp; arma::mat rss; 
 	arma::mat Sigma_a; Sigma_a.zeros(n,n);
 	arma::mat I_n; I_n.zeros(n,n);
+
+	
+	for(int q = 0; q < m; q++){
+		U = Rcpp::rnorm(n+1,0.0,1.0);
+		sim_lik[q] = cumsum(Rcpp::dnorm(U,0.0,1.0));
+	}
+	
+	
 	for(int i = 0; i < n; i++){
 		I_n(i,i) = 1.0;
 	}
@@ -206,7 +214,13 @@ Rcpp::List genIM(NumericVector Y, NumericMatrix Z, NumericVector thetaseq, Numer
 						lik[0] = lik[0] - log(chSigma(q,q));
 					}
 					lik[0] = lik[0] - 0.5 * n * log(2 * M_PI) - 0.5 * rss(0,0) + R::dnorm(thetaseq[i], museq[j], std::sqrt(saseq[k]), 1);
-					data_lik[i] = std::max(data_lik[i], lik[0]);
+					tempproptheta[0] = 0.0;
+					for(int q = 0; q < m; q++){
+						if(sim_lik[q] <= lik[0]){
+							tempproptheta[0] = tempproptheta[0] + 1.0/m; 	
+						}
+					}
+					proptheta[i] = std::max(proptheta[i],tempproptheta[0]);
 				}
 			}
 		}
@@ -214,7 +228,11 @@ Rcpp::List genIM(NumericVector Y, NumericMatrix Z, NumericVector thetaseq, Numer
 	}
 	
 	
-	result = Rcpp::List::create(Rcpp::Named("lik") = lik, Rcpp::Named("rss") = rss, Rcpp::Named("ym") = ym, Rcpp::Named("data_lik") = data_lik, Rcpp::Named("Sigma") = Sigma);
+
+	
+	
+	
+	result = Rcpp::List::create(Rcpp::Named("proptheta") = proptheta);
 
 	return result;
 	
