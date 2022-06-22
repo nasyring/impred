@@ -42,7 +42,7 @@ END_RCPP
 }
 
 Rcpp::List genIM(NumericVector Y, NumericMatrix Z, NumericVector thetaseq, NumericVector museq, NumericVector saseq, NumericVector seseq, NumericVector M);
-RcppExport SEXP impred_denIM(SEXP YSEXP, SEXP ZSEXP, SEXP thetaseqSEXP, SEXP museqSEXP, SEXP saseqSEXP, SEXP seseqSEXP, SEXP MSEXP){
+RcppExport SEXP impred_genIM(SEXP YSEXP, SEXP ZSEXP, SEXP thetaseqSEXP, SEXP museqSEXP, SEXP saseqSEXP, SEXP seseqSEXP, SEXP MSEXP){
 BEGIN_RCPP
     Rcpp::RObject __result;
     Rcpp::RNGScope __rngScope;
