@@ -185,7 +185,8 @@ Rcpp::List genIM(NumericVector Y, NumericMatrix Z, NumericVector thetaseq, Numer
 	
 	for(int q = 0; q < m; q++){
 		U = Rcpp::rnorm(n+1,0.0,1.0);
-		sim_lik_tmp = cumsum(Rcpp::dnorm(U,0.0,1.0));
+		U = Rcpp::dnorm(U,0.0,1.0);
+		sim_lik_tmp = Rcpp::cumsum(U);
 		sim_lik[q] = sim_lik_tmp[0];
 	}
 	
