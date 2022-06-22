@@ -41,13 +41,13 @@ BEGIN_RCPP
 END_RCPP
 }
 
-Rcpp::List genIM(NumericVector Y, arma::mat Z, NumericVector thetaseq, NumericVector museq, NumericVector saseq, NumericVector seseq, NumericVector M);
+Rcpp::List genIM(NumericVector Y, NumericMatrix Z, NumericVector thetaseq, NumericVector museq, NumericVector saseq, NumericVector seseq, NumericVector M);
 RcppExport SEXP impred_denIM(SEXP YSEXP, SEXP ZSEXP, SEXP thetaseqSEXP, SEXP museqSEXP, SEXP saseqSEXP, SEXP seseqSEXP, SEXP MSEXP){
 BEGIN_RCPP
     Rcpp::RObject __result;
     Rcpp::RNGScope __rngScope;
-    Rcpp::traits::input_parameter< NumericMatrix >::type Y(YSEXP);
-    Rcpp::traits::input_parameter< NumericVector >::type Z(ZSEXP);
+    Rcpp::traits::input_parameter< NumericVector >::type Y(YSEXP);
+    Rcpp::traits::input_parameter< NumericMatrix >::type Z(ZSEXP);
     Rcpp::traits::input_parameter< NumericVector >::type thetaseq(thetaseqSEXP);
     Rcpp::traits::input_parameter< NumericVector >::type museq(museqSEXP);
     Rcpp::traits::input_parameter< NumericVector >::type saseq(saseqSEXP);
