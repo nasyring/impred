@@ -210,7 +210,7 @@ Rcpp::List genIM(NumericVector Y, NumericMatrix Z, NumericVector thetaseq, Numer
 						}
 					}
 					chSigma = arma::chol(Sigma);
-					tmp = solve(trimatl(chSigma.t), ym);
+					tmp = solve(trimatl(chSigma.t()), ym);
 					rss = dot(tmp,tmp);
 					lik[0] = 0.0;
 					for(int q = 0; q < n; q++){
