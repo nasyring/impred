@@ -174,10 +174,7 @@ Rcpp::List genIM(NumericVector Y, NumericMatrix Z, NumericVector thetaseq, Numer
 	double data_liks[s_t][s_par][s_par][s_par];
 	double max_data_liks = -10000000.0;
 	double sim_liks[s_t][s_par][s_par][s_par][m];
-	double max_sim_liks[m];
-	for(int i = 0; i < m; i++){
-		max_sim_liks[i] = -100000000.0;
-	}
+	NumericVector max_sim_liks(m,-100000000.0);
 	
 	NumericVector U(n,0.0); 
 	NumericVector lik(1, 0.0);
@@ -265,7 +262,7 @@ Rcpp::List genIM(NumericVector Y, NumericMatrix Z, NumericVector thetaseq, Numer
 	
 	
 	
-	result = Rcpp::List::create(Rcpp::Named("maxplauses") = maxplauses);
+	result = Rcpp::List::create(Rcpp::Named("maxplauses") = maxplauses, Rcpp::Named("max_data_liks") = max_data_liks, Rcpp::Named("max_sim_liks") = max_sim_liks);
 
 	return result;
 	
