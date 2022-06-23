@@ -171,12 +171,12 @@ Rcpp::List genIM(NumericVector Y, NumericMatrix Z, NumericVector thetaseq, Numer
 	int s_par = museq.length();
 	int s_t = thetaseq.length();
 	
-	double data_liks[st][s_par][s_par][s_par];
+	double data_liks[s_t][s_par][s_par][s_par];
 	double max_data_liks = -10000000.0;
-	double sim_liks[st][s_par][s_par][s_par][m];
+	double sim_liks[s_t][s_par][s_par][s_par][m];
 	double max_sim_liks[m];
 	for(int i = 0; i < m; i++){
-		max_sim_liks[i] = -100000000.0
+		max_sim_liks[i] = -100000000.0;
 	}
 	
 	NumericVector U(n,0.0); 
@@ -204,7 +204,7 @@ Rcpp::List genIM(NumericVector Y, NumericMatrix Z, NumericVector thetaseq, Numer
 	
 	
 	for(int i = 0; i < s_t; i++){
-		max_data_liks[i] = -100000000;
+		max_data_liks[i] = -100000000.0;
 		for(int j = 0; j < s_par; j++){
 			for(int q = 0; q < n; q++){
 				ym(q) = Y[q] - museq[j];	
