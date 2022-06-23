@@ -235,7 +235,7 @@ Rcpp::List genIM(NumericVector Y, NumericMatrix Z, NumericVector thetaseq, Numer
 	
 	
 	
-	result = Rcpp::List::create(Rcpp::Named("proptheta") = proptheta);
+	result = Rcpp::List::create(Rcpp::Named("proptheta") = proptheta,Rcpp::Named("sim_lik") = sim_lik,Rcpp::Named("lik") = lik);
 
 	return result;
 	
