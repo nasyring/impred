@@ -200,6 +200,28 @@ Rcpp::List genIM(NumericVector Y, NumericMatrix Z, NumericVector thetaseq, Numer
 	}
 	
 	
+	for(int q = 0; q < n; q++){
+		ym(q) = Y[q] - museq[0];	
+	}
+	for(int q = 0; q < n; q++){
+		for(int r = 0; r<n; r++){
+			Sigma(q,r) = ZZ(q,r)*saseq[0] + I_n(q,r)*seseq[0];	
+		}
+	}
+	chSigma = arma::chol(Sigma);
+	tmp = solve(trimatl(chSigma.t()), ym);
+	rss = dot(tmp,tmp);
+	lik[0] = 0.0;
+	for(int q = 0; q < n; q++){
+		lik[0] = lik[0] - log(chSigma(q,q));
+	}
+	siglik[0] = lik[0];
+	lik[0] = siglik[0] - 0.5 * n * log(2 * M_PI) - 0.5 * rss(0,0) + R::dnorm(thetaseq[i], museq[j], std::sqrt(saseq[k]), 1);
+				
+	result = Rcpp::List::create(Rcpp::Named("rss") = rss, Rcpp::Named("siglik") = siglik, Rcpp::Named("lik") = lik);
+	
+	/*
+	
 	for(int i = 0; i < s_t; i++){
 		for(int j = 0; j < s_par; j++){
 			for(int q = 0; q < n; q++){
@@ -272,6 +294,9 @@ Rcpp::List genIM(NumericVector Y, NumericMatrix Z, NumericVector thetaseq, Numer
 	
 	
 	result = Rcpp::List::create(Rcpp::Named("maxplauses") = maxplauses, Rcpp::Named("max_data_liks") = max_data_liks, Rcpp::Named("max_sim_liks") = max_sim_liks, Rcpp::Named("testplauses") = testplauses, Rcpp::Named("testliks") = testliks, Rcpp::Named("testsimliks") = testsimliks);
+
+
+	*/
 
 	return result;
 	
