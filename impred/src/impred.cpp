@@ -216,7 +216,7 @@ Rcpp::List genIM(NumericVector Y, NumericMatrix Z, NumericVector thetaseq, Numer
 		lik[0] = lik[0] - log(chSigma(q,q));
 	}
 	siglik[0] = lik[0];
-	lik[0] = siglik[0] - 0.5 * n * log(2 * M_PI) - 0.5 * rss(0,0) + R::dnorm(thetaseq[i], museq[j], std::sqrt(saseq[k]), 1);
+	lik[0] = siglik[0] - 0.5 * n * log(2 * M_PI) - 0.5 * rss(0,0) + R::dnorm(thetaseq[0], museq[0], std::sqrt(saseq[0]), 1);
 				
 	result = Rcpp::List::create(Rcpp::Named("rss") = rss, Rcpp::Named("siglik") = siglik, Rcpp::Named("lik") = lik);
 	
