@@ -254,7 +254,7 @@ Rcpp::List genIM(NumericVector Y, NumericMatrix Z, NumericVector thetaseq, Numer
 					for(int q = 0; q < m; q++){
 						sim_ratios[i][j][k][t][q] = sim_liks[i][j][k][t][q]/max_sim_liks[q];
 						if(sim_ratios[i][j][k][t][q]<=data_ratios[i][j][k][t]){
-							plauses[i][j][k][t] = plauses[i][j][k][t] + /.0/m;
+							plauses[i][j][k][t] = plauses[i][j][k][t] + 1.0/m;
 						}
 					}
 					maxplauses[i] = std::max(maxplauses[i], plauses[i][j][k][t]);
