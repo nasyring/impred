@@ -238,10 +238,10 @@ Rcpp::List genIM(NumericVector Y, NumericMatrix Z, NumericVector thetaseq, Numer
 	}
 	
 	
-	double data_ratios[st][s_par][s_par][s_par];
-	double sim_ratios[st][s_par][s_par][s_par][m];
-	double plauses[st][s_par][s_par][s_par];
-	double maxplauses[st];
+	double data_ratios[s_t][s_par][s_par][s_par];
+	double sim_ratios[s_t][s_par][s_par][s_par][m];
+	double plauses[s_t][s_par][s_par][s_par];
+	double maxplauses[s_t];
 	
 	
 	
