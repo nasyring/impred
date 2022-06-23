@@ -238,8 +238,8 @@ Rcpp::List genIM(NumericVector Y, NumericMatrix Z, NumericVector thetaseq, Numer
 	double sim_ratios[s_t][s_par][s_par][s_par][m];
 	double plauses[s_t][s_par][s_par][s_par];
 	NumericVector maxplauses(s_t, 0.0);
-	
-	
+	NumericVector testplauses(s_par*s_par*s_par, 0.0);
+	int ind = 0;
 	
 	for(int i = 0; i < s_t; i++){
 		maxplauses[i] = 0.0;
@@ -254,6 +254,10 @@ Rcpp::List genIM(NumericVector Y, NumericMatrix Z, NumericVector thetaseq, Numer
 							plauses[i][j][k][t] = plauses[i][j][k][t] + 1.0/m;
 						}
 					}
+					if(i == 0){
+						testplauses[ind] = plauses[i][j][k][t];
+						ind = ind+1;	
+					}
 					maxplauses[i] = std::max(maxplauses[i], plauses[i][j][k][t]);
 				}
 			}
@@ -262,7 +266,7 @@ Rcpp::List genIM(NumericVector Y, NumericMatrix Z, NumericVector thetaseq, Numer
 	
 	
 	
-	result = Rcpp::List::create(Rcpp::Named("maxplauses") = maxplauses, Rcpp::Named("max_data_liks") = max_data_liks, Rcpp::Named("max_sim_liks") = max_sim_liks);
+	result = Rcpp::List::create(Rcpp::Named("maxplauses") = maxplauses, Rcpp::Named("max_data_liks") = max_data_liks, Rcpp::Named("max_sim_liks") = max_sim_liks, Rcpp::Named("testplauses") = testplauses);
 
 	return result;
 	
