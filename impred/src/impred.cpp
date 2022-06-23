@@ -181,14 +181,14 @@ Rcpp::List genIM(NumericVector Y, NumericMatrix Z, NumericVector thetaseq, Numer
 	arma::mat chSigma; arma::mat tmp; arma::mat rss; 
 	arma::mat Sigma_a; Sigma_a.zeros(n,n);
 	arma::mat I_n; I_n.zeros(n,n);
+	arma::vec Ud;arma::mat Udot;NumericVector templik(m,0.0);NumericVector siglik(1,0.0);
 
 	
 	for(int q = 0; q < m; q++){
 		U = Rcpp::rnorm(n+1,0.0,1.0);
-		U = Rcpp::dnorm(U,0.0,1.0, 1);
-		for(int r = 0; r < (n+1); r++){
-			sim_lik[q] = sim_lik[q] + U[r];
-		}
+		Ud = as<arma::vec>(U);
+		Udot = dot(Ud,Ud);
+		templik[q] = Udot(0,0);
 	}
 	
 	
@@ -210,13 +210,17 @@ Rcpp::List genIM(NumericVector Y, NumericMatrix Z, NumericVector thetaseq, Numer
 						}
 					}
 					chSigma = arma::chol(Sigma);
-					tmp = solve(trimatu(chSigma), ym);
+					tmp = solve(trimatl(chSigma.t), ym);
 					rss = dot(tmp,tmp);
 					lik[0] = 0.0;
 					for(int q = 0; q < n; q++){
 						lik[0] = lik[0] - log(chSigma(q,q));
 					}
+					siglik[0] = lik[0];
 					lik[0] = lik[0] - 0.5 * n * log(2 * M_PI) - 0.5 * rss(0,0) + R::dnorm(thetaseq[i], museq[j], std::sqrt(saseq[k]), 1);
+					for(int q = 0; q < m; q++){
+						sim_lik[q] = -0.5*templik[q] + siglik[0] - 0.5 * n * log(2 * M_PI)+ R::dnorm(thetaseq[i], museq[j], std::sqrt(saseq[k]), 1);
+					}
 					tempproptheta[0] = 0.0;
 					for(int q = 0; q < m; q++){
 						if(sim_lik[q] <= lik[0]){
