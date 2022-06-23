@@ -204,7 +204,6 @@ Rcpp::List genIM(NumericVector Y, NumericMatrix Z, NumericVector thetaseq, Numer
 	
 	
 	for(int i = 0; i < s_t; i++){
-		max_data_liks[i] = -100000000.0;
 		for(int j = 0; j < s_par; j++){
 			for(int q = 0; q < n; q++){
 				ym(q) = Y[q] - museq[j];	
