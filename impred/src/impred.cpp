@@ -171,18 +171,24 @@ Rcpp::List genIM(NumericVector Y, NumericMatrix Z, NumericVector thetaseq, Numer
 	int s_par = museq.length();
 	int s_t = thetaseq.length();
 	
-	NumericVector U(n,0.0); NumericVector sim_lik(m,0.0); NumericVector proptheta(s_t,0.0);NumericVector tempproptheta(1,0.0);
+	double data_liks[st][s_par][s_par][s_par];
+	double max_data_liks = -10000000.0;
+	double sim_liks[st][s_par][s_par][s_par][m];
+	double max_sim_liks[m];
+	for(int i = 0; i < m; i++){
+		max_sim_liks[i] = -100000000.0
+	}
+	
+	NumericVector U(n,0.0); 
 	NumericVector lik(1, 0.0);
 	arma::vec z; z.zeros(n);
 	arma::vec ym; ym.zeros(n);
-	NumericVector data_lik(s_t, -1000000000.0);
 	arma::mat ZZ = as<arma::mat>(Z); 
 	arma::mat Sigma; Sigma.zeros(n,n);
 	arma::mat chSigma; arma::mat tmp; arma::mat rss; 
-	arma::mat Sigma_a; Sigma_a.zeros(n,n);
 	arma::mat I_n; I_n.zeros(n,n);
 	arma::vec Ud;arma::mat Udot;NumericVector templik(m,0.0);NumericVector siglik(1,0.0);
-
+	
 	
 	for(int q = 0; q < m; q++){
 		U = Rcpp::rnorm(n,0.0,1.0);
@@ -198,6 +204,7 @@ Rcpp::List genIM(NumericVector Y, NumericMatrix Z, NumericVector thetaseq, Numer
 	
 	
 	for(int i = 0; i < s_t; i++){
+		max_data_liks[i] = -100000000;
 		for(int j = 0; j < s_par; j++){
 			for(int q = 0; q < n; q++){
 				ym(q) = Y[q] - museq[j];	
@@ -217,17 +224,13 @@ Rcpp::List genIM(NumericVector Y, NumericMatrix Z, NumericVector thetaseq, Numer
 						lik[0] = lik[0] - log(chSigma(q,q));
 					}
 					siglik[0] = lik[0];
-					lik[0] = lik[0] - 0.5 * n * log(2 * M_PI) - 0.5 * rss(0,0) + R::dnorm(thetaseq[i], museq[j], std::sqrt(saseq[k]), 1);
+					lik[0] = siglik[0] - 0.5 * n * log(2 * M_PI) - 0.5 * rss(0,0) + R::dnorm(thetaseq[i], museq[j], std::sqrt(saseq[k]), 1);
+					data_liks[i][j][k][t] = lik[0];
+					max_data_liks = std::max(max_data_liks, lik[0]);
 					for(int q = 0; q < m; q++){
-						sim_lik[q] = -0.5*templik[q] + siglik[0] - 0.5 * n * log(2 * M_PI)+ R::dnorm(thetaseq[i], museq[j], std::sqrt(saseq[k]), 1);
+						sim_liks[i][j][k][t][q] = -0.5*templik[q] + siglik[0] - 0.5 * n * log(2 * M_PI)+ R::dnorm(thetaseq[i], museq[j], std::sqrt(saseq[k]), 1);
+						max_sim_liks[q] = std::max(sim_liks[i][j][k][t][q], max_sim_liks[q]);
 					}
-					tempproptheta[0] = 0.0;
-					for(int q = 0; q < m; q++){
-						if(sim_lik[q] <= lik[0]){
-							tempproptheta[0] = tempproptheta[0] + 1.0/m; 	
-						}
-					}
-					proptheta[i] = std::max(proptheta[i],tempproptheta[0]);
 				}
 			}
 		}
@@ -235,11 +238,35 @@ Rcpp::List genIM(NumericVector Y, NumericMatrix Z, NumericVector thetaseq, Numer
 	}
 	
 	
-
+	double data_ratios[st][s_par][s_par][s_par];
+	double sim_ratios[st][s_par][s_par][s_par][m];
+	double plauses[st][s_par][s_par][s_par];
+	double maxplauses[st];
 	
 	
 	
-	result = Rcpp::List::create(Rcpp::Named("proptheta") = proptheta,Rcpp::Named("sim_lik") = sim_lik,Rcpp::Named("lik") = lik,Rcpp::Named("U") = U,Rcpp::Named("Ud") = Ud,Rcpp::Named("Udot") = Udot,Rcpp::Named("templik") = templik,Rcpp::Named("rss") = rss);
+	for(int i = 0; i < s_t; i++){
+		maxplauses[i] = 0.0;
+		for(int j = 0; j < s_par; j++){
+			for(int k = 0; k < s_par; k++){
+				for(int t = 0; t < s_par; t++){
+					plauses[i][j][k][t] = 0.0;
+					data_ratios[i][j][k][t] = data_liks[i][j][k][t]/max_data_liks;
+					for(int q = 0; q < m; q++){
+						sim_ratios[i][j][k][t][q] = sim_liks[i][j][k][t][q]/max_sim_liks[q];
+						if(sim_ratios[i][j][k][t][q]<=data_ratios[i][j][k][t]){
+							plauses[i][j][k][t] = plauses[i][j][k][t] + /.0/m;
+						}
+					}
+					maxplauses[i] = std::max(maxplauses[i], plauses[i][j][k][t]);
+				}
+			}
+		}
+	}
+	
+	
+	
+	result = Rcpp::List::create(Rcpp::Named("maxplauses") = maxplauses, Rcpp::Named("plauses") = plauses);
 
 	return result;
 	
