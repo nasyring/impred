@@ -190,7 +190,7 @@ Rcpp::List genIM(NumericVector Y, NumericMatrix Z, NumericVector thetaseq, Numer
 	for(int q = 0; q < m; q++){
 		U = Rcpp::rnorm(n,0.0,1.0);
 		for(int s = 0; s < n; s++){
-			Udd(s,q) = U[s];
+			Ud(s,q) = U[s];
 		}			
 	}
 	
@@ -225,7 +225,7 @@ Rcpp::List genIM(NumericVector Y, NumericMatrix Z, NumericVector thetaseq, Numer
 					max_data_liks = std::max(max_data_liks, lik[0]);
 					for(int q = 0; q < m; q++){
 						for(int s = 0; s < n; s++){
-							ymsim(s) = Udd(s,q);
+							ymsim(s) = Ud(s,q);
 						}
 						tmpsim = solve(trimatl(chSigma.t()), ymsim);
 						rsssim = dot(tmpsim,tmpsim);
