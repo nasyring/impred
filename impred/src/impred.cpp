@@ -179,19 +179,19 @@ Rcpp::List genIM(NumericVector Y, NumericMatrix Z, NumericVector thetaseq, Numer
 	NumericVector U(n,0.0); 
 	NumericVector lik(1, 0.0);
 	arma::vec z; z.zeros(n);
-	arma::vec ym; ym.zeros(n);
+	arma::vec ym; ym.zeros(n);arma::vec ymsim; ymsim.zeros(n);
 	arma::mat ZZ = as<arma::mat>(Z); 
 	arma::mat Sigma; Sigma.zeros(n,n);
-	arma::mat chSigma; arma::mat tmp; arma::mat rss; 
+	arma::mat chSigma; arma::mat tmp; arma::mat rss; arma::mat tmpsim; arma::mat rsssim; 
 	arma::mat I_n; I_n.zeros(n,n);
-	arma::vec Ud;arma::mat Udot;NumericVector templik(m,0.0);NumericVector siglik(1,0.0);
+	arma::mat Ud; Ud.zeros(n,m); NumericVector templik(m,0.0);NumericVector siglik(1,0.0);
 	
 	
 	for(int q = 0; q < m; q++){
 		U = Rcpp::rnorm(n,0.0,1.0);
-		Ud = as<arma::vec>(U);
-		Udot = dot(Ud,Ud);
-		templik[q] = Udot(0,0);
+		for(int s = 0; s < n; s++){
+			Udd(s,q) = U[s];
+		}			
 	}
 	
 	
@@ -225,7 +225,7 @@ Rcpp::List genIM(NumericVector Y, NumericMatrix Z, NumericVector thetaseq, Numer
 					max_data_liks = std::max(max_data_liks, lik[0]);
 					for(int q = 0; q < m; q++){
 						for(int s = 0; s < n; s++){
-							ymsim(s) = Ud(s,q);
+							ymsim(s) = Udd(s,q);
 						}
 						tmpsim = solve(trimatl(chSigma.t()), ymsim);
 						rsssim = dot(tmpsim,tmpsim);
