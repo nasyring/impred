@@ -224,7 +224,12 @@ Rcpp::List genIM(NumericVector Y, NumericMatrix Z, NumericVector thetaseq, Numer
 					data_liks[i][j][k][t] = lik[0];
 					max_data_liks = std::max(max_data_liks, lik[0]);
 					for(int q = 0; q < m; q++){
-						sim_liks[i][j][k][t][q] = -0.5*templik[q] + siglik[0] - 0.5 * n * log(2 * M_PI)+ R::dnorm(thetaseq[i], museq[j], std::sqrt(saseq[k]), 1);
+						for(int s = 0; s < n; s++){
+							ymsim(s) = Ud(s,q);
+						}
+						tmpsim = solve(trimatl(chSigma.t()), ymsim);
+						rsssim = dot(tmpsim,tmpsim);
+						sim_liks[i][j][k][t][q] = -0.5*rsssim(0,0) + siglik[0] - 0.5 * n * log(2 * M_PI)+ R::dnorm(thetaseq[i], museq[j], std::sqrt(saseq[k]), 1);
 						max_sim_liks[q] = std::max(sim_liks[i][j][k][t][q], max_sim_liks[q]);
 					}
 				}
