@@ -204,7 +204,7 @@ Rcpp::List genIM(NumericVector Y, NumericMatrix Z, NumericVector thetaseq, Numer
 			ymsim(s) = Ud(s,q);
 		}
 	}
-	/*
+	
 	for(int i = 0; i < s_t; i++){
 		for(int j = 0; j < s_par; j++){
 			for(int q = 0; q < n; q++){
@@ -242,7 +242,7 @@ Rcpp::List genIM(NumericVector Y, NumericMatrix Z, NumericVector thetaseq, Numer
 		}
 		
 	}
-	
+	/*
 	
 	double data_ratios[s_t][s_par][s_par][s_par];
 	double sim_ratios[s_t][s_par][s_par][s_par][m];
