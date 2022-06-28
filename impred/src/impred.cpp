@@ -194,12 +194,17 @@ Rcpp::List genIM(NumericVector Y, NumericMatrix Z, NumericVector thetaseq, Numer
 		}			
 	}
 	
-	/*
+	
 	for(int i = 0; i < n; i++){
 		I_n(i,i) = 1.0;
 	}
-	
-	
+
+	for(int q = 0; q < m; q++){
+		for(int s = 0; s < n; s++){
+			ymsim(s) = Ud(s,q);
+		}
+	}
+	/*
 	for(int i = 0; i < s_t; i++){
 		for(int j = 0; j < s_par; j++){
 			for(int q = 0; q < n; q++){
@@ -280,7 +285,7 @@ Rcpp::List genIM(NumericVector Y, NumericMatrix Z, NumericVector thetaseq, Numer
 
 	*/
 
-	result = Rcpp::List::create(Rcpp::Named("Ud") = Ud);
+	result = Rcpp::List::create(Rcpp::Named("Ud") = Ud, Rcpp::Named("ymsim") = ymsim);
 	
 	return result;
 	
