@@ -194,7 +194,7 @@ Rcpp::List genIM(NumericVector Y, NumericMatrix Z, NumericVector thetaseq, Numer
 		}			
 	}
 	
-	
+	/*
 	for(int i = 0; i < n; i++){
 		I_n(i,i) = 1.0;
 	}
@@ -278,8 +278,10 @@ Rcpp::List genIM(NumericVector Y, NumericMatrix Z, NumericVector thetaseq, Numer
 	
 	result = Rcpp::List::create(Rcpp::Named("maxplauses") = maxplauses, Rcpp::Named("max_data_liks") = max_data_liks, Rcpp::Named("max_sim_liks") = max_sim_liks, Rcpp::Named("testplauses") = testplauses, Rcpp::Named("testliks") = testliks, Rcpp::Named("testsimliks") = testsimliks);
 
+	*/
 
-
+	result = Rcpp::List::create(Rcpp::Named("Ud") = Ud);
+	
 	return result;
 	
 	
