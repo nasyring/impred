@@ -199,11 +199,6 @@ Rcpp::List genIM(NumericVector Y, NumericMatrix Z, NumericVector thetaseq, Numer
 		I_n(i,i) = 1.0;
 	}
 
-	for(int q = 0; q < m; q++){
-		for(int s = 0; s < n; s++){
-			ymsim(s) = Ud(s,q);
-		}
-	}
 	
 	for(int i = 0; i < s_t; i++){
 		for(int j = 0; j < s_par; j++){
@@ -228,7 +223,7 @@ Rcpp::List genIM(NumericVector Y, NumericMatrix Z, NumericVector thetaseq, Numer
 					lik[0] = siglik[0] - 0.5 * n * log(2 * M_PI) - 0.5 * rss(0,0) + R::dnorm(thetaseq[i], museq[j], std::sqrt(saseq[k]), 1);
 					data_liks[i][j][k][t] = lik[0];
 					max_data_liks = std::max(max_data_liks, lik[0]);
-					for(int q = 0; q < m; q++){
+					/*for(int q = 0; q < m; q++){
 						for(int s = 0; s < n; s++){
 							ymsim(s) = Ud(s,q);
 						}
@@ -236,7 +231,7 @@ Rcpp::List genIM(NumericVector Y, NumericMatrix Z, NumericVector thetaseq, Numer
 						rsssim = dot(tmpsim,tmpsim);
 						sim_liks[i][j][k][t][q] = -0.5*rsssim(0,0) + siglik[0] - 0.5 * n * log(2 * M_PI)+ R::dnorm(thetaseq[i], museq[j], std::sqrt(saseq[k]), 1);
 						max_sim_liks[q] = std::max(sim_liks[i][j][k][t][q], max_sim_liks[q]);
-					}
+					}*/
 				}
 			}
 		}
