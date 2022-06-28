@@ -212,7 +212,7 @@ Rcpp::List genIM(NumericVector Y, NumericMatrix Z, NumericVector thetaseq, Numer
 							Sigma(q,r) = ZZ(q,r)*saseq[k] + I_n(q,r)*seseq[t];	
 						}
 					}
-					chSigma = arma::chol(Sigma);
+					/*chSigma = arma::chol(Sigma);
 					tmp = solve(trimatl(chSigma.t()), ym);
 					rss = dot(tmp,tmp);
 					lik[0] = 0.0;
@@ -222,7 +222,7 @@ Rcpp::List genIM(NumericVector Y, NumericMatrix Z, NumericVector thetaseq, Numer
 					siglik[0] = lik[0];
 					lik[0] = siglik[0] - 0.5 * n * log(2 * M_PI) - 0.5 * rss(0,0) + R::dnorm(thetaseq[i], museq[j], std::sqrt(saseq[k]), 1);
 					data_liks[i][j][k][t] = lik[0];
-					max_data_liks = std::max(max_data_liks, lik[0]);
+					max_data_liks = std::max(max_data_liks, lik[0]);*/
 					/*for(int q = 0; q < m; q++){
 						for(int s = 0; s < n; s++){
 							ymsim(s) = Ud(s,q);
