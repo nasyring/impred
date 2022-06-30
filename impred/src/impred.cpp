@@ -237,8 +237,8 @@ Rcpp::List genIM(NumericVector Y, NumericMatrix Z, NumericVector museq, NumericV
 		}			
 	}
 	
-	arma::mat nums; nums.zeros(s_par, s_par); double dens[s_par][s_par][s_par]; double maxdens = -10000000.0;
-	double simratios[s_par][s_par]; double plauses[s_par][s_par][s_par]; arma::vec Uu;Uu.zeros(n);
+	double nums[s_par][s_par][s_par]; double dens[s_par][s_par][s_par]; double maxdens = -10000000.0;
+	double simratios[s_par][s_par][s_par]; double plauses[s_par][s_par][s_par]; arma::vec Uu;Uu.zeros(n);
 	
 	for(int j = 0; j < s_par; j++){
 		for(int k = 0; k < s_par; k++){
@@ -256,7 +256,7 @@ Rcpp::List genIM(NumericVector Y, NumericMatrix Z, NumericVector museq, NumericV
 		for(int p = 0; p < s_par; p++ ){
 			for(int k = 0; k < s_par; k++){
 				for(int t = 0; t < s_par; t++){
-					nums(k,t) = siglik(k,t)- 0.5 * n * log(2 * M_PI) - 0.5 * ztz(q);
+					nums[p][k][t] = siglik(k,t)- 0.5 * n * log(2 * M_PI) - 0.5 * ztz(q);
 					for(int s = 0; s < n; s++){
 						for(int r = 0; r<n; r++){
 							Sigma(s,r) = ZZ(s,r)*saseq[k] + I_n(s,r)*seseq[t];	
@@ -286,14 +286,14 @@ Rcpp::List genIM(NumericVector Y, NumericMatrix Z, NumericVector museq, NumericV
 								}
 							}
 						}
-					simratios[k][t] = nums(k,t)/maxdens;
+					simratios[p][k][t] = nums[p][k][t]/maxdens;
 				}
 			}
 		}
 		for(int j = 0; j < s_par; j++){
 			for(int k = 0; k < s_par; k++){
 				for(int t = 0; t < s_par; t++){
-					if(simratios[k][t] <= dataratios[j][k][t]){
+					if(simratios[j][k][t] <= dataratios[j][k][t]){
 						plauses[j][k][t] = plauses[j][k][t] + 1.0/m; 
 					}
 				}
@@ -321,7 +321,7 @@ Rcpp::List genIM(NumericVector Y, NumericMatrix Z, NumericVector museq, NumericV
 	for(int j = 0; j < s_par; j++){
 		for(int k = 0; k < s_par; k++){
 			temp1(j,k) = dataratios[0][j][k]; 
-			temp2(j,k) = simratios[j][k];
+			temp2(j,k) = simratios[0][j][k];
 		}
 	}
 	
