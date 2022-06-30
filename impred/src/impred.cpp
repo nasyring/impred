@@ -338,30 +338,25 @@ Rcpp::List genIM(NumericVector Y, NumericMatrix Z, NumericVector museq, NumericV
 			ym(r) = ym(r) + museq[0];	
 		}
 		maxdens = -1000000000.0;
-		for(int j = 0; j < s_par; j++){
-			for(int l = 0; l < s_par; l++){
-				for(int v = 0; v < s_par; v++){
-					for(int s = 0; s < n; s++){
-						for(int r = 0; r<n; r++){
-							Sigma(s,r) = ZZ(s,r)*saseq[l] + I_n(s,r)*seseq[v];	
-						}
-					}
-					for(int r = 0; r < n; r++){
-						ym2(r) = ym(r) - museq[j];	
-					}
-					tmp = solve(trimatl(chSigma.t()), ym2);
-					rss = dot(tmp,tmp);
-					dens[j][l][v] = siglik(l,v) - 0.5 * n * log(2 * M_PI) - 0.5 * rss(0,0);
-					maxdens = std::max(maxdens, dens[j][l][v]);
-				}
+		for(int s = 0; s < n; s++){
+			for(int r = 0; r<n; r++){
+				Sigma(s,r) = ZZ(s,r)*saseq[0] + I_n(s,r)*seseq[0];	
 			}
 		}
-	simratios[0][0][0] = nums[0][0][0]/maxdens;
+		for(int r = 0; r < n; r++){
+			ym2(r) = ym(r) - museq[0];	
+		}
+		tmp = solve(trimatl(chSigma.t()), ym2);
+		rss = dot(tmp,tmp);
+		dens[0][0][0] = siglik(l,v) - 0.5 * n * log(2 * M_PI) - 0.5 * rss(0,0);
+			maxdens = std::max(maxdens, dens[0][0][0]);
+		simratios[0][0][0] = nums[0][0][0]/maxdens;
 	double d1 = simratios[0][0][0];
 	double d2 = nums[0][0][0];
+	double d3 = dens[0][0][0];
 	
 	
-	result = Rcpp::List::create(Rcpp::Named("plauses") = plauses_musa, Rcpp::Named("max_data_liks") = max_data_liks, Rcpp::Named("maxdens") = maxdens, Rcpp::Named("temp1") = temp1, Rcpp::Named("temp2") = temp2, Rcpp::Named("d1") = d1, Rcpp::Named("d2") = d2);
+	result = Rcpp::List::create(Rcpp::Named("plauses") = plauses_musa, Rcpp::Named("max_data_liks") = max_data_liks, Rcpp::Named("maxdens") = maxdens, Rcpp::Named("temp1") = temp1, Rcpp::Named("temp2") = temp2, Rcpp::Named("d1") = d1, Rcpp::Named("d2") = d2, Rcpp::Named("d3") = d3);
 	
 	return result;
 	
