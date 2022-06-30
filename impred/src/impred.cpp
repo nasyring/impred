@@ -339,7 +339,7 @@ Rcpp::List genIM(NumericVector Y, NumericMatrix Z, NumericVector museq, NumericV
 					
 	
 	
-	result = Rcpp::List::create(Rcpp::Named("plauses") = plauses_musa, Rcpp::Named("max_data_liks") = max_data_liks, Rcpp::Named("maxdens") = maxdens, Rcpp::Named("temp1") = temp1, Rcpp::Named("temp2") = temp2, Rcpp::Named("Uu") = Uu, , Rcpp::Named("ym") = ym);
+	result = Rcpp::List::create(Rcpp::Named("plauses") = plauses_musa, Rcpp::Named("max_data_liks") = max_data_liks, Rcpp::Named("maxdens") = maxdens, Rcpp::Named("temp1") = temp1, Rcpp::Named("temp2") = temp2, Rcpp::Named("Uu") = Uu,  Rcpp::Named("tmp") = tmp);
 	
 	return result;
 	
