@@ -187,21 +187,10 @@ Rcpp::List genIM(NumericVector Y, NumericMatrix Z, NumericVector museq, NumericV
 	arma::mat Ud; Ud.zeros(n,m); NumericVector templik(m,0.0);arma::mat siglik; siglik.zeros(s_par,s_par); 
 	arma::vec ztz; ztz.zeros(m);
 	
-	// replace this for loop below
-	for(int q = 0; q < m; q++){
-		U = Rcpp::rnorm(n,0.0,1.0);
-		for(int s = 0; s < n; s++){
-			Ud(s,q) = U[s];
-			ztz(q) = U[s]*U[s];
-		}			
-	}
-	
 	
 	for(int i = 0; i < n; i++){
 		I_n(i,i) = 1.0;
 	}
-
-	
 	
 	for(int j = 0; j < s_par; j++){
 		for(int q = 0; q < n; q++){
@@ -222,95 +211,113 @@ Rcpp::List genIM(NumericVector Y, NumericMatrix Z, NumericVector museq, NumericV
 					lik[0] = lik[0] - log(chSigma(q,q));
 				}
 				siglik(k,t) = lik[0];
-				lik[0] = siglik[0] - 0.5 * n * log(2 * M_PI) - 0.5 * rss(0,0);
+				lik[0] = lik[0] - 0.5 * n * log(2 * M_PI) - 0.5 * rss(0,0);
 				data_liks[j][k][t] = lik[0];
 				max_data_liks = std::max(max_data_liks, lik[0]);
+			}
+		}
+	}
+	
+	
+	double dataratios[s_par][s_par][s_par];
+	for(int j = 0; j < s_par; j++){
+		for(int k = 0; k < s_par; k++){
+			for(int t = 0; t < s_par; t++){
+				dataratios[j][k][t] = data_liks[j][k][t]/maxdataliks;
 			}
 		}
 	}
 	
 	// Loop for sim data
+	
 	for(int q = 0; q < m; q++){
 		U = Rcpp::rnorm(n,0.0,1.0);
 		for(int s = 0; s < n; s++){
+			Ud(s,q) = U[s];
 			ztz(q) = U[s]*U[s];
 		}			
 	}
 	
+	arma::mat nums; nums.zeros(s_par, s_par); double dens[s_par][s_par][s_par]; double maxdens = -10000000.0;
+	double simratios[s_par][s_par]; double plauses[s_par][s_par][s_par]; arma::vec Uu;Uu.zeros(n);
+	
 	for(int j = 0; j < s_par; j++){
-		for(int q = 0; q < n; q++){
-			ym(q) = U[q] - museq[j];	
+		for(int k = 0; k < s_par; k++){
+			for(int t = 0; t < s_par; t++){
+				plauses[j][k][t] = 0.0;
+			}
+		}
+	}
+	
+	
+	for(int q = 0; q < m; q++){
+		for(int s = 0; s < n; s++){
+			Uu(s) = Ud(s,q);
 		}
 		for(int k = 0; k < s_par; k++){
 			for(int t = 0; t < s_par; t++){
-				for(int q = 0; q < n; q++){
+				nums(k,t) = siglik(k,t)- 0.5 * n * log(2 * M_PI) - 0.5 * ztz(q);
+				for(int s = 0; s < n; s++){
 					for(int r = 0; r<n; r++){
-						Sigma(q,r) = ZZ(q,r)*saseq[k] + I_n(q,r)*seseq[t];	
+						Sigma(s,r) = ZZ(s,r)*saseq[k] + I_n(s,r)*seseq[t];	
 					}
 				}
 				chSigma = arma::chol(Sigma);
-				tmp = solve(trimatl(chSigma.t()), ym);
-				rss = dot(tmp,tmp);
-				lik[0] = 0.0;
-				for(int q = 0; q < n; q++){
-					lik[0] = lik[0] - log(chSigma(q,q));
-				}
-				siglik(k,t) = lik[0];
-				lik[0] = siglik[0] - 0.5 * n * log(2 * M_PI) - 0.5 * rss(0,0);
-				data_liks[j][k][t] = lik[0];
-				max_data_liks = std::max(max_data_liks, lik[0]);
+				
+					for(int j = 0; j < s_par; j++){
+						for(int l = 0; l < s_par; l++){
+							for(int v = 0; v < s_par; v++){
+								chSigma = arma::chol(Sigma);
+								ym = chSigma.t()*Uu;
+								for(int r = 0; r < n; r++){
+									ym(r) = ym(r) + museq[j];	
+								}
+								for(int s = 0; s < n; s++){
+									for(int r = 0; r<n; r++){
+										Sigma(s,r) = ZZ(s,r)*saseq[l] + I_n(s,r)*seseq[v];	
+									}
+								}
+
+								tmp = solve(trimatl(chSigma.t()), ym);
+								rss = dot(tmp,tmp);
+								dens[j][l][v] = siglik(l,v) - 0.5 * n * log(2 * M_PI) - 0.5 * rss(0,0);
+								maxdens = std::max(maxdens, dens[j][l][v]);
+							}
+						}
+					}
+				simratios[k][t] = nums(k,t)/maxdens;
 			}
 		}
-	}	
-	
-	
-	
-	
-	
-	/*
-	
-	double data_ratios[s_t][s_par][s_par][s_par];
-	double sim_ratios[s_t][s_par][s_par][s_par][m];
-	double plauses[s_t][s_par][s_par][s_par];
-	NumericVector maxplauses(s_t, 0.0);
-	NumericVector testplauses(s_par*s_par*s_par, 0.0);NumericVector testliks(s_par*s_par*s_par, 0.0);NumericVector testsimliks(m*s_par*s_par*s_par, 0.0);
-	int ind = 0;int ind2 = 0;
-	
-	for(int i = 0; i < s_t; i++){
-		maxplauses[i] = 0.0;
+		
 		for(int j = 0; j < s_par; j++){
 			for(int k = 0; k < s_par; k++){
 				for(int t = 0; t < s_par; t++){
-					plauses[i][j][k][t] = 0.0;
-					data_ratios[i][j][k][t] = data_liks[i][j][k][t]/max_data_liks;
-					for(int q = 0; q < m; q++){
-						sim_ratios[i][j][k][t][q] = sim_liks[i][j][k][t][q]/max_sim_liks[q];
-						if(sim_ratios[i][j][k][t][q]<=data_ratios[i][j][k][t]){
-							plauses[i][j][k][t] = plauses[i][j][k][t] + 1.0/m;
-						}
+					if(simratios[k][t] <= dataratios[j][k][t]){
+						plauses[j][k][t] = plauses[j][k][t] + 1.0/m; 
 					}
-					if(i == 0){
-						testplauses[ind] = plauses[i][j][k][t];
-						testliks[ind] = data_liks[i][j][k][t];
-						ind = ind+1;	
-						for(int q = 0; q < m; q++){
-							testsimliks[ind2] = sim_liks[i][j][k][t][q];
-							ind2 = ind2+1;
-						}
-					}
-					maxplauses[i] = std::max(maxplauses[i], plauses[i][j][k][t]);
 				}
+			}
+		}		
+
+		
+		
+	}
+	
+	NumericVector zeros(s_par*s_par,0.0);  NumericMatrix plauses_musa(s_par, s_par, zeros.begin());
+	
+	for(int j = 0; j < s_par; j++){
+		for(int k = 0; k < s_par; k++){
+			for(int t = 0; t < s_par; t++){
+				plauses_musa[j,k] = std::max(plauses_musa[j,k], plauses[j][k][t]);
 			}
 		}
 	}
 	
 	
 	
-	result = Rcpp::List::create(Rcpp::Named("maxplauses") = maxplauses, Rcpp::Named("max_data_liks") = max_data_liks, Rcpp::Named("max_sim_liks") = max_sim_liks, Rcpp::Named("testplauses") = testplauses, Rcpp::Named("testliks") = testliks, Rcpp::Named("testsimliks") = testsimliks);
-
-	*/
-
-	result = Rcpp::List::create(Rcpp::Named("Ud") = Ud, Rcpp::Named("ymsim") = ymsim);
+	
+	
+	result = Rcpp::List::create(Rcpp::Named("plauses") = plauses_musa);
 	
 	return result;
 	
