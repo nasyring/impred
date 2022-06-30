@@ -179,7 +179,7 @@ Rcpp::List genIM(NumericVector Y, NumericMatrix Z, NumericVector museq, NumericV
 	NumericVector U(n,0.0); 
 	NumericVector lik(1, 0.0);
 	arma::vec z; z.zeros(n);
-	arma::vec ym; ym.zeros(n);arma::vec ymsim; ymsim.zeros(n);
+	arma::vec ym; ym.zeros(n);arma::vec ym2; ym2.zeros(n);arma::vec ymsim; ymsim.zeros(n);
 	arma::mat ZZ = as<arma::mat>(Z); 
 	arma::mat Sigma; Sigma.zeros(n,n);
 	arma::mat chSigma; arma::mat tmp; arma::mat rss; arma::mat tmpsim; arma::mat rsssim; 
@@ -254,41 +254,42 @@ Rcpp::List genIM(NumericVector Y, NumericMatrix Z, NumericVector museq, NumericV
 		for(int s = 0; s < n; s++){
 			Uu(s) = Ud(s,q);
 		}
-		for(int k = 0; k < s_par; k++){
-			for(int t = 0; t < s_par; t++){
-				nums(k,t) = siglik(k,t)- 0.5 * n * log(2 * M_PI) - 0.5 * ztz(q);
-				for(int s = 0; s < n; s++){
-					for(int r = 0; r<n; r++){
-						Sigma(s,r) = ZZ(s,r)*saseq[k] + I_n(s,r)*seseq[t];	
-					}
-				}
-				chSigma = arma::chol(Sigma);
-				
-					for(int j = 0; j < s_par; j++){
-						for(int l = 0; l < s_par; l++){
-							for(int v = 0; v < s_par; v++){
-								chSigma = arma::chol(Sigma);
-								ym = chSigma.t()*Uu;
-								for(int r = 0; r < n; r++){
-									ym(r) = ym(r) + museq[j];	
-								}
-								for(int s = 0; s < n; s++){
-									for(int r = 0; r<n; r++){
-										Sigma(s,r) = ZZ(s,r)*saseq[l] + I_n(s,r)*seseq[v];	
-									}
-								}
-
-								tmp = solve(trimatl(chSigma.t()), ym);
-								rss = dot(tmp,tmp);
-								dens[j][l][v] = siglik(l,v) - 0.5 * n * log(2 * M_PI) - 0.5 * rss(0,0);
-								maxdens = std::max(maxdens, dens[j][l][v]);
-							}
+		for(int p = 0; p < s_par; p++ ){
+			for(int k = 0; k < s_par; k++){
+				for(int t = 0; t < s_par; t++){
+					nums(k,t) = siglik(k,t)- 0.5 * n * log(2 * M_PI) - 0.5 * ztz(q);
+					for(int s = 0; s < n; s++){
+						for(int r = 0; r<n; r++){
+							Sigma(s,r) = ZZ(s,r)*saseq[k] + I_n(s,r)*seseq[t];	
 						}
 					}
-				simratios[k][t] = nums(k,t)/maxdens;
+					chSigma = arma::chol(Sigma);
+					ym = chSigma.t()*Uu;
+					for(int r = 0; r < n; r++){
+						ym(r) = ym(r) + museq[j];	
+					}
+						for(int j = 0; j < s_par; j++){
+							for(int l = 0; l < s_par; l++){
+								for(int v = 0; v < s_par; v++){
+									for(int s = 0; s < n; s++){
+										for(int r = 0; r<n; r++){
+											Sigma(s,r) = ZZ(s,r)*saseq[l] + I_n(s,r)*seseq[v];	
+										}
+									}
+									for(int r = 0; r < n; r++){
+										ym2(r) = ym(r) - museq[l];	
+									}
+									tmp = solve(trimatl(chSigma.t()), ym2);
+									rss = dot(tmp,tmp);
+									dens[j][l][v] = siglik(l,v) - 0.5 * n * log(2 * M_PI) - 0.5 * rss(0,0);
+									maxdens = std::max(maxdens, dens[j][l][v]);
+								}
+							}
+						}
+					simratios[k][t] = nums(k,t)/maxdens;
+				}
 			}
 		}
-		
 		for(int j = 0; j < s_par; j++){
 			for(int k = 0; k < s_par; k++){
 				for(int t = 0; t < s_par; t++){
