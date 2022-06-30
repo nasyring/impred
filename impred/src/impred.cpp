@@ -168,7 +168,7 @@ Rcpp::List genIM(NumericVector Y, NumericMatrix Z, NumericVector museq, NumericV
 	List result;
 	int n = Y.length();
 	int m = round(M[0]);
-	int s_par = museq.length();
+	int s_par = museq.length(); 
 	
 	
 	double data_liks[s_par][s_par][s_par];
@@ -184,13 +184,15 @@ Rcpp::List genIM(NumericVector Y, NumericMatrix Z, NumericVector museq, NumericV
 	arma::mat Sigma; Sigma.zeros(n,n);
 	arma::mat chSigma; arma::mat tmp; arma::mat rss; arma::mat tmpsim; arma::mat rsssim; 
 	arma::mat I_n; I_n.zeros(n,n);
-	arma::mat Ud; Ud.zeros(n,m); NumericVector templik(m,0.0);NumericVector siglik(1,0.0);
+	arma::mat Ud; Ud.zeros(n,m); NumericVector templik(m,0.0);arma::mat siglik; siglik.zeros(s_par,s_par); 
+	arma::vec ztz; ztz.zeros(m);
 	
-	
+	// replace this for loop below
 	for(int q = 0; q < m; q++){
 		U = Rcpp::rnorm(n,0.0,1.0);
 		for(int s = 0; s < n; s++){
 			Ud(s,q) = U[s];
+			ztz(q) = U[s]*U[s];
 		}			
 	}
 	
@@ -219,23 +221,51 @@ Rcpp::List genIM(NumericVector Y, NumericMatrix Z, NumericVector museq, NumericV
 				for(int q = 0; q < n; q++){
 					lik[0] = lik[0] - log(chSigma(q,q));
 				}
-				siglik[0] = lik[0];
+				siglik(k,t) = lik[0];
 				lik[0] = siglik[0] - 0.5 * n * log(2 * M_PI) - 0.5 * rss(0,0);
 				data_liks[j][k][t] = lik[0];
 				max_data_liks = std::max(max_data_liks, lik[0]);
-				for(int q = 0; q < m; q++){
-					for(int s = 0; s < n; s++){
-						ymsim(s) = Ud(s,q);
-					}
-					tmpsim = solve(trimatl(chSigma.t()), ymsim);
-					rsssim = dot(tmpsim,tmpsim);
-					sim_liks[j][k][t][q] = -0.5*rsssim(0,0) + siglik[0] - 0.5 * n * log(2 * M_PI);
-					max_sim_liks[q] = std::max(sim_liks[j][k][t][q], max_sim_liks[q]);
-				}
 			}
 		}
 	}
-
+	
+	// Loop for sim data
+	for(int q = 0; q < m; q++){
+		U = Rcpp::rnorm(n,0.0,1.0);
+		for(int s = 0; s < n; s++){
+			ztz(q) = U[s]*U[s];
+		}			
+	}
+	
+	for(int j = 0; j < s_par; j++){
+		for(int q = 0; q < n; q++){
+			ym(q) = U[q] - museq[j];	
+		}
+		for(int k = 0; k < s_par; k++){
+			for(int t = 0; t < s_par; t++){
+				for(int q = 0; q < n; q++){
+					for(int r = 0; r<n; r++){
+						Sigma(q,r) = ZZ(q,r)*saseq[k] + I_n(q,r)*seseq[t];	
+					}
+				}
+				chSigma = arma::chol(Sigma);
+				tmp = solve(trimatl(chSigma.t()), ym);
+				rss = dot(tmp,tmp);
+				lik[0] = 0.0;
+				for(int q = 0; q < n; q++){
+					lik[0] = lik[0] - log(chSigma(q,q));
+				}
+				siglik(k,t) = lik[0];
+				lik[0] = siglik[0] - 0.5 * n * log(2 * M_PI) - 0.5 * rss(0,0);
+				data_liks[j][k][t] = lik[0];
+				max_data_liks = std::max(max_data_liks, lik[0]);
+			}
+		}
+	}	
+	
+	
+	
+	
 	
 	/*
 	
