@@ -314,10 +314,17 @@ Rcpp::List genIM(NumericVector Y, NumericMatrix Z, NumericVector museq, NumericV
 	}
 	
 	
+	arma::mat temp1; temp1.zeros(s_par, s_par);
+	arma::mat temp2; temp2.zeros(s_par, s_par);
 	
+	for(int j = 0; j < s_par; j++){
+		for(int k = 0; k < s_par; k++){
+			temp1(j,k) = dataratios[0][j][k]; 
+			temp2(j,k) = simratios[j][k];
+		}
+	}
 	
-	
-	result = Rcpp::List::create(Rcpp::Named("plauses") = plauses_musa);
+	result = Rcpp::List::create(Rcpp::Named("plauses") = plauses_musa, Rcpp::Named("max_data_liks") = max_data_liks, Rcpp::Named("maxdens") = maxdens, Rcpp::Named("temp1") = temp1, Rcpp::Named("temp2") = temp2);
 	
 	return result;
 	
