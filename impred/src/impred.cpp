@@ -170,7 +170,6 @@ Rcpp::List genIM(NumericVector Y, NumericMatrix Z, NumericVector museq, NumericV
 	int m = round(M[0]);
 	int s_par = museq.length(); 
 	
-	
 	double data_liks[s_par][s_par][s_par];
 	double max_data_liks = -10000000.0;
 	double sim_liks[s_par][s_par][s_par][m];
@@ -266,7 +265,7 @@ Rcpp::List genIM(NumericVector Y, NumericMatrix Z, NumericVector museq, NumericV
 					chSigma = arma::chol(Sigma);
 					ym = chSigma.t()*Uu;
 					for(int r = 0; r < n; r++){
-						ym(r) = ym(r) + museq[j];	
+						ym(r) = ym(r) + museq[p];	
 					}
 						for(int j = 0; j < s_par; j++){
 							for(int l = 0; l < s_par; l++){
