@@ -325,7 +325,21 @@ Rcpp::List genIM(NumericVector Y, NumericMatrix Z, NumericVector museq, NumericV
 		}
 	}
 	
-	result = Rcpp::List::create(Rcpp::Named("plauses") = plauses_musa, Rcpp::Named("max_data_liks") = max_data_liks, Rcpp::Named("maxdens") = maxdens, Rcpp::Named("temp1") = temp1, Rcpp::Named("temp2") = temp2);
+	for(int s = 0; s < n; s++){
+		Uu(s) = Ud(s,0);
+	}
+	for(int s = 0; s < n; s++){
+		for(int r = 0; r<n; r++){
+			Sigma(s,r) = ZZ(s,r)*saseq[2] + I_n(s,r)*seseq[2];	
+		}
+	}
+	chSigma = arma::chol(Sigma);
+	ym = chSigma.t()*Uu;
+	tmp = solve(trimatl(chSigma.t()), ym);
+					
+	
+	
+	result = Rcpp::List::create(Rcpp::Named("plauses") = plauses_musa, Rcpp::Named("max_data_liks") = max_data_liks, Rcpp::Named("maxdens") = maxdens, Rcpp::Named("temp1") = temp1, Rcpp::Named("temp2") = temp2, Rcpp::Named("Uu") = Uu, , Rcpp::Named("ym") = ym);
 	
 	return result;
 	
