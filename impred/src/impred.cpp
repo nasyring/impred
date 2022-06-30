@@ -163,17 +163,17 @@ result = Rcpp::List::create(Rcpp::Named("randsetpred") = randsetpred);
 	
 }
 
-Rcpp::List genIM(NumericVector Y, NumericMatrix Z, NumericVector thetaseq, NumericVector museq, NumericVector saseq, NumericVector seseq, NumericVector M) {
+Rcpp::List genIM(NumericVector Y, NumericMatrix Z, NumericVector museq, NumericVector saseq, NumericVector seseq, NumericVector M) {
 	
 	List result;
 	int n = Y.length();
 	int m = round(M[0]);
 	int s_par = museq.length();
-	int s_t = thetaseq.length();
 	
-	double data_liks[s_t][s_par][s_par][s_par];
+	
+	double data_liks[s_par][s_par][s_par];
 	double max_data_liks = -10000000.0;
-	double sim_liks[s_t][s_par][s_par][s_par][m];
+	double sim_liks[s_par][s_par][s_par][m];
 	NumericVector max_sim_liks(m,-100000000.0);
 	
 	NumericVector U(n,0.0); 
@@ -200,43 +200,43 @@ Rcpp::List genIM(NumericVector Y, NumericMatrix Z, NumericVector thetaseq, Numer
 	}
 
 	
-	for(int i = 0; i < s_t; i++){
-		for(int j = 0; j < s_par; j++){
-			for(int q = 0; q < n; q++){
-				ym(q) = Y[q] - museq[j];	
-			}
-			for(int k = 0; k < s_par; k++){
-				for(int t = 0; t < s_par; t++){
-					for(int q = 0; q < n; q++){
-						for(int r = 0; r<n; r++){
-							Sigma(q,r) = ZZ(q,r)*saseq[k] + I_n(q,r)*seseq[t];	
-						}
+	
+	for(int j = 0; j < s_par; j++){
+		for(int q = 0; q < n; q++){
+			ym(q) = Y[q] - museq[j];	
+		}
+		for(int k = 0; k < s_par; k++){
+			for(int t = 0; t < s_par; t++){
+				for(int q = 0; q < n; q++){
+					for(int r = 0; r<n; r++){
+						Sigma(q,r) = ZZ(q,r)*saseq[k] + I_n(q,r)*seseq[t];	
 					}
-					/*chSigma = arma::chol(Sigma);
-					tmp = solve(trimatl(chSigma.t()), ym);
-					rss = dot(tmp,tmp);
-					lik[0] = 0.0;
-					for(int q = 0; q < n; q++){
-						lik[0] = lik[0] - log(chSigma(q,q));
+				}
+				chSigma = arma::chol(Sigma);
+				tmp = solve(trimatl(chSigma.t()), ym);
+				rss = dot(tmp,tmp);
+				lik[0] = 0.0;
+				for(int q = 0; q < n; q++){
+					lik[0] = lik[0] - log(chSigma(q,q));
+				}
+				siglik[0] = lik[0];
+				lik[0] = siglik[0] - 0.5 * n * log(2 * M_PI) - 0.5 * rss(0,0);
+				data_liks[j][k][t] = lik[0];
+				max_data_liks = std::max(max_data_liks, lik[0]);
+				for(int q = 0; q < m; q++){
+					for(int s = 0; s < n; s++){
+						ymsim(s) = Ud(s,q);
 					}
-					siglik[0] = lik[0];
-					lik[0] = siglik[0] - 0.5 * n * log(2 * M_PI) - 0.5 * rss(0,0) + R::dnorm(thetaseq[i], museq[j], std::sqrt(saseq[k]), 1);
-					data_liks[i][j][k][t] = lik[0];
-					max_data_liks = std::max(max_data_liks, lik[0]);*/
-					/*for(int q = 0; q < m; q++){
-						for(int s = 0; s < n; s++){
-							ymsim(s) = Ud(s,q);
-						}
-						tmpsim = solve(trimatl(chSigma.t()), ymsim);
-						rsssim = dot(tmpsim,tmpsim);
-						sim_liks[i][j][k][t][q] = -0.5*rsssim(0,0) + siglik[0] - 0.5 * n * log(2 * M_PI)+ R::dnorm(thetaseq[i], museq[j], std::sqrt(saseq[k]), 1);
-						max_sim_liks[q] = std::max(sim_liks[i][j][k][t][q], max_sim_liks[q]);
-					}*/
+					tmpsim = solve(trimatl(chSigma.t()), ymsim);
+					rsssim = dot(tmpsim,tmpsim);
+					sim_liks[j][k][t][q] = -0.5*rsssim(0,0) + siglik[0] - 0.5 * n * log(2 * M_PI);
+					max_sim_liks[q] = std::max(sim_liks[j][k][t][q], max_sim_liks[q]);
 				}
 			}
 		}
-		
 	}
+
+	
 	/*
 	
 	double data_ratios[s_t][s_par][s_par][s_par];
