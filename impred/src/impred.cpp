@@ -354,9 +354,11 @@ Rcpp::List genIM(NumericVector Y, NumericMatrix Z, NumericVector museq, NumericV
 	double d1 = simratios[0][0][0];
 	double d2 = nums[0][0][0];
 	double d3 = dens[0][0][0];
+	double d4 = ztz(0);
+	double d5 = rss(0,0);
 	
 	
-	result = Rcpp::List::create(Rcpp::Named("plauses") = plauses_musa, Rcpp::Named("max_data_liks") = max_data_liks, Rcpp::Named("maxdens") = maxdens, Rcpp::Named("temp1") = temp1, Rcpp::Named("temp2") = temp2, Rcpp::Named("d1") = d1, Rcpp::Named("d2") = d2, Rcpp::Named("d3") = d3);
+	result = Rcpp::List::create(Rcpp::Named("plauses") = plauses_musa, Rcpp::Named("max_data_liks") = max_data_liks, Rcpp::Named("maxdens") = maxdens, Rcpp::Named("temp1") = temp1, Rcpp::Named("temp2") = temp2, Rcpp::Named("d1") = d1, Rcpp::Named("d2") = d2, Rcpp::Named("d3") = d3, Rcpp::Named("d4") = d4, Rcpp::Named("d5") = d5);
 	
 	return result;
 	
