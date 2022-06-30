@@ -172,7 +172,6 @@ Rcpp::List genIM(NumericVector Y, NumericMatrix Z, NumericVector museq, NumericV
 	
 	double data_liks[s_par][s_par][s_par];
 	double max_data_liks = -10000000.0;
-	double sim_liks[s_par][s_par][s_par][m];
 	NumericVector max_sim_liks(m,-100000000.0);
 	
 	NumericVector U(n,0.0); 
@@ -299,9 +298,6 @@ Rcpp::List genIM(NumericVector Y, NumericMatrix Z, NumericVector museq, NumericV
 				}
 			}
 		}		
-
-		
-		
 	}
 	
 	NumericVector zeros(s_par*s_par,0.0);  NumericMatrix plauses_musa(s_par, s_par, zeros.begin());
@@ -335,7 +331,7 @@ Rcpp::List genIM(NumericVector Y, NumericMatrix Z, NumericVector museq, NumericV
 			for(int r = 0; r<n; r++){
 				Sigma(s,r) = ZZ(s,r)*saseq[0] + I_n(s,r)*seseq[0];	
 				}
-			}
+		}
 		chSigma = arma::chol(Sigma);
 		ym = chSigma.t()*Uu;
 		for(int r = 0; r < n; r++){
@@ -348,22 +344,21 @@ Rcpp::List genIM(NumericVector Y, NumericMatrix Z, NumericVector museq, NumericV
 					for(int s = 0; s < n; s++){
 						for(int r = 0; r<n; r++){
 							Sigma(s,r) = ZZ(s,r)*saseq[l] + I_n(s,r)*seseq[v];	
-							}
 						}
-						for(int r = 0; r < n; r++){
-							ym2(r) = ym(r) - museq[j];	
-						}
-						tmp = solve(trimatl(chSigma.t()), ym2);
-						rss = dot(tmp,tmp);
-						dens[j][l][v] = siglik(l,v) - 0.5 * n * log(2 * M_PI) - 0.5 * rss(0,0);
-						maxdens = std::max(maxdens, dens[j][l][v]);
 					}
+					for(int r = 0; r < n; r++){
+						ym2(r) = ym(r) - museq[j];	
+					}
+					tmp = solve(trimatl(chSigma.t()), ym2);
+					rss = dot(tmp,tmp);
+					dens[j][l][v] = siglik(l,v) - 0.5 * n * log(2 * M_PI) - 0.5 * rss(0,0);
+					maxdens = std::max(maxdens, dens[j][l][v]);
 				}
 			}
 		}
-		simratios[0][0][0] = nums[0][0][0]/maxdens;
+	simratios[0][0][0] = nums[0][0][0]/maxdens;
 	double d1 = simratios[0][0][0];
-		double d2 = nums[0][0][0];
+	double d2 = nums[0][0][0];
 	
 	
 	result = Rcpp::List::create(Rcpp::Named("plauses") = plauses_musa, Rcpp::Named("max_data_liks") = max_data_liks, Rcpp::Named("maxdens") = maxdens, Rcpp::Named("temp1") = temp1, Rcpp::Named("temp2") = temp2, Rcpp::Named("d1") = d1, Rcpp::Named("d2") = d2);
