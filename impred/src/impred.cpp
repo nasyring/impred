@@ -232,7 +232,7 @@ Rcpp::List genIM(NumericVector Y, NumericMatrix Z, NumericVector museq, NumericV
 		U = Rcpp::rnorm(n,0.0,1.0);
 		for(int s = 0; s < n; s++){
 			Ud(s,q) = U[s];
-			ztz(q) = U[s]*U[s];
+			ztz(q) = ztz(q) + U[s]*U[s];
 		}			
 	}
 	
