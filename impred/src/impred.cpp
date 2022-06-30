@@ -311,54 +311,7 @@ Rcpp::List genIM(NumericVector Y, NumericMatrix Z, NumericVector museq, NumericV
 	}
 	
 	
-	arma::mat temp1; temp1.zeros(s_par, s_par);
-	arma::mat temp2; temp2.zeros(s_par, s_par);
-	
-	for(int j = 0; j < s_par; j++){
-		for(int k = 0; k < s_par; k++){
-			temp1(j,k) = dataratios[0][j][k]; 
-			temp2(j,k) = simratios[0][j][k];
-		}
-	}
-
-	
-
-		for(int s = 0; s < n; s++){
-			Uu(s) = Ud(s,0);
-		}
-		nums[0][0][0] = siglik(0,0)- 0.5 * n * log(2 * M_PI) - 0.5 * ztz(0);
-		for(int s = 0; s < n; s++){
-			for(int r = 0; r<n; r++){
-				Sigma(s,r) = ZZ(s,r)*saseq[0] + I_n(s,r)*seseq[0];	
-				}
-		}
-		chSigma = arma::chol(Sigma);
-		ym = chSigma.t()*Uu;
-		for(int r = 0; r < n; r++){
-			ym(r) = ym(r) + museq[0];	
-		}
-		maxdens = -1000000000.0;
-		for(int s = 0; s < n; s++){
-			for(int r = 0; r<n; r++){
-				Sigma(s,r) = ZZ(s,r)*saseq[0] + I_n(s,r)*seseq[0];	
-			}
-		}
-		for(int r = 0; r < n; r++){
-			ym2(r) = ym(r) - museq[0];	
-		}
-		tmp = solve(trimatl(chSigma.t()), ym2);
-		rss = dot(tmp,tmp);
-		dens[0][0][0] = siglik(0,0) - 0.5 * n * log(2 * M_PI) - 0.5 * rss(0,0);
-			maxdens = std::max(maxdens, dens[0][0][0]);
-		simratios[0][0][0] = nums[0][0][0]/maxdens;
-	double d1 = simratios[0][0][0];
-	double d2 = nums[0][0][0];
-	double d3 = dens[0][0][0];
-	double d4 = ztz(0);
-	double d5 = rss(0,0);
-	
-	
-	result = Rcpp::List::create(Rcpp::Named("plauses") = plauses_musa, Rcpp::Named("max_data_liks") = max_data_liks, Rcpp::Named("maxdens") = maxdens, Rcpp::Named("temp1") = temp1, Rcpp::Named("temp2") = temp2, Rcpp::Named("d1") = d1, Rcpp::Named("d2") = d2, Rcpp::Named("d3") = d3, Rcpp::Named("d4") = d4, Rcpp::Named("d5") = d5);
+	result = Rcpp::List::create(Rcpp::Named("plauses") = plauses_musa);
 	
 	return result;
 	
