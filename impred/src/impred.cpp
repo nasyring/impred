@@ -222,7 +222,7 @@ Rcpp::List genIM(NumericVector Y, NumericMatrix Z, NumericVector museq, NumericV
 	for(int j = 0; j < s_par; j++){
 		for(int k = 0; k < s_par; k++){
 			for(int t = 0; t < s_par; t++){
-				dataratios[j][k][t] = data_liks[j][k][t]/maxdataliks;
+				dataratios[j][k][t] = data_liks[j][k][t]/max_data_liks;
 			}
 		}
 	}
@@ -308,7 +308,7 @@ Rcpp::List genIM(NumericVector Y, NumericMatrix Z, NumericVector museq, NumericV
 	for(int j = 0; j < s_par; j++){
 		for(int k = 0; k < s_par; k++){
 			for(int t = 0; t < s_par; t++){
-				plauses_musa[j,k] = std::max(plauses_musa[j,k], plauses[j][k][t]);
+				plauses_musa(j,k) = std::max(plauses_musa(j,k), plauses[j][k][t]);
 			}
 		}
 	}
