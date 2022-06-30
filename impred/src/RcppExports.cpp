@@ -41,19 +41,18 @@ BEGIN_RCPP
 END_RCPP
 }
 
-Rcpp::List genIM(NumericVector Y, NumericMatrix Z, NumericVector thetaseq, NumericVector museq, NumericVector saseq, NumericVector seseq, NumericVector M);
-RcppExport SEXP impred_genIM(SEXP YSEXP, SEXP ZSEXP, SEXP thetaseqSEXP, SEXP museqSEXP, SEXP saseqSEXP, SEXP seseqSEXP, SEXP MSEXP){
+Rcpp::List genIM(NumericVector Y, NumericMatrix Z, NumericVector museq, NumericVector saseq, NumericVector seseq, NumericVector M);
+RcppExport SEXP impred_genIM(SEXP YSEXP, SEXP ZSEXP, SEXP museqSEXP, SEXP saseqSEXP, SEXP seseqSEXP, SEXP MSEXP){
 BEGIN_RCPP
     Rcpp::RObject __result;
     Rcpp::RNGScope __rngScope;
     Rcpp::traits::input_parameter< NumericVector >::type Y(YSEXP);
     Rcpp::traits::input_parameter< NumericMatrix >::type Z(ZSEXP);
-    Rcpp::traits::input_parameter< NumericVector >::type thetaseq(thetaseqSEXP);
     Rcpp::traits::input_parameter< NumericVector >::type museq(museqSEXP);
     Rcpp::traits::input_parameter< NumericVector >::type saseq(saseqSEXP);
     Rcpp::traits::input_parameter< NumericVector >::type seseq(seseqSEXP);
     Rcpp::traits::input_parameter< NumericVector >::type M(MSEXP);
-    __result = Rcpp::wrap(genIM( Y,  Z, thetaseq,  museq,  saseq, seseq,  M));
+    __result = Rcpp::wrap(genIM( Y,  Z,  museq,  saseq, seseq,  M));
     return __result;
 END_RCPP
 }
