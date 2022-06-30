@@ -277,7 +277,7 @@ Rcpp::List genIM(NumericVector Y, NumericMatrix Z, NumericVector museq, NumericV
 										}
 									}
 									for(int r = 0; r < n; r++){
-										ym2(r) = ym(r) - museq[l];	
+										ym2(r) = ym(r) - museq[j];	
 									}
 									tmp = solve(trimatl(chSigma.t()), ym2);
 									rss = dot(tmp,tmp);
@@ -325,7 +325,7 @@ Rcpp::List genIM(NumericVector Y, NumericMatrix Z, NumericVector museq, NumericV
 		}
 	}
 	
-	result = Rcpp::List::create(Rcpp::Named("plauses") = plauses_musa, Rcpp::Named("max_data_liks") = max_data_liks, Rcpp::Named("maxdens") = maxdens, Rcpp::Named("temp1") = temp1, Rcpp::Named("temp2") = temp2, Rcpp::Named("chSigma") = chSigma);
+	result = Rcpp::List::create(Rcpp::Named("plauses") = plauses_musa, Rcpp::Named("max_data_liks") = max_data_liks, Rcpp::Named("maxdens") = maxdens, Rcpp::Named("temp1") = temp1, Rcpp::Named("temp2") = temp2);
 	
 	return result;
 	
