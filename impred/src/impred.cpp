@@ -267,6 +267,7 @@ Rcpp::List genIM(NumericVector Y, NumericMatrix Z, NumericVector museq, NumericV
 					for(int r = 0; r < n; r++){
 						ym(r) = ym(r) + museq[p];	
 					}
+					maxdens = -1000000000.0;
 						for(int j = 0; j < s_par; j++){
 							for(int l = 0; l < s_par; l++){
 								for(int v = 0; v < s_par; v++){
