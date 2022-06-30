@@ -348,7 +348,7 @@ Rcpp::List genIM(NumericVector Y, NumericMatrix Z, NumericVector museq, NumericV
 		}
 		tmp = solve(trimatl(chSigma.t()), ym2);
 		rss = dot(tmp,tmp);
-		dens[0][0][0] = siglik(l,v) - 0.5 * n * log(2 * M_PI) - 0.5 * rss(0,0);
+		dens[0][0][0] = siglik(0,0) - 0.5 * n * log(2 * M_PI) - 0.5 * rss(0,0);
 			maxdens = std::max(maxdens, dens[0][0][0]);
 		simratios[0][0][0] = nums[0][0][0]/maxdens;
 	double d1 = simratios[0][0][0];
