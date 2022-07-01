@@ -163,6 +163,20 @@ result = Rcpp::List::create(Rcpp::Named("randsetpred") = randsetpred);
 	
 }
 
+
+Rcpp::List randsetspredlmer() {
+	
+	List result;
+	
+	
+	result = Rcpp::List::create(Rcpp::Named("") = );
+
+	return result;
+	
+	
+}
+
+
 Rcpp::List genIM(NumericVector Y, NumericMatrix Z, NumericVector museq, NumericVector saseq, NumericVector seseq, NumericVector M) {
 	
 	List result;
