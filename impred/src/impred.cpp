@@ -168,10 +168,9 @@ Rcpp::List randsetspredlmer(NumericMatrix S, NumericVector dimS, NumericVector U
 	
 	List result;
 	
-	int M = int(dimS[0]);
-	arma::colvec xa = as<arma::colvec>(x);
-	arma::colvec Cxa;
-	arma::colvec Bya = as<arma::colvec>(By);
+//	arma::colvec xa = as<arma::colvec>(x);
+//	arma::colvec Cxa; Cxa.zeros(2);
+//	arma::colvec Bya = as<arma::colvec>(By);
 /*	double xBy = dot(xa, Bya);
 	arma::mat Csigma2;  Csigma2.zeros(2,2);
 	NumericVector zeroes4(4,0.0);
