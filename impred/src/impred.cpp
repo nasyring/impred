@@ -169,13 +169,13 @@ Rcpp::List randsetspredlmer(NumericMatrix S, NumericVector dimS, NumericVector U
 	List result;
 	
 	int M = int(dimS[0]);
-	arma::mat C1a = as<arma::mat>(C1);
-	arma::mat C2a = as<arma::mat>(C2);
 	arma::colvec xa = as<arma::colvec>(x);
 	arma::colvec Cxa;
 	arma::colvec Bya = as<arma::colvec>(By);
 	arma::mat xBy = xa.t()*Bya;
-	arma::mat Csigma(2,2); NumericVector total_sigma(1,0.0);
+	arma::mat Csigma2(2,2);
+	NumericMatrix Csigma;
+	NumericVector total_sigma(1,0.0);
 	NumericVector Uu(1, 0.0); NumericVector Ul(1, 0.0);
 	NumericVector zeroes(20000,0.0);
 	NumericMatrix randsetpred = NumericMatrix(10000, 2, zeroes.begin());
@@ -184,8 +184,9 @@ Rcpp::List randsetspredlmer(NumericMatrix S, NumericVector dimS, NumericVector U
 	
 	
 		Z[0] = R::rnorm(0.0,1.0);
-		Csigma = S(0,1)*C1a + S(0,0)*C2a;
-		Cxa = Csigma*xa;
+		Csigma = S(0,1)*C1 + S(0,0)*C2;
+		Csigma2 = as<arma::mat>(Csigma);
+		Cxa = Csigma2*xa;
 		total_sigma[0] = dot(xa, Cxa) + S(0,0)*ztz[0];
 		total_sigma[0] = std::sqrt(total_sigma[0]);
 		thetas[0] = Z[0]*total_sigma(0,0) + xBy(0,0);
