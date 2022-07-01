@@ -41,6 +41,27 @@ BEGIN_RCPP
 END_RCPP
 }
 
+
+
+Rcpp::List randsetspredlmer(NumericMatrix S, NumericVector dimS, NumericVector U, NumericMatrix C1, NumericMatrix C2, NumericVector By, NumericVector x, NumericVector ztz);
+RcppExport SEXP impred_randsetspredlmer(SEXP SSEXP, SEXP dimSSEXP, SEXP USEXP, SEXP C1SEXP, SEXP C2SEXP, SEXP BySEXP, SEXP xSEXP, SEXP ztzSEXP){
+BEGIN_RCPP
+    Rcpp::RObject __result;
+    Rcpp::RNGScope __rngScope;
+    Rcpp::traits::input_parameter< NumericMatrix >::type S(SSEXP);
+    Rcpp::traits::input_parameter< NumericVector >::type dimS(dimSSEXP);
+    Rcpp::traits::input_parameter< NumericVector >::type U(USEXP);
+    Rcpp::traits::input_parameter< NumericVector >::type C1(USEXP);
+    Rcpp::traits::input_parameter< NumericVector >::type C2(USEXP);
+    Rcpp::traits::input_parameter< NumericVector >::type By(USEXP);
+    Rcpp::traits::input_parameter< NumericVector >::type x(USEXP);
+    Rcpp::traits::input_parameter< NumericVector >::type ztz(USEXP);
+     __result = Rcpp::wrap(randsetspredlmer(S,dimS,U,C1,C2,By,x,ztz));
+    return __result;
+END_RCPP
+}
+
+
 Rcpp::List genIM(NumericVector Y, NumericMatrix Z, NumericVector museq, NumericVector saseq, NumericVector seseq, NumericVector M);
 RcppExport SEXP impred_genIM(SEXP YSEXP, SEXP ZSEXP, SEXP museqSEXP, SEXP saseqSEXP, SEXP seseqSEXP, SEXP MSEXP){
 BEGIN_RCPP
