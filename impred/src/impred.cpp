@@ -179,7 +179,9 @@ Rcpp::List randsetspredlmer(NumericMatrix S, NumericVector dimS, NumericVector U
 	NumericVector zeroes(20000,0.0);
 	NumericMatrix randsetpred = NumericMatrix(10000, 2, zeroes.begin());
 	NumericVector thetas(10000, 0.0);
-		
+	NumericVector Z(1, 0.0);
+	
+	
 	for(int j=0; j < 10000; j++){
 		Z[0] = R::rnorm(0.0,1.0);
 		Csigma = S(j,1)*C1a + S(j,0)*C2a;
