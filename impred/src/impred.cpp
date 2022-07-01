@@ -184,8 +184,8 @@ Rcpp::List randsetspredlmer(NumericMatrix S, NumericVector dimS, NumericVector U
 	
 	
 		Z[0] = R::rnorm(0.0,1.0);
-		Csigma = S(0,1)*C1a + S(0,0)*C2a;
-		total_sigma = xa.t()*Csigma*xa + S(0,0)*z2;
+		Csigma = S(0,1)%C1a + S(0,0)%C2a;
+		total_sigma = xa.t()*Csigma*xa + S(0,0)%z2;
 		arma::mat total_sigma2;
 		total_sigma2(0,0) = std::sqrt(total_sigma(0,0));
 		thetas[0] = Z[0]*total_sigma(0,0) + xBy(0,0);
