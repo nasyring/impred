@@ -184,7 +184,11 @@ Rcpp::List randsetspredlmer(NumericMatrix S, NumericVector dimS, NumericVector U
 	
 	
 		Z[0] = R::rnorm(0.0,1.0);
-		Csigma = S(0,1)*C1 + S(0,0)*C2;
+		for(int i = 0; i < 2; i++){
+			for(int j = 0; j < 2; j++){
+				Csigma(i,j) = S(0,1)*C1(i,j) + S(0,0)*C2(i,j);
+			}
+		}
 		Csigma2 = as<arma::mat>(Csigma);
 		Cxa = Csigma2*xa;
 		total_sigma[0] = dot(xa, Cxa) + S(0,0)*ztz[0];
