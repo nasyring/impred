@@ -218,7 +218,7 @@ Rcpp::List randsetspredlmer(NumericMatrix S, NumericVector dimS, NumericVector U
 	
 	result = Rcpp::List::create(Rcpp::Named("randsetpred") = randsetpred);
 	*/
-	result = Rcpp::List::create(Rcpp::Named("thetas") = thetas, Rcpp::Named("total_sigma") = total_sigma, Rcpp::Named("total_sigma2") = total_sigma2, Rcpp::Named("Csigma") = Csigma,Rcpp::Named("xBy") = xBy);
+	result = Rcpp::List::create(Rcpp::Named("thetas") = thetas, Rcpp::Named("total_sigma") = total_sigma, Rcpp::Named("Csigma") = Csigma,Rcpp::Named("xBy") = xBy);
 
 	
 	return result;
