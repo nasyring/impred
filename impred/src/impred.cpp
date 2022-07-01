@@ -172,7 +172,7 @@ Rcpp::List randsetspredlmer(NumericMatrix S, NumericVector dimS, NumericVector U
 	arma::colvec xa = as<arma::colvec>(x);
 	arma::colvec Cxa;
 	arma::colvec Bya = as<arma::colvec>(By);
-	double xBy = dot(xa, Bya);
+/*	double xBy = dot(xa, Bya);
 	arma::mat Csigma2;  Csigma2.zeros(2,2);
 	NumericVector zeroes4(4,0.0);
 	NumericMatrix Csigma(2,2,zeroes4.begin());
@@ -182,7 +182,7 @@ Rcpp::List randsetspredlmer(NumericMatrix S, NumericVector dimS, NumericVector U
 	NumericMatrix randsetpred = NumericMatrix(10000, 2, zeroes.begin());
 	NumericVector thetas(10000, 0.0);
 	NumericVector Z(1, 0.0);
-	
+*/	
 	/*
 		Z[0] = R::rnorm(0.0,1.0);
 		for(int i = 0; i < 2; i++){
@@ -220,7 +220,7 @@ Rcpp::List randsetspredlmer(NumericMatrix S, NumericVector dimS, NumericVector U
 	
 	result = Rcpp::List::create(Rcpp::Named("randsetpred") = randsetpred);
 	*/
-	result = Rcpp::List::create(Rcpp::Named("thetas") = thetas, Rcpp::Named("total_sigma") = total_sigma, Rcpp::Named("Csigma") = Csigma,Rcpp::Named("xBy") = xBy);
+//	result = Rcpp::List::create(Rcpp::Named("thetas") = thetas, Rcpp::Named("total_sigma") = total_sigma, Rcpp::Named("Csigma") = Csigma,Rcpp::Named("xBy") = xBy);
 
 	
 	return result;
