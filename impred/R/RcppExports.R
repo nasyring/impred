@@ -11,6 +11,10 @@ randsetspred <- function(S,dimS,nsize,n_i,dimn_i,k,U,Ybar) {
     .Call(`impred_randsetspred`, S,dimS,nsize,n_i,dimn_i,k,U,Ybar)
 }
 
+randsetspredlmer <- function(S,dimS,U,C1,C2,By,x,ztz) {
+    .Call(`impred_randsetspredlmer`, S,dimS,U,C1,C2,By,x,ztz)
+}
+
 genIM <- function(Y,  Z,  museq,  saseq, seseq,  M) {
     .Call(`impred_genIM`, Y,  Z,  museq,  saseq, seseq,  M)
 }
