@@ -194,7 +194,7 @@ Rcpp::List randsetspredlmer(NumericMatrix S, NumericVector dimS, NumericVector U
 
 	std::sort(thetas.begin(), thetas.end());
 
-	
+	/*
 	for(int j=0; j < 10000; j++){
 		Ul[0] = 0.5-std::fabs(U[j]-0.5);
 		Uu[0] = 1.0-Ul[0];
@@ -203,7 +203,10 @@ Rcpp::List randsetspredlmer(NumericMatrix S, NumericVector dimS, NumericVector U
 	}
 	
 	result = Rcpp::List::create(Rcpp::Named("randsetpred") = randsetpred);
+	*/
+	result = Rcpp::List::create(Rcpp::Named("thetas") = thetas);
 
+	
 	return result;
 	
 	
