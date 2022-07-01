@@ -51,8 +51,8 @@ BEGIN_RCPP
     Rcpp::traits::input_parameter< NumericMatrix >::type S(SSEXP);
     Rcpp::traits::input_parameter< NumericVector >::type dimS(dimSSEXP);
     Rcpp::traits::input_parameter< NumericVector >::type U(USEXP);
-    Rcpp::traits::input_parameter< NumericVector >::type C1(USEXP);
-    Rcpp::traits::input_parameter< NumericVector >::type C2(USEXP);
+    Rcpp::traits::input_parameter< NumericMatrix >::type C1(USEXP);
+    Rcpp::traits::input_parameter< NumericMatrix >::type C2(USEXP);
     Rcpp::traits::input_parameter< NumericVector >::type By(USEXP);
     Rcpp::traits::input_parameter< NumericVector >::type x(USEXP);
     Rcpp::traits::input_parameter< NumericVector >::type ztz(USEXP);
