@@ -51,11 +51,11 @@ BEGIN_RCPP
     Rcpp::traits::input_parameter< NumericMatrix >::type S(SSEXP);
     Rcpp::traits::input_parameter< NumericVector >::type dimS(dimSSEXP);
     Rcpp::traits::input_parameter< NumericVector >::type U(USEXP);
-    Rcpp::traits::input_parameter< NumericMatrix >::type C1(USEXP);
-    Rcpp::traits::input_parameter< NumericMatrix >::type C2(USEXP);
-    Rcpp::traits::input_parameter< NumericVector >::type By(USEXP);
-    Rcpp::traits::input_parameter< NumericVector >::type x(USEXP);
-    Rcpp::traits::input_parameter< NumericVector >::type ztz(USEXP);
+    Rcpp::traits::input_parameter< NumericMatrix >::type C1(C1SEXP);
+    Rcpp::traits::input_parameter< NumericMatrix >::type C2(C2SEXP);
+    Rcpp::traits::input_parameter< NumericVector >::type By(BySEXP);
+    Rcpp::traits::input_parameter< NumericVector >::type x(xSEXP);
+    Rcpp::traits::input_parameter< NumericVector >::type ztz(ztzSEXP);
      __result = Rcpp::wrap(randsetspredlmer(S,dimS,U,C1,C2,By,x,ztz));
     return __result;
 END_RCPP
