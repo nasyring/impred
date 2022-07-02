@@ -184,20 +184,21 @@ Rcpp::List randsetspredlmer(NumericMatrix S, NumericVector dimS, NumericVector U
 	
 	
 	
-	/*
+	
 		Z[0] = R::rnorm(0.0,1.0);
 		for(int i = 0; i < 2; i++){
 			for(int j = 0; j < 2; j++){
 				Csigma(i,j) = S(0,1)*C1(i,j) + S(0,0)*C2(i,j);
 			}
 		}
-		*/
-		//Csigma2 = as<arma::mat>(Csigma);
-		//Cxa = Csigma2*xa;
-		//total_sigma[0] = dot(xa, Cxa) + S(0,0)*ztz[0];
-		//total_sigma[0] = std::sqrt(total_sigma[0]);
-		//thetas[0] = Z[0]*total_sigma(0,0) + xBy(0,0);
+		
+		Csigma2 = as<arma::mat>(Csigma);
+		Cxa = Csigma2*xa;
+		total_sigma[0] = dot(xa, Cxa) + S(0,0)*ztz[0];
+		total_sigma[0] = std::sqrt(total_sigma[0]);
+		thetas[0] = Z[0]*total_sigma(0,0) + xBy(0,0);
 	
+	result = Rcpp::List::create(Rcpp::Named("Csigma") = Csigma, Rcpp::Named("Cxa") = Cxa, Rcpp::Named("total_sigma") = total_sigma, Rcpp::Named("theta") = thetas[0]);
 	
 	/*
 	for(int j=0; j < 10000; j++){
@@ -223,7 +224,6 @@ Rcpp::List randsetspredlmer(NumericMatrix S, NumericVector dimS, NumericVector U
 	*/
 //	result = Rcpp::List::create(Rcpp::Named("thetas") = thetas, Rcpp::Named("total_sigma") = total_sigma, Rcpp::Named("Csigma") = Csigma,Rcpp::Named("xBy") = xBy);
 
-	result = Rcpp::List::create(Rcpp::Named("xBy") = xBy);
 	
 	return result;
 	
