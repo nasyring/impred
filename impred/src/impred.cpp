@@ -167,7 +167,7 @@ result = Rcpp::List::create(Rcpp::Named("randsetpred") = randsetpred);
 Rcpp::List randsetspredlmer(NumericMatrix S, NumericVector dimS, NumericVector U, NumericMatrix C1, NumericMatrix C2, NumericVector By, NumericVector x, NumericVector ztz) {
 	
 	List result;
-	
+	/*
 	arma::colvec xa = as<arma::colvec>(x);
 	arma::colvec Cxa; Cxa.zeros(2);
 	arma::colvec Bya = as<arma::colvec>(By);
@@ -181,8 +181,8 @@ Rcpp::List randsetspredlmer(NumericMatrix S, NumericVector dimS, NumericVector U
 	NumericMatrix randsetpred = NumericMatrix(10000, 2, zeroes.begin());
 	NumericVector thetas(10000, 0.0);
 	NumericVector Z(1, 0.0);
+	*/
 	
-	result = Rcpp::List::create(Rcpp::Named("xBy") = xBy);
 	
 	/*
 		Z[0] = R::rnorm(0.0,1.0);
