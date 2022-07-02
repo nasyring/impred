@@ -196,7 +196,7 @@ Rcpp::List randsetspredlmer(NumericMatrix S, NumericVector dimS, NumericVector U
 		Cxa = Csigma2*xa;
 		total_sigma[0] = dot(xa, Cxa) + S(0,0)*ztz[0];
 		total_sigma[0] = std::sqrt(total_sigma[0]);
-		thetas[0] = Z[0]*total_sigma(0,0) + xBy(0,0);
+		thetas[0] = Z[0]*total_sigma[0] + xBy;
 	
 	result = Rcpp::List::create(Rcpp::Named("Csigma") = Csigma, Rcpp::Named("Cxa") = Cxa, Rcpp::Named("total_sigma") = total_sigma, Rcpp::Named("theta") = thetas[0]);
 	
