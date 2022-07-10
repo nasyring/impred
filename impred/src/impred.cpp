@@ -118,10 +118,10 @@ Rcpp::List randsetspred(NumericMatrix S, NumericVector dimS, NumericVector nsize
 	NumericVector Uu(1,0.0);
 	NumericVector zeroes = NumericVector(10000*6, 0.0); 
         NumericMatrix randsetpred = NumericMatrix(10000, 6, zeroes.begin());
-	NumericVector Zint(2,0.0);NumericVector siga(1,0.0);NumericVector sige(1,0.0);
-	NumericVector U3(1, 0.0);NumericVector U3l(1, 0.0);NumericVector U3u(1, 0.0);
-	NumericVector Sa(M, 0.0);NumericVector Se(M, 0.0);
-	
+	NumericVector Zint(2,0.0); NumericVector siga(1,0.0); NumericVector sige(1,0.0);
+	NumericVector U3(1, 0.0); NumericVector U3l(1, 0.0); NumericVector U3u(1, 0.0);
+	NumericVector Sa(M, 0.0); NumericVector Se(M, 0.0);
+	NumericVector Z(1,0.0);
 	
 	for(int j=0; j < M; j++){
 		Sa[j] = S(j,0); Se[j] = S(j,1);	
@@ -135,12 +135,12 @@ Rcpp::List randsetspred(NumericMatrix S, NumericVector dimS, NumericVector nsize
 	
 	if(Sa[0] < 0.0){	
 	for(int j=0; j < M; j++){
-		U3[0] = std::max(R::runif(1,0.0,1.0), U3[0]);U3[0] = std::max(R::runif(1,0.0,1.0), U3[0]);U3[0] = std::max(R::runif(1,0.0,1.0), U3[0]);
+		U3[0] = std::max(R::runif(0.0,1.0), U3[0]);U3[0] = std::max(R::runif(0.0,1.0), U3[0]);U3[0] = std::max(R::runif(0.0,1.0), U3[0]);
 		U3l[0] = 0.5 - std::abs(0.5 - U3[0]);
 		U3u[0] = 0.5 -U3l[0];
 		siga[0] = std::max(Sa[round(U3u[0]*M)],0.0);
 		sige[0] = std::max(Se[round(U3u[0]*M)],0.0);
-		Zint[0] = R::qnorm(U3l[0],0.0,1.0); Zint[1] = R::qnorm(U3u[0],0.0,1.0);
+		Zint[0] = R::qnorm(U3l[0],0.0,1.0,1,0); Zint[1] = R::qnorm(U3u[0],0.0,1.0,1,0);
 		Qwl[0] = Zint[0]*std::sqrt(siga[0]*(1-(2*n_i[dn_i-1]/n)+(1/(n*n))*sumn_i2[0])+sige[0]*((1/n)+1/(k[0])));
 		Qwu[0] = Zint[1]*std::sqrt(siga[0]*(1-(2*n_i[dn_i-1]/n)+(1/(n*n))*sumn_i2[0])+sige[0]*((1/n)+1/(k[0])));
 		Qnl[0] = Zint[0]*std::sqrt(siga[0]*(1+(1/(n*n))*sumn_i2[0])+sige[0]*((1/n)+1/(k[0])));
