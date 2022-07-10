@@ -135,6 +135,7 @@ Rcpp::List randsetspred(NumericMatrix S, NumericVector dimS, NumericVector nsize
 	
 	if(Sa[0] < 0.0){	
 	for(int j=0; j < M; j++){
+		U3[0] = 0.0;
 		U3[0] = std::max(R::runif(0.0,1.0), U3[0]);U3[0] = std::max(R::runif(0.0,1.0), U3[0]);U3[0] = std::max(R::runif(0.0,1.0), U3[0]);
 		U3l[0] = 0.5 - std::abs(0.5 - U3[0]);
 		U3u[0] = 0.5 -U3l[0];
