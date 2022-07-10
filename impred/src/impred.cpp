@@ -153,7 +153,6 @@ Rcpp::List randsetspred(NumericMatrix S, NumericVector dimS, NumericVector nsize
 		randsetpred(j,3) = Ybar[0]+Qnu[0];
 		randsetpred(j,4) = Ybar[0]+QTl[0];
 		randsetpred(j,5) = Ybar[0]+QTu[0];		
-			
 	}
 	}else {
 		
