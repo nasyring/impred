@@ -116,8 +116,8 @@ Rcpp::List randsetspred(NumericMatrix S, NumericVector dimS, NumericVector nsize
 	NumericVector QTu(1,0.0);
 	NumericVector Ul(1,0.0);
 	NumericVector Uu(1,0.0);
-	NumericVector zeroes = NumericVector(10000*16, 0.0); 
-        NumericMatrix randsetpred = NumericMatrix(10000, 16, zeroes.begin());
+	NumericVector zeroes = NumericVector(10000*18, 0.0); 
+        NumericMatrix randsetpred = NumericMatrix(10000, 18, zeroes.begin());
 	NumericVector Zint(2,0.0); NumericVector siga(1,0.0); NumericVector sige(1,0.0);
 	NumericVector U3(1, 0.0); NumericVector U3l(1, 0.0); NumericVector U3u(1, 0.0);
 	NumericVector Sa(M, 0.0); NumericVector Se(M, 0.0);
@@ -164,6 +164,8 @@ Rcpp::List randsetspred(NumericMatrix S, NumericVector dimS, NumericVector nsize
 		randsetpred(j,13) = Zint[1];
 		randsetpred(j,14) = siga[0];
 		randsetpred(j,15) = sige[0];
+		randsetpred(j,14) = U3l[0];
+		randsetpred(j,15) = U3u[0];
 	}
 	}else {
 		
