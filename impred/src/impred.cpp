@@ -105,9 +105,9 @@ Rcpp::List randsetspred(NumericMatrix S, NumericVector dimS, NumericVector nsize
 	int index = int(1);
 	int dn_i = int(dimn_i[0]);
 	NumericVector sumn_i2(1,0.0);
-	NumericVector Qsampsw(10000,0.0);
-	NumericVector Qsampsn(10000,0.0);
-	NumericVector QsampsT(10000,0.0);
+	NumericVector Qsampsw(M,0.0);
+	NumericVector Qsampsn(M,0.0);
+	NumericVector QsampsT(M,0.0);
 	NumericVector Qwl(1,0.0);
 	NumericVector Qwu(1,0.0);
 	NumericVector Qnl(1,0.0);
@@ -118,18 +118,51 @@ Rcpp::List randsetspred(NumericMatrix S, NumericVector dimS, NumericVector nsize
 	NumericVector Uu(1,0.0);
 	NumericVector zeroes = NumericVector(10000*6, 0.0); 
         NumericMatrix randsetpred = NumericMatrix(10000, 6, zeroes.begin());
-	NumericVector Z(1,0.0);
+	NumericVector Zint(2,0.0);NumericVector siga(1,0.0);NumericVector sige(1,0.0);
+	NumericVector U3(1, 0.0);NumericVector U3l(1, 0.0);NumericVector U3u(1, 0.0);
+	NumericVector Sa(M, 0.0);NumericVector Se(M, 0.0);
+	
+	
+	for(int j=0; j < M; j++){
+		Sa[j] = S(j,0); Se[j] = S(j,1);	
+	}
+	std::sort(Sa.begin(), Sa.end()); std::sort(Se.begin(), Se.end());
 	
 	for(int j=0; j<dn_i; j++){
 		sumn_i2[0] = sumn_i2[0] + n_i[j]*n_i[j];	
 	}
+	
+	
+	if(Sa[0] < 0.0){	
+	for(int j=0; j < M; j++){
+		U3[0] = std::max(R::runif(1,0.0,1.0), U3[0]);U3[0] = std::max(R::runif(1,0.0,1.0), U3[0]);U3[0] = std::max(R::runif(1,0.0,1.0), U3[0]);
+		U3l[0] = 0.5 - std::abs(0.5 - U3[0]);
+		U3u[0] = 0.5 -U3l[0];
+		siga[0] = std::max(Sa[round(U3u[0]*M)],0.0);
+		sige[0] = std::max(Se[round(U3u[0]*M)],0.0);
+		Zint[0] = R::qnorm(U3l[0],0.0,1.0); Zint[1] = R::qnorm(U3u[0],0.0,1.0);
+		Qwl[0] = Zint[0]*std::sqrt(siga[0]*(1-(2*n_i[dn_i-1]/n)+(1/(n*n))*sumn_i2[0])+sige[0]*((1/n)+1/(k[0])));
+		Qwu[0] = Zint[1]*std::sqrt(siga[0]*(1-(2*n_i[dn_i-1]/n)+(1/(n*n))*sumn_i2[0])+sige[0]*((1/n)+1/(k[0])));
+		Qnl[0] = Zint[0]*std::sqrt(siga[0]*(1+(1/(n*n))*sumn_i2[0])+sige[0]*((1/n)+1/(k[0])));
+		Qnu[0] = Zint[1]*std::sqrt(siga[0]*(1+(1/(n*n))*sumn_i2[0])+sige[0]*((1/n)+1/(k[0])));
+		QTl[0] = Zint[0]*std::sqrt(siga[0]*(1+(1/(n*n))*sumn_i2[0])+sige[0]*((1/n)));
+		QTu[0] = Zint[1]*std::sqrt(siga[0]*(1+(1/(n*n))*sumn_i2[0])+sige[0]*((1/n)));
+		randsetpred(j,0) = Ybar[0]+Qwl[0];
+		randsetpred(j,1) = Ybar[0]+Qwu[0];
+		randsetpred(j,2) = Ybar[0]+Qnl[0];
+		randsetpred(j,3) = Ybar[0]+Qnu[0];
+		randsetpred(j,4) = Ybar[0]+QTl[0];
+		randsetpred(j,5) = Ybar[0]+QTu[0];		
+			
+	}
+	}else {
 		
-	for(int j=0; j < 10000; j++){
+	
+	for(int j=0; j < M; j++){
 		Z[0] = R::rnorm(0.0,1.0);
-		index = rand() % M;
-		Qsampsw[j] = Z[0]*std::sqrt(S(index,0)*(1-(2*n_i[dn_i-1]/n)+(1/(n*n))*sumn_i2[0])+S(index,1)*((1/n)+1/(k[0])));
-		Qsampsn[j] = Z[0]*std::sqrt(S(index,0)*(1+(1/(n*n))*sumn_i2[0])+S(index,1)*((1/n)+1/(k[0])));
-		QsampsT[j] = Z[0]*std::sqrt(S(index,0)*(1+(1/(n*n))*sumn_i2[0])+S(index,1)*(1/n));
+		Qsampsw[j] = Z[0]*std::sqrt(S(M,0)*(1-(2*n_i[dn_i-1]/n)+(1/(n*n))*sumn_i2[0])+S(M,1)*((1/n)+1/(k[0])));
+		Qsampsn[j] = Z[0]*std::sqrt(S(M,0)*(1+(1/(n*n))*sumn_i2[0])+S(M,1)*((1/n)+1/(k[0])));
+		QsampsT[j] = Z[0]*std::sqrt(S(M,0)*(1+(1/(n*n))*sumn_i2[0])+S(M,1)*(1/n));
 	}
 
 
@@ -154,7 +187,7 @@ Rcpp::List randsetspred(NumericMatrix S, NumericVector dimS, NumericVector nsize
 		randsetpred(j,5) = Ybar[0]+QTu[0];
 
 	}
-	
+	}
 
 result = Rcpp::List::create(Rcpp::Named("randsetpred") = randsetpred);
 
