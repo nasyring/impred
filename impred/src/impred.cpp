@@ -116,6 +116,7 @@ Rcpp::List randsetspred(NumericMatrix S, NumericVector dimS, NumericVector nsize
 	NumericVector QTu(1,0.0);
 	NumericVector Ul(1,0.0);
 	NumericVector Uu(1,0.0);
+	NumericVector Z = NumericVector(1, 0.0); 
 	NumericVector zeroes = NumericVector(10000*6, 0.0); 
         NumericMatrix randsetpred = NumericMatrix(10000, 6, zeroes.begin());
 
