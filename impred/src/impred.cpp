@@ -158,7 +158,7 @@ Rcpp::List randsetspred(NumericMatrix S, NumericVector dimS, NumericVector nsize
 	
 	for(int j=0; j < 10000; j++){
 		Z[0] = R::rnorm(0.0,1.0);
-		index = round(M*R::runif(0.0,1.0))
+		index = round(M*R::runif(0.0,1.0));
 		Qsampsw[j] = Z[0]*std::sqrt(S(index,0)*(1-(2*n_i[dn_i-1]/n)+(1/(n*n))*sumn_i2[0])+S(index,1)*((1/n)+1/(k[0])));
 		Qsampsn[j] = Z[0]*std::sqrt(S(index,0)*(1+(1/(n*n))*sumn_i2[0])+S(index,1)*((1/n)+1/(k[0])));
 		QsampsT[j] = Z[0]*std::sqrt(S(index,0)*(1+(1/(n*n))*sumn_i2[0])+S(index,1)*(1/n));
