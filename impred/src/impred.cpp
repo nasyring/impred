@@ -105,9 +105,9 @@ Rcpp::List randsetspred(NumericMatrix S, NumericVector dimS, NumericVector nsize
 	int index = int(1);
 	int dn_i = int(dimn_i[0]);
 	NumericVector sumn_i2(1,0.0);
-	NumericVector Qsampsw(M,0.0);
-	NumericVector Qsampsn(M,0.0);
-	NumericVector QsampsT(M,0.0);
+	NumericVector Qsampsw(10000,0.0);
+	NumericVector Qsampsn(10000,0.0);
+	NumericVector QsampsT(10000,0.0);
 	NumericVector Qwl(1,0.0);
 	NumericVector Qwu(1,0.0);
 	NumericVector Qnl(1,0.0);
@@ -118,15 +118,13 @@ Rcpp::List randsetspred(NumericMatrix S, NumericVector dimS, NumericVector nsize
 	NumericVector Uu(1,0.0);
 	NumericVector zeroes = NumericVector(10000*6, 0.0); 
         NumericMatrix randsetpred = NumericMatrix(10000, 6, zeroes.begin());
-	NumericVector Zint(2,0.0); NumericVector siga(1,0.0); NumericVector sige(1,0.0);
-	NumericVector U3(1, 0.0); NumericVector U3l(1, 0.0); NumericVector U3u(1, 0.0);
-	NumericVector Sa(M, 0.0); NumericVector Se(M, 0.0);
-	NumericVector Z(1,0.0);
+
 	
-	for(int j=0; j < M; j++){
+	/*for(int j=0; j < M; j++){
 		Sa[j] = S(j,0); Se[j] = S(j,1);	
 	}
 	std::sort(Sa.begin(), Sa.end()); std::sort(Se.begin(), Se.end());
+	*/
 	
 	for(int j=0; j<dn_i; j++){
 		sumn_i2[0] = sumn_i2[0] + n_i[j]*n_i[j];	
@@ -158,11 +156,12 @@ Rcpp::List randsetspred(NumericMatrix S, NumericVector dimS, NumericVector nsize
 	}else {
 */		
 	
-	for(int j=0; j < M; j++){
+	for(int j=0; j < 10000; j++){
 		Z[0] = R::rnorm(0.0,1.0);
-		Qsampsw[j] = Z[0]*std::sqrt(S(M,0)*(1-(2*n_i[dn_i-1]/n)+(1/(n*n))*sumn_i2[0])+S(M,1)*((1/n)+1/(k[0])));
-		Qsampsn[j] = Z[0]*std::sqrt(S(M,0)*(1+(1/(n*n))*sumn_i2[0])+S(M,1)*((1/n)+1/(k[0])));
-		QsampsT[j] = Z[0]*std::sqrt(S(M,0)*(1+(1/(n*n))*sumn_i2[0])+S(M,1)*(1/n));
+		index = round(M*R::runif(0.0,1.0))
+		Qsampsw[j] = Z[0]*std::sqrt(S(index,0)*(1-(2*n_i[dn_i-1]/n)+(1/(n*n))*sumn_i2[0])+S(index,1)*((1/n)+1/(k[0])));
+		Qsampsn[j] = Z[0]*std::sqrt(S(index,0)*(1+(1/(n*n))*sumn_i2[0])+S(index,1)*((1/n)+1/(k[0])));
+		QsampsT[j] = Z[0]*std::sqrt(S(index,0)*(1+(1/(n*n))*sumn_i2[0])+S(index,1)*(1/n));
 	}
 
 
