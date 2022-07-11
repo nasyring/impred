@@ -133,7 +133,7 @@ Rcpp::List randsetspred(NumericMatrix S, NumericVector dimS, NumericVector nsize
 	}
 	
 	
-	if(Sa[0] < 0.0){	
+	/*if(Sa[0] < 0.0){	
 	for(int j=0; j < M; j++){
 		U3[0] = 0.0;
 		U3[0] = std::max(R::runif(0.0,1.0), U3[0]);U3[0] = std::max(R::runif(0.0,1.0), U3[0]);U3[0] = std::max(R::runif(0.0,1.0), U3[0]);
@@ -156,7 +156,7 @@ Rcpp::List randsetspred(NumericMatrix S, NumericVector dimS, NumericVector nsize
 		randsetpred(j,5) = Ybar[0]+QTu[0];
 	}
 	}else {
-		
+*/		
 	
 	for(int j=0; j < M; j++){
 		Z[0] = R::rnorm(0.0,1.0);
@@ -187,7 +187,7 @@ Rcpp::List randsetspred(NumericMatrix S, NumericVector dimS, NumericVector nsize
 		randsetpred(j,5) = Ybar[0]+QTu[0];
 
 	}
-	}
+//	}
 
 result = Rcpp::List::create(Rcpp::Named("randsetpred") = randsetpred);
 
