@@ -131,6 +131,7 @@ Rcpp::List plaus_balanced(NumericVector thetaseq, NumericVector saseq, NumericVe
 	NumericVector F_the(1, 0.0);
 	
 	for(int k = 0; k < m_the; k++){
+		index = 0;
 		for(int j = 0; j < m_sa; j++){
 			for(int i = 0; i < m_se; i++){	
 				F_the[0] = (1-std::abs(2.0*R::pnorm((Ybar[0] - thetaseq[k])/std::sqrt(saseq[j]*(1+(1/(n[0]*n[0]))*sumn_i2[0]) + seseq[i]/n[0]),0.0,1.0,1,0)-1))*F_sase[index];
