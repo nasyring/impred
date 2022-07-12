@@ -13,6 +13,11 @@ plaus_balanced <- function(thetaseq, saseq, seseq, n, n_i, S, lambda, r, Ybar) {
 }
 
 
+plaus_unbalanced <- function(thetaseq, saseq, seseq, n, n_i, S, lambda, r, Ybar, samples1, samples2) {
+    .Call(`impred_plaus_unbalanced`, thetaseq, saseq, seseq, n, n_i, S, lambda, r, Ybar, samples1, samples2)
+}
+
+
 randsetspred <- function(S,dimS,nsize,n_i,dimn_i,k,U,Ybar) {
     .Call(`impred_randsetspred`, S,dimS,nsize,n_i,dimn_i,k,U,Ybar)
 }
