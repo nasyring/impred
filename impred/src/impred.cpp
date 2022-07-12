@@ -121,7 +121,7 @@ Rcpp::List plaus_balanced(NumericVector thetaseq, NumericVector saseq, NumericVe
 	int index = 0;
 	for(int j = 0; j < m_sa; j++){
 		for(int i = 0; i < m_se; i++){	
-			F_sase[index] = (1.0-std::abs(2.0*R::pchisq(S[1]/(lambda[1]*saseq[j] + seseq[i]), r[1], 1, 0) - 1.0))*(1.0-std::abs(2.0*R::pchisq(S[2]/(lambda[2]*saseq[j] + seseq[i]), r[2], 1, 0) - 1.0));
+			F_sase[index] = (1.0-std::abs(2.0*R::pchisq(S[0]/(lambda[0]*saseq[j] + seseq[i]), r[0], 1, 0) - 1.0))*(1.0-std::abs(2.0*R::pchisq(S[1]/(lambda[1]*saseq[j] + seseq[i]), r[1], 1, 0) - 1.0));
 			index = index+1;	
 		}
 	}
