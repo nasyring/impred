@@ -13,7 +13,7 @@ extern SEXP impred_randsetspreddens(SEXP, SEXP, SEXP, SEXP, SEXP, SEXP, SEXP, SE
 extern SEXP impred_sigmaSolve(SEXP, SEXP, SEXP, SEXP, SEXP);
 extern SEXP impred_zeroin(SEXP, SEXP, SEXP, SEXP, SEXP, SEXP, SEXP, SEXP);
 extern SEXP impred_root_function(SEXP, SEXP, SEXP, SEXP, SEXP);
-
+extern SEXP impred_plaus_balanced(SEXP, SEXP, SEXP, SEXP, SEXP, SEXP, SEXP, SEXP, SEXP);
 
 static const R_CallMethodDef CallEntries[] = {
     {"impred_randsetsMCMC", (DL_FUNC) &impred_randsetsMCMC, 5},
@@ -24,6 +24,7 @@ static const R_CallMethodDef CallEntries[] = {
     {"impred_sigmaSolve", (DL_FUNC) &impred_sigmaSolve, 5}, 
     {"impred_zeroin", (DL_FUNC) &impred_zeroin, 8},
     {"impred_root_function", (DL_FUNC) &impred_root_function, 8}, 
+    {"impred_plaus_balanced", (DL_FUNC) &impred_plaus_balanced, 9}, 
     {NULL, NULL, 0}
 };
 
