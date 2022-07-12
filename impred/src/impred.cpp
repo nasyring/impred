@@ -102,6 +102,7 @@ Rcpp::List plaus_balanced(NumericVector thetaseq, NumericVector saseq, NumericVe
 	int m_the = thetaseq.length();
 	int m_se = seseq.length();
 	int m_sa = saseq.length();
+	int dn_i = n_i.length();
 
 	NumericVector sumn_i2(1, 0.0);
 	for(int j=0; j<dn_i; j++){
@@ -113,14 +114,14 @@ Rcpp::List plaus_balanced(NumericVector thetaseq, NumericVector saseq, NumericVe
 	NumericVector H(10000,0.0);
 	U1 = Rcpp::runif(10000,0.0,1.0); U2 = Rcpp::runif(10000,0.0,1.0); U3 = Rcpp::runif(10000,0.0,1.0);
 	for(int j = 0; j < 10000; j++){
-		H[j] = (1-std::abs(2*U1 - 1))*(1-std::abs(2*U2 - 1))*(1-std::abs(2*U3 - 1));	
+		H[j] = (1-std::abs(2*U1[j] - 1))*(1-std::abs(2*U2[j] - 1))*(1-std::abs(2*U3[j] - 1));	
 	}
 	
 	NumericVector F_sase(m_sa*m_se, 0.0);
 	int index = 0;
 	for(int j = 0; j < m_sa; j++){
 		for(int i = 0; i < m_se; i++){	
-			F_sase[index] = (1-std::abs(2.0*R::pchisq(S[1]/(lambda[1]*saseq[j] + seseq[i]), r[1]) - 1))*(1-std::abs(2.0*R::pchisq(S[2]/(lambda[2]*saseq[j] + seseq[i]), r[2]) - 1));
+			F_sase[index] = (1-std::abs(2.0*R::pchisq(S[1]/(lambda[1]*saseq[j] + seseq[i]), r[1], 1, 0) - 1))*(1-std::abs(2.0*R::pchisq(S[2]/(lambda[2]*saseq[j] + seseq[i]), r[2], 1, 0) - 1));
 			index = index+1;	
 		}
 	}
@@ -132,9 +133,9 @@ Rcpp::List plaus_balanced(NumericVector thetaseq, NumericVector saseq, NumericVe
 	for(int k = 0; k < m_the; k++){
 		for(int j = 0; j < m_sa; j++){
 			for(int i = 0; i < m_se; i++){	
-				F_the[0] = (1-std::abs(2.0*R::pnorm((Ybar[0] - thetaseq[k])/std::sqrt(saseq[j]*(1+(1/(n[0]*n[0]))*sumn_i2[0]) + seseq[i]/n[0])))-1))*F_sase[index];
+				F_the[0] = (1-std::abs(2.0*R::pnorm((Ybar[0] - thetaseq[k])/std::sqrt(saseq[j]*(1+(1/(n[0]*n[0]))*sumn_i2[0]) + seseq[i]/n[0]), 0.0, 1.0, 1, 0)-1))*F_sase[index];
 				index = index+1;
-				plause[0] = 0.0;
+				plaus[0] = 0.0;
 				for(int h = 0; h <  10000; h++){
 					if(H[h] <= F_the[0]){
 						plaus[0] = plaus[0] + 1/10000.0;
