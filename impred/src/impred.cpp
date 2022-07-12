@@ -157,7 +157,7 @@ Rcpp::List plaus_balanced(NumericVector thetaseq, NumericVector saseq, NumericVe
 	}
 	
 	
-	result = Rcpp::List::create(Rcpp::Named("plauses") = plausestheta);
+	result = Rcpp::List::create(Rcpp::Named("plauses") = plausestheta, Rcpp::Named("H") = H, Rcpp::Named("F_sase") = F_sase);
 	return result;
 	
 }
