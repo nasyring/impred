@@ -42,6 +42,28 @@ END_RCPP
 }
 
 
+Rcpp::List plaus_unbalanced(NumericVector thetaseq, NumericVector saseq, NumericVector seseq, NumericVector n, NumericVector n_i, NumericVector S, NumericVector lambda, NumericVector r, NumericVector Ybar, NumericVector samples1, NumericVector samples2);
+RcppExport SEXP impred_plaus_unbalanced(SEXP thetaseqSEXP, SEXP saseqSEXP, SEXP seseqSEXP, SEXP nSEXP, SEXP n_iSEXP, SEXP SSEXP, SEXP lambdaSEXP, SEXP rSEXP, SEXP YbarSEXP, SEXP samples1SEXP, SEXP samples2SEXP){
+BEGIN_RCPP
+    Rcpp::RObject __result;
+    Rcpp::RNGScope __rngScope;
+    Rcpp::traits::input_parameter< NumericMatrix >::type thetaseq(thetaseqSEXP);
+    Rcpp::traits::input_parameter< NumericVector >::type saseq(saseqSEXP);
+    Rcpp::traits::input_parameter< NumericVector >::type seseq(seseqSEXP);
+    Rcpp::traits::input_parameter< NumericVector >::type n(nSEXP);
+    Rcpp::traits::input_parameter< NumericVector >::type n_i(n_iSEXP);
+    Rcpp::traits::input_parameter< NumericVector >::type S(SSEXP);
+    Rcpp::traits::input_parameter< NumericVector >::type lambda(lambdaSEXP);
+    Rcpp::traits::input_parameter< NumericVector >::type r(rSEXP);
+    Rcpp::traits::input_parameter< NumericVector >::type Ybar(YbarSEXP);
+    Rcpp::traits::input_parameter< NumericVector >::type samples1(samples1SEXP);
+    Rcpp::traits::input_parameter< NumericVector >::type samples2(samples2SEXP);
+    __result = Rcpp::wrap(plaus_unbalanced(thetaseq,saseq,seseq,n,n_i,S,lambda,r,Ybar, samples1, samples2));
+    return __result;
+END_RCPP
+}
+
+
 
 // randsetspred
 Rcpp::List randsetspred(NumericMatrix S, NumericVector dimS, NumericVector nsize, NumericVector n_i, NumericVector dimn_i, NumericVector k, NumericVector U, NumericVector Ybar);
