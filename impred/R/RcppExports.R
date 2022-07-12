@@ -7,6 +7,12 @@ randsetsMCMC <- function(H,A,rL,dimH,M_samp) {
     .Call(`impred_randsetsMCMC`, H,A,rL,dimH,M_samp)
 }
 
+
+plaus_balanced <- function(thetaseq, saseq, seseq, n, n_i, S, lambda, r, Ybar) {
+    .Call(`impred_plaus_balanced`, thetaseq, saseq, seseq, n, n_i, S, lambda, r, Ybar)
+}
+
+
 randsetspred <- function(S,dimS,nsize,n_i,dimn_i,k,U,Ybar) {
     .Call(`impred_randsetspred`, S,dimS,nsize,n_i,dimn_i,k,U,Ybar)
 }
