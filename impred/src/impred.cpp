@@ -164,6 +164,93 @@ Rcpp::List plaus_balanced(NumericVector thetaseq, NumericVector saseq, NumericVe
 	
 }
 
+Rcpp::List plaus_unbalanced(NumericVector thetaseq, NumericVector saseq, NumericVector seseq, NumericVector n, NumericVector n_i, NumericVector S, NumericVector lambda, NumericVector r, NumericVector Ybar, NumericVector samples1, NumericVector samples2){
+	
+	List result;
+	int m_the = thetaseq.length();
+	int m_se = seseq.length();
+	int m_sa = saseq.length();
+	int dn_i = n_i.length();
+	int m_samples = samples1.length();
+	int L = S.length();
+	
+	NumericVector sumn_i2(1, 0.0);
+	for(int j=0; j<dn_i; j++){
+		sumn_i2[0] = sumn_i2[0] + n_i[j]*n_i[j];	
+	}
+
+	
+	NumericVector U1(10000,0.0); NumericVector U2(10000,0.0); NumericVector U3(10000,0.0);	
+	NumericVector H(10000,0.0);
+	U1 = Rcpp::runif(10000,0.0,1.0); U2 = Rcpp::runif(10000,0.0,1.0); U3 = Rcpp::runif(10000,0.0,1.0);
+	for(int j = 0; j < 10000; j++){
+		H[j] = (1-std::abs(2*U1[j] - 1))*(1-std::abs(2*U2[j] - 1))*(1-std::abs(2*U3[j] - 1));	
+	}
+	
+	NumericVector F_sase(m_sa*m_se, 0.0);
+	NumericVector F_sa(1, 0.0);
+	NumericVector F_se(1, 0.0);
+	NumericVector omega1(1, 0.0);
+	NumericVector omega2(1, 0.0);
+	
+	
+	int index = 0;
+	for(int j = 0; j < m_sa; j++){
+		for(int i = 0; i < m_se; i++){
+			omega1[0] = 0.0; omega2[0] = 0.0; F_sa[0] = 0.0; F_se[0] = 0.0;
+			for(int l = 0; l < L; l++){
+				omega1[0] = omega1[0] + std::log(S[l]) - std::log(lambda[l]*saseq[j] + seseq[i]);	
+			}
+			omega2[0] - std::log(S[L-1]) - std::log(lambda[L-1]*saseq[j] + seseq[i]); 
+			for(int h = 0; h < m_samples; h++){
+				if(samples1[h] < omega1[0]){
+					F_sa[0] = F_sa[0] + 1.0/10000.0;
+				}
+				if(samples2[h] < omega2[0]){
+					F_se[0] = F_se[0] + 1.0/10000.0;
+				}
+			}
+			F_sase[index] = (1.0-std::abs(2.0*F_sa[0] - 1.0))*(1.0-std::abs(2.0*F_se[0] - 1.0));
+			index = index+1;	
+		}
+	}
+	
+	NumericVector plausestheta(m_the, 0.0);
+	NumericVector plaus(1, 0.0);
+	NumericVector F_the(1, 0.0);
+	
+	for(int k = 0; k < m_the; k++){
+		index = 0;
+		for(int j = 0; j < m_sa; j++){
+			for(int i = 0; i < m_se; i++){	
+				F_the[0] = (1-std::abs(2.0*R::pnorm((Ybar[0] - thetaseq[k])/std::sqrt(saseq[j]*(1+(1/(n[0]*n[0]))*sumn_i2[0]) + seseq[i]/n[0]),0.0,1.0,1,0)-1))*F_sase[index];
+				index = index+1;
+				plaus[0] = 0.0;
+				for(int h = 0; h <  10000; h++){
+					if(H[h] <= F_the[0]){
+						plaus[0] = plaus[0] + 1/10000.0;
+					}
+				}
+				plausestheta[k] = std::max(plausestheta[k], plaus[0]);
+			}
+		}
+	}	
+		
+	/*	
+	NumericVector maxplaus(1, 0.0);
+	for(int k = 0; k < m_the; k++){
+		maxplaus[0] = std::max(maxplaus[0], plausestheta[k]);
+	}
+	
+	for(int k = 0; k < m_the; k++){
+		plausestheta[k] = plausestheta[k]/maxplaus[0];
+	}
+	*/
+	result = Rcpp::List::create(Rcpp::Named("plauses") = plausestheta);
+	return result;
+	
+}
+
 
 
 Rcpp::List randsetspred(NumericMatrix S, NumericVector dimS, NumericVector nsize, NumericVector n_i, NumericVector dimn_i, NumericVector k, NumericVector U, NumericVector Ybar) {
