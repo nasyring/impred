@@ -8,13 +8,13 @@ randsetsMCMC <- function(H,A,rL,dimH,M_samp) {
 }
 
 
-plaus_balanced <- function(thetaseq, saseq, seseq, n, n_i, S, lambda, r, Ybar) {
-    .Call(`impred_plaus_balanced`, thetaseq, saseq, seseq, n, n_i, S, lambda, r, Ybar)
+plaus_balanced <- function(thetaseq, saseq, seseq, n, n_i, S, lambda, r, Ybar, numk) {
+    .Call(`impred_plaus_balanced`, thetaseq, saseq, seseq, n, n_i, S, lambda, r, Ybar, numk)
 }
 
 
-plaus_unbalanced <- function(thetaseq, saseq, seseq, n, n_i, S, lambda, r, Ybar, samples1, samples2) {
-    .Call(`impred_plaus_unbalanced`, thetaseq, saseq, seseq, n, n_i, S, lambda, r, Ybar, samples1, samples2)
+plaus_unbalanced <- function(thetaseq, saseq, seseq, n, n_i, S, lambda, r, Ybar, numk, samples1, samples2) {
+    .Call(`impred_plaus_unbalanced`, thetaseq, saseq, seseq, n, n_i, S, lambda, r, Ybar, numk, samples1, samples2)
 }
 
 
