@@ -16,6 +16,10 @@ plaus_balanced_marginal <- function(thetaseq, n, n_i, S, lambda, r, Ybar, numk, 
     .Call(`impred_plaus_balanced_marginal`, thetaseq, n, n_i, S, lambda, r, Ybar, numk, sa2, se2)
 }
 
+plaus_unbalanced_marginal <- function(thetaseq, n, n_i, S, lambda, r, Ybar, numk, sa2, se2) {
+    .Call(`impred_plaus_unbalanced_marginal`, thetaseq, n, n_i, S, lambda, r, Ybar, numk, sa2, se2)
+}
+
 plaus_unbalanced <- function(thetaseq, saseq, seseq, n, n_i, S, lambda, r, Ybar, numk, samples1, samples2) {
     .Call(`impred_plaus_unbalanced`, thetaseq, saseq, seseq, n, n_i, S, lambda, r, Ybar, numk, samples1, samples2)
 }
