@@ -326,13 +326,13 @@ Rcpp::List plaus_balanced_marginal(NumericVector thetaseq, NumericVector n, Nume
 			}
 		}
 		for(int k = 0; k < 10000; k++){
-			if(U[k] <= (1.0-std::abs(2.0*F_the[0] - 1))){
+			if(H[k] <= (1.0-std::abs(2.0*F_the[0] - 1))){
 				plausestheta[j] = plausestheta[j] + 1.0/10000.0;	
 			}
-			if(U[k] <= (1.0-std::abs(2.0*F_ystark[0] - 1))){
+			if(H[k] <= (1.0-std::abs(2.0*F_ystark[0] - 1))){
 				plausesystar = plausesystar + 1.0/10000.0;	
 			}
-			if(U[k] <= (1.0-std::abs(2.0*F_ystark_exs[0] - 1))){
+			if(H[k] <= (1.0-std::abs(2.0*F_ystark_exs[0] - 1))){
 				plausesystarexs = plausesystarexs + 1.0/10000.0;	
 			}
 		}
@@ -406,13 +406,13 @@ Rcpp::List plaus_unbalanced_marginal(NumericVector thetaseq, NumericVector n, Nu
 			}
 		}
 		for(int k = 0; k < 10000; k++){
-			if(U[k] <= (1.0-std::abs(2.0*F_the[0] - 1))){
+			if(H[k] <= (1.0-std::abs(2.0*F_the[0] - 1))){
 				plausestheta[j] = plausestheta[j] + 1.0/10000.0;	
 			}
-			if(U[k] <= (1.0-std::abs(2.0*F_ystark[0] - 1))){
+			if(H[k] <= (1.0-std::abs(2.0*F_ystark[0] - 1))){
 				plausesystar = plausesystar + 1.0/10000.0;	
 			}
-			if(U[k] <= (1.0-std::abs(2.0*F_ystark_exs[0] - 1))){
+			if(H[k] <= (1.0-std::abs(2.0*F_ystark_exs[0] - 1))){
 				plausesystarexs = plausesystarexs + 1.0/10000.0;	
 			}
 		}
