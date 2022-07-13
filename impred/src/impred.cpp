@@ -278,6 +278,90 @@ Rcpp::List plaus_unbalanced(NumericVector thetaseq, NumericVector saseq, Numeric
 	
 }
 
+Rcpp::List plaus_balanced_marginal(NumericVector thetaseq, NumericVector n, NumericVector n_i, NumericVector S, NumericVector lambda, NumericVector r, NumericVector Ybar, NumericVector numk, NumericVector sa2, NumericVector se2){
+	
+	List result;
+	int m_the = thetaseq.length();
+	int m_se = seseq.length();
+	int m_sa = saseq.length();
+	int dn_i = n_i.length();
+
+	NumericVector sumn_i2(1, 0.0);
+	for(int j=0; j<dn_i; j++){
+		sumn_i2[0] = sumn_i2[0] + n_i[j]*n_i[j];	
+	}
+	
+	NumericVector H(10000,0.0);
+	H = Rcpp::runif(10000,0.0,1.0); 
+	
+	
+	NumericVector plausestheta(m_the, 0.0);
+	NumericVector plaus(1, 0.0);
+	NumericVector plausesystar(m_the, 0.0);
+	NumericVector plausystar(1, 0.0);
+	NumericVector plausesystarexs(m_the, 0.0);
+	NumericVector plausystarexs(1, 0.0);
+	NumericVector sd_the(10000, 0.0);
+	NumericVector sd_ystark(10000, 0.0);
+	NumericVector sd_ystark_exs(10000, 0.0);
+	NumericVector Z(1, 0.0);
+	
+	for(int j = 0; j < 10000; j++){
+		Z[0] = R::rnorm(0.0, 1.0);
+		sd_the[j] = Z[0]*std::sqrt(sa2[j]*(1+(1/(n[0]*n[0]))*sumn_i2[0]) + se2[j]/n[0]);
+		sd_ystark[j] = Z[0]*std::sqrt(sa2[j]*(1+(1/(n[0]*n[0]))*sumn_i2[0]) + se2[j]*(1.0/numk[0] + 1.0/n[0]));		
+		sd_ystark_exs[j] = Z[0]*std::sqrt(sa2[j]*(1-2.0*n_i[dn_i-1]/n[0]+(1/(n[0]*n[0]))*sumn_i2[0]) + se2[j]*(1.0/numk[0] + 1.0/n[0]));	
+	}
+	
+	
+	
+	for(int k = 0; k < m_the; k++){
+		index = 0;
+		for(int j = 0; j < m_sa; j++){
+			for(int i = 0; i < m_se; i++){	
+				F_the[0] = (1-std::abs(2.0*R::pnorm((Ybar[0] - thetaseq[k])/std::sqrt(saseq[j]*(1+(1/(n[0]*n[0]))*sumn_i2[0]) + seseq[i]/n[0]),0.0,1.0,1,0)-1))*F_sase[index];
+				F_ystark[0] = (1-std::abs(2.0*R::pnorm((Ybar[0] - thetaseq[k])/std::sqrt(saseq[j]*(1+(1/(n[0]*n[0]))*sumn_i2[0]) + seseq[i]*(1.0/n[0] + 1.0/numk[0]),0.0,1.0,1,0)-1))*F_sase[index];
+				F_ystark_exs[0] = (1-std::abs(2.0*R::pnorm((Ybar[0] - thetaseq[k])/std::sqrt(saseq[j]*(1-2*n_i[dn_i-1]/n[0]+(1/(n[0]*n[0]))*sumn_i2[0]) + seseq[i]*(1.0/n[0] + 1.0/numk[0]),0.0,1.0,1,0)-1))*F_sase[index];
+				index = index+1;
+				plaus[0] = 0.0;plausystar[0] = 0.0;plausystarexs[0] = 0.0;
+				for(int h = 0; h <  10000; h++){
+					if(H[h] <= F_the[0]){
+						plaus[0] = plaus[0] + 1/10000.0;
+					}
+					if(H[h] <= F_ystark[0]){
+						plausystar[0] = plausystar[0] + 1/10000.0;
+					}
+					if(H[h] <= F_ystark_exs[0]){
+						plausystarexs[0] = plausystarexs[0] + 1/10000.0;
+					}
+				}
+				plausestheta[k] = std::max(plausestheta[k], plaus[0]);
+				plausesystar[k] = std::max(plausesystar[k], plausystar[0]);
+				plausestheta[k] = std::max(plausesystarexs[k], plausystarexs[0]);
+			}
+		}
+	}	
+		
+		
+	NumericVector maxplaus(1, 0.0);
+	NumericVector maxplausstar(1, 0.0);
+	NumericVector maxplausstarexs(1, 0.0);
+	for(int k = 0; k < m_the; k++){
+		maxplaus[0] = std::max(maxplaus[0], plausestheta[k]);
+		maxplausstar[0] = std::max(maxplausstar[0], plausesystar[k]);
+		maxplausstarexs[0] = std::max(maxplausstarexs[0], plausesystarexs[k]);
+	}
+	
+	for(int k = 0; k < m_the; k++){
+		plausestheta[k] = plausestheta[k]/maxplaus[0];
+		plausesystar[k] = plausesystar[k]/maxplausstar[0];
+		plausesystarexs[k] = plausesystarexs[k]/maxplausstarexs[0];
+	}
+	
+	result = Rcpp::List::create(Rcpp::Named("plausestheta") = plausestheta, Rcpp::Named("plausesnew") = plausesystar, Rcpp::Named("plausesexs") = plausesystarexs);
+	return result;
+	
+}
 
 
 Rcpp::List randsetspred(NumericMatrix S, NumericVector dimS, NumericVector nsize, NumericVector n_i, NumericVector dimn_i, NumericVector k, NumericVector U, NumericVector Ybar) {
