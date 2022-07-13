@@ -158,7 +158,7 @@ Rcpp::List plaus_balanced(NumericVector thetaseq, NumericVector saseq, NumericVe
 				}
 				plausestheta[k] = std::max(plausestheta[k], plaus[0]);
 				plausesystar[k] = std::max(plausesystar[k], plausystar[0]);
-				plausestheta[k] = std::max(plausesystarexs[k], plausystarexs[0]);
+				plausesystarexs[k] = std::max(plausesystarexs[k], plausystarexs[0]);
 			}
 		}
 	}	
@@ -267,7 +267,7 @@ Rcpp::List plaus_unbalanced(NumericVector thetaseq, NumericVector saseq, Numeric
 				}
 				plausestheta[k] = std::max(plausestheta[k], plaus[0]);
 				plausesystar[k] = std::max(plausesystar[k], plausystar[0]);
-				plausestheta[k] = std::max(plausesystarexs[k], plausystarexs[0]);
+				plausesystarexs[k] = std::max(plausesystarexs[k], plausystarexs[0]);
 			}
 		}
 	}	
