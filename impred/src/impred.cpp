@@ -218,7 +218,7 @@ Rcpp::List plaus_unbalanced(NumericVector thetaseq, NumericVector saseq, Numeric
 	for(int j = 0; j < m_sa; j++){
 		for(int i = 0; i < m_se; i++){
 			omega1[0] = 0.0; omega2[0] = 0.0; F_sa[0] = 0.0; F_se[0] = 0.0;
-			for(int l = 0; l < L; l++){
+			for(int l = 0; l < (L-1); l++){
 				omega1[0] = omega1[0] + std::log(S[l]) - std::log(lambda[l]*saseq[j] + seseq[i]);	
 			}
 			omega2[0] = std::log(S[L-1]) - std::log(lambda[L-1]*saseq[j] + seseq[i]); 
