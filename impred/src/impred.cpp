@@ -273,7 +273,7 @@ Rcpp::List plaus_unbalanced(NumericVector thetaseq, NumericVector saseq, Numeric
 	}	
 		
 
-	result = Rcpp::List::create(Rcpp::Named("plausestheta") = plausestheta, Rcpp::Named("plausesnew") = plausesystar, Rcpp::Named("plausesexs") = plausesystarexs);
+	result = Rcpp::List::create(Rcpp::Named("omega1") = omega1,Rcpp::Named("omega2") = omega2,Rcpp::Named("plausestheta") = plausestheta, Rcpp::Named("plausesnew") = plausesystar, Rcpp::Named("plausesexs") = plausesystarexs);
 	return result;
 	
 }
