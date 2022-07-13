@@ -22,8 +22,8 @@ BEGIN_RCPP
 END_RCPP
 }
 
-Rcpp::List plaus_balanced(NumericVector thetaseq, NumericVector saseq, NumericVector seseq, NumericVector n, NumericVector n_i, NumericVector S, NumericVector lambda, NumericVector r, NumericVector Ybar);
-RcppExport SEXP impred_plaus_balanced(SEXP thetaseqSEXP, SEXP saseqSEXP, SEXP seseqSEXP, SEXP nSEXP, SEXP n_iSEXP, SEXP SSEXP, SEXP lambdaSEXP, SEXP rSEXP, SEXP YbarSEXP){
+Rcpp::List plaus_balanced(NumericVector thetaseq, NumericVector saseq, NumericVector seseq, NumericVector n, NumericVector n_i, NumericVector S, NumericVector lambda, NumericVector r, NumericVector Ybar, NumericVector numk);
+RcppExport SEXP impred_plaus_balanced(SEXP thetaseqSEXP, SEXP saseqSEXP, SEXP seseqSEXP, SEXP nSEXP, SEXP n_iSEXP, SEXP SSEXP, SEXP lambdaSEXP, SEXP rSEXP, SEXP YbarSEXP, SEXP numkSEXP){
 BEGIN_RCPP
     Rcpp::RObject __result;
     Rcpp::RNGScope __rngScope;
@@ -36,14 +36,15 @@ BEGIN_RCPP
     Rcpp::traits::input_parameter< NumericVector >::type lambda(lambdaSEXP);
     Rcpp::traits::input_parameter< NumericVector >::type r(rSEXP);
     Rcpp::traits::input_parameter< NumericVector >::type Ybar(YbarSEXP);
-    __result = Rcpp::wrap(plaus_balanced(thetaseq,saseq,seseq,n,n_i,S,lambda,r,Ybar));
+    Rcpp::traits::input_parameter< NumericVector >::type numk(numkSEXP);
+    __result = Rcpp::wrap(plaus_balanced(thetaseq,saseq,seseq,n,n_i,S,lambda,r,Ybar,numk));
     return __result;
 END_RCPP
 }
 
 
-Rcpp::List plaus_unbalanced(NumericVector thetaseq, NumericVector saseq, NumericVector seseq, NumericVector n, NumericVector n_i, NumericVector S, NumericVector lambda, NumericVector r, NumericVector Ybar, NumericVector samples1, NumericVector samples2);
-RcppExport SEXP impred_plaus_unbalanced(SEXP thetaseqSEXP, SEXP saseqSEXP, SEXP seseqSEXP, SEXP nSEXP, SEXP n_iSEXP, SEXP SSEXP, SEXP lambdaSEXP, SEXP rSEXP, SEXP YbarSEXP, SEXP samples1SEXP, SEXP samples2SEXP){
+Rcpp::List plaus_unbalanced(NumericVector thetaseq, NumericVector saseq, NumericVector seseq, NumericVector n, NumericVector n_i, NumericVector S, NumericVector lambda, NumericVector r, NumericVector Ybar, NumericVector numk, NumericVector samples1, NumericVector samples2);
+RcppExport SEXP impred_plaus_unbalanced(SEXP thetaseqSEXP, SEXP saseqSEXP, SEXP seseqSEXP, SEXP nSEXP, SEXP n_iSEXP, SEXP SSEXP, SEXP lambdaSEXP, SEXP rSEXP, SEXP YbarSEXP, SEXP numkSEXP, SEXP samples1SEXP, SEXP samples2SEXP){
 BEGIN_RCPP
     Rcpp::RObject __result;
     Rcpp::RNGScope __rngScope;
@@ -56,9 +57,10 @@ BEGIN_RCPP
     Rcpp::traits::input_parameter< NumericVector >::type lambda(lambdaSEXP);
     Rcpp::traits::input_parameter< NumericVector >::type r(rSEXP);
     Rcpp::traits::input_parameter< NumericVector >::type Ybar(YbarSEXP);
+    Rcpp::traits::input_parameter< NumericVector >::type numk(numkSEXP);
     Rcpp::traits::input_parameter< NumericVector >::type samples1(samples1SEXP);
     Rcpp::traits::input_parameter< NumericVector >::type samples2(samples2SEXP);
-    __result = Rcpp::wrap(plaus_unbalanced(thetaseq,saseq,seseq,n,n_i,S,lambda,r,Ybar, samples1, samples2));
+    __result = Rcpp::wrap(plaus_unbalanced(thetaseq,saseq,seseq,n,n_i,S,lambda,r,Ybar, numk, samples1, samples2));
     return __result;
 END_RCPP
 }
