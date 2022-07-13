@@ -141,8 +141,8 @@ Rcpp::List plaus_balanced(NumericVector thetaseq, NumericVector saseq, NumericVe
 		for(int j = 0; j < m_sa; j++){
 			for(int i = 0; i < m_se; i++){	
 				F_the[0] = (1-std::abs(2.0*R::pnorm((Ybar[0] - thetaseq[k])/std::sqrt(saseq[j]*(1+(1/(n[0]*n[0]))*sumn_i2[0]) + seseq[i]/n[0]),0.0,1.0,1,0)-1))*F_sase[index];
-				F_ystark[0] = (1-std::abs(2.0*R::pnorm((Ybar[0] - thetaseq[k])/std::sqrt(saseq[j]*(1+(1/(n[0]*n[0]))*sumn_i2[0]) + seseq[i]*(1.0/n[0] + 1.0/numk[0]),0.0,1.0,1,0)-1))*F_sase[index];
-				F_ystark_exs[0] = (1-std::abs(2.0*R::pnorm((Ybar[0] - thetaseq[k])/std::sqrt(saseq[j]*(1-2*n_i[dn_i-1]/n[0]+(1/(n[0]*n[0]))*sumn_i2[0]) + seseq[i]*(1.0/n[0] + 1.0/numk[0]),0.0,1.0,1,0)-1))*F_sase[index];
+				F_ystark[0] = (1-std::abs(2.0*R::pnorm((Ybar[0] - thetaseq[k])/std::sqrt(saseq[j]*(1+(1/(n[0]*n[0]))*sumn_i2[0]) + seseq[i]*(1.0/n[0] + 1.0/numk[0])),0.0,1.0,1,0)-1))*F_sase[index];
+				F_ystark_exs[0] = (1-std::abs(2.0*R::pnorm((Ybar[0] - thetaseq[k])/std::sqrt(saseq[j]*(1-2*n_i[dn_i-1]/n[0]+(1/(n[0]*n[0]))*sumn_i2[0]) + seseq[i]*(1.0/n[0] + 1.0/numk[0])),0.0,1.0,1,0)-1))*F_sase[index];
 				index = index+1;
 				plaus[0] = 0.0;plausystar[0] = 0.0;plausystarexs[0] = 0.0;
 				for(int h = 0; h <  10000; h++){
@@ -250,8 +250,8 @@ Rcpp::List plaus_unbalanced(NumericVector thetaseq, NumericVector saseq, Numeric
 		for(int j = 0; j < m_sa; j++){
 			for(int i = 0; i < m_se; i++){	
 				F_the[0] = (1-std::abs(2.0*R::pnorm((Ybar[0] - thetaseq[k])/std::sqrt(saseq[j]*(1+(1/(n[0]*n[0]))*sumn_i2[0]) + seseq[i]/n[0]),0.0,1.0,1,0)-1))*F_sase[index];
-				F_ystark[0] = (1-std::abs(2.0*R::pnorm((Ybar[0] - thetaseq[k])/std::sqrt(saseq[j]*(1+(1/(n[0]*n[0]))*sumn_i2[0]) + seseq[i]*(1.0/n[0] + 1.0/numk[0]),0.0,1.0,1,0)-1))*F_sase[index];
-				F_ystark_exs[0] = (1-std::abs(2.0*R::pnorm((Ybar[0] - thetaseq[k])/std::sqrt(saseq[j]*(1-2*n_i[dn_i-1]/n[0]+(1/(n[0]*n[0]))*sumn_i2[0]) + seseq[i]*(1.0/n[0] + 1.0/numk[0]),0.0,1.0,1,0)-1))*F_sase[index];
+				F_ystark[0] = (1-std::abs(2.0*R::pnorm((Ybar[0] - thetaseq[k])/std::sqrt(saseq[j]*(1+(1/(n[0]*n[0]))*sumn_i2[0]) + seseq[i]*(1.0/n[0] + 1.0/numk[0])),0.0,1.0,1,0)-1))*F_sase[index];
+				F_ystark_exs[0] = (1-std::abs(2.0*R::pnorm((Ybar[0] - thetaseq[k])/std::sqrt(saseq[j]*(1-2*n_i[dn_i-1]/n[0]+(1/(n[0]*n[0]))*sumn_i2[0]) + seseq[i]*(1.0/n[0] + 1.0/numk[0])),0.0,1.0,1,0)-1))*F_sase[index];
 				index = index+1;
 				plaus[0] = 0.0;plausystar[0] = 0.0;plausystarexs[0] = 0.0;
 				for(int h = 0; h <  10000; h++){
