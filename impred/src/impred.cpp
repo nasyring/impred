@@ -357,6 +357,71 @@ Rcpp::List plaus_balanced_marginal(NumericVector thetaseq, NumericVector n, Nume
 	return result;
 	
 }
+						   
+Rcpp::List plaus_unbalanced_marginal(NumericVector thetaseq, NumericVector n, NumericVector n_i, NumericVector S, NumericVector lambda, NumericVector r, NumericVector Ybar, NumericVector numk, NumericVector sa2, NumericVector se2){
+	
+	List result;
+	int m_the = thetaseq.length();
+	int dn_i = n_i.length();
+
+	NumericVector sumn_i2(1, 0.0);
+	for(int j=0; j<dn_i; j++){
+		sumn_i2[0] = sumn_i2[0] + n_i[j]*n_i[j];	
+	}
+	
+	NumericVector H(10000,0.0);
+	H = Rcpp::runif(10000,0.0,1.0); 
+	
+	
+	NumericVector plausestheta(m_the, 0.0);
+	NumericVector plausesystar(m_the, 0.0);
+	NumericVector plausesystarexs(m_the, 0.0);
+	NumericVector sd_the(10000, 0.0);
+	NumericVector sd_ystark(10000, 0.0);
+	NumericVector sd_ystark_exs(10000, 0.0);
+	NumericVector F_the(1, 0.0);
+	NumericVector F_ystark(1, 0.0);
+	NumericVector F_ystark_exs(1, 0.0);
+	NumericVector Z(1, 0.0);
+	
+	for(int j = 0; j < 10000; j++){
+		Z[0] = R::rnorm(0.0, 1.0);
+		sd_the[j] = Z[0]*std::sqrt(sa2[j]*(1+(1/(n[0]*n[0]))*sumn_i2[0]) + se2[j]/n[0]);
+		sd_ystark[j] = Z[0]*std::sqrt(sa2[j]*(1+(1/(n[0]*n[0]))*sumn_i2[0]) + se2[j]*(1.0/numk[0] + 1.0/n[0]));		
+		sd_ystark_exs[j] = Z[0]*std::sqrt(sa2[j]*(1-2.0*n_i[dn_i-1]/n[0]+(1/(n[0]*n[0]))*sumn_i2[0]) + se2[j]*(1.0/numk[0] + 1.0/n[0]));	
+	}
+	
+	
+	for(int j = 0; j < m_the; j++){
+		F_the[0] = 0.0;F_ystark[0] = 0.0;F_ystark_exs[0] = 0.0;
+		for(int k = 0; k < 10000; k++){
+			if(sd_the[k] < Ybar[0] - thetaseq[j]){
+				F_the[0] = F_the[0] + 1.0/10000.0;	
+			}
+			if(sd_ystark[k] < Ybar[0] - thetaseq[j]){
+				F_ystark[0] = F_ystark[0] + 1.0/10000.0;	
+			}
+			if(sd_ystark_exs[k] < Ybar[0] - thetaseq[j]){
+				F_ystark_exs[0] = F_ystark_exs[0] + 1.0/10000.0;	
+			}
+		}
+		for(int k = 0; k < 10000; k++){
+			if(U[k] <= (1.0-std::abs(2.0*F_the[0] - 1))){
+				plausestheta[j] = plausestheta[j] + 1.0/10000.0;	
+			}
+			if(U[k] <= (1.0-std::abs(2.0*F_ystark[0] - 1))){
+				plausesystar = plausesystar + 1.0/10000.0;	
+			}
+			if(U[k] <= (1.0-std::abs(2.0*F_ystark_exs[0] - 1))){
+				plausesystarexs = plausesystarexs + 1.0/10000.0;	
+			}
+		}
+	}
+	
+	result = Rcpp::List::create(Rcpp::Named("plausestheta") = plausestheta, Rcpp::Named("plausesnew") = plausesystar, Rcpp::Named("plausesexs") = plausesystarexs);
+	return result;
+	
+}						   
 
 
 Rcpp::List randsetspred(NumericMatrix S, NumericVector dimS, NumericVector nsize, NumericVector n_i, NumericVector dimn_i, NumericVector k, NumericVector U, NumericVector Ybar) {
