@@ -62,6 +62,26 @@ BEGIN_RCPP
 END_RCPP
 }
 
+Rcpp::List plaus_unbalanced_marginal(NumericVector thetaseq, NumericVector n, NumericVector n_i, NumericVector S, NumericVector lambda, NumericVector r, NumericVector Ybar, NumericVector numk, NumericVector sa2, NumericVector se2);
+RcppExport SEXP impred_plaus_unbalanced_marginal(SEXP thetaseqSEXP, SEXP nSEXP, SEXP n_iSEXP, SEXP SSEXP, SEXP lambdaSEXP, SEXP rSEXP, SEXP YbarSEXP, SEXP numkSEXP, SEXP sa2SEXP, SEXP se2SEXP){
+BEGIN_RCPP
+    Rcpp::RObject __result;
+    Rcpp::RNGScope __rngScope;
+    Rcpp::traits::input_parameter< NumericMatrix >::type thetaseq(thetaseqSEXP);
+    Rcpp::traits::input_parameter< NumericVector >::type n(nSEXP);
+    Rcpp::traits::input_parameter< NumericVector >::type n_i(n_iSEXP);
+    Rcpp::traits::input_parameter< NumericVector >::type S(SSEXP);
+    Rcpp::traits::input_parameter< NumericVector >::type lambda(lambdaSEXP);
+    Rcpp::traits::input_parameter< NumericVector >::type r(rSEXP);
+    Rcpp::traits::input_parameter< NumericVector >::type Ybar(YbarSEXP);
+    Rcpp::traits::input_parameter< NumericVector >::type numk(numkSEXP);
+    Rcpp::traits::input_parameter< NumericVector >::type sa2(sa2SEXP);
+    Rcpp::traits::input_parameter< NumericVector >::type se2(se2SEXP);
+    __result = Rcpp::wrap(plaus_unbalanced_marginal(thetaseq,n,n_i,S,lambda,r,Ybar,numk,sa2,se2));
+    return __result;
+END_RCPP
+}
+
 
 
 
