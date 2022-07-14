@@ -7,6 +7,9 @@ randsetsMCMC <- function(H,A,rL,dimH,M_samp) {
     .Call(`impred_randsetsMCMC`, H,A,rL,dimH,M_samp)
 }
 
+plaus_unbalanced_marginal_lmer <- function(thetaseq,S,C1,C2,By,x,ztz) {
+    .Call(`impred_plaus_unbalanced_marginal_lmer`, thetaseq,S,C1,C2,By,x,ztz)
+}
 
 plaus_balanced <- function(thetaseq, saseq, seseq, n, n_i, S, lambda, r, Ybar, numk) {
     .Call(`impred_plaus_balanced`, thetaseq, saseq, seseq, n, n_i, S, lambda, r, Ybar, numk)
