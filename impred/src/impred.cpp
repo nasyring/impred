@@ -424,7 +424,7 @@ Rcpp::List plaus_unbalanced_marginal(NumericVector thetaseq, NumericVector n, Nu
 }						   
 
 
-Rcpp::List plaus_unbalanced_marginal_lmer(NumericVector thetaseq, NumericMatrix S, NumericMatrix C1, NumericMatrix C2, NumericVector By, NumericVector x, NumericVector ztz){
+Rcpp::List plaus_unbalanced_marginal_lmer(NumericVector thetaseq, NumericVector total_sigma, NumericVector By, NumericVector x, NumericVector ztz){
 
 	List result;
 	int m_the = thetaseq.length();
@@ -439,20 +439,6 @@ Rcpp::List plaus_unbalanced_marginal_lmer(NumericVector thetaseq, NumericMatrix 
 	NumericVector zeroes(20000,0.0);
 	NumericVector Z(1, 0.0);
 	NumericVector plausestheta(m_the,0.0);
-	NumericVector F_the(1,0.0);
-	
-	
-	for(int j=0; j < 10000; j++){
-		Z[0] = R::rnorm(0.0,1.0);
-		Csigma(0,0) = S(j,1)*C1(0,0) + S(j,0)*C2(0,0);
-		Csigma(0,1) = S(j,1)*C1(0,1) + S(j,0)*C2(0,1);
-		Csigma(1,0) = S(j,1)*C1(1,0) + S(j,0)*C2(1,0);
-		Csigma(1,1) = S(j,1)*C1(1,1) + S(j,0)*C2(1,1);
-		Csigma2 = as<arma::mat>(Csigma);
-		Cxa = Csigma2*xa;
-		total_sigma[j] = dot(xa, Cxa) + S(j,0)*ztz[0];
-		total_sigma[j] = Z[0]*std::sqrt(total_sigma[0]);
-	}
 
 	for(int j = 0; j < m_the; j++){
 		F_the[0] = 0.0;
@@ -465,7 +451,7 @@ Rcpp::List plaus_unbalanced_marginal_lmer(NumericVector thetaseq, NumericMatrix 
 		plausestheta[j] = F_the[0];	
 	}
 	
-	result = Rcpp::List::create(Rcpp::Named("plausestheta") = plausestheta, Rcpp::Named("total_sigma") = total_sigma, Rcpp::Named("Csigma") = Csigma, Rcpp::Named("Csigma2") = Csigma2, Rcpp::Named("Cxa") = Cxa );
+	result = Rcpp::List::create(Rcpp::Named("plausestheta") = plausestheta);
 	return result;
 	
 }						   
