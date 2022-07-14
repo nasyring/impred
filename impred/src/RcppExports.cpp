@@ -87,10 +87,10 @@ RcppExport SEXP impred_plaus_unbalanced_marginal_lmer(SEXP thetaseqSEXP, SEXP SS
 BEGIN_RCPP
     Rcpp::RObject __result;
     Rcpp::RNGScope __rngScope;
-    Rcpp::traits::input_parameter< NumericMatrix >::type thetaseq(thetaseqSEXP);
-    Rcpp::traits::input_parameter< NumericVector >::type S(SSEXP);
-    Rcpp::traits::input_parameter< NumericVector >::type C1(C1SEXP);
-    Rcpp::traits::input_parameter< NumericVector >::type C2(C2SEXP);
+    Rcpp::traits::input_parameter< NumericVector >::type thetaseq(thetaseqSEXP);
+    Rcpp::traits::input_parameter< NumericMatrix >::type S(SSEXP);
+    Rcpp::traits::input_parameter< NumericMatrix >::type C1(C1SEXP);
+    Rcpp::traits::input_parameter< NumericMatrix >::type C2(C2SEXP);
     Rcpp::traits::input_parameter< NumericVector >::type By(BySEXP);
     Rcpp::traits::input_parameter< NumericVector >::type x(xSEXP);
     Rcpp::traits::input_parameter< NumericVector >::type ztz(ztzSEXP);
