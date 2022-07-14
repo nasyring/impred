@@ -424,17 +424,10 @@ Rcpp::List plaus_unbalanced_marginal(NumericVector thetaseq, NumericVector n, Nu
 }						   
 
 
-Rcpp::List plaus_unbalanced_marginal_lmer(NumericVector thetaseq, NumericVector total_sigma, NumericVector By, NumericVector x, NumericVector ztz){
+Rcpp::List plaus_marginal_lmer(NumericVector thetaseq, NumericVector total_sigma, NumericVector xBy){
 
 	List result;
 	int m_the = thetaseq.length();
-	arma::colvec xa = as<arma::colvec>(x);
-	arma::colvec Cxa; Cxa.zeros(2);
-	arma::colvec Bya = as<arma::colvec>(By);
-	double xBy = dot(xa, Bya);
-	arma::mat Csigma2;  Csigma2.zeros(2,2);
-	NumericVector zeroes4(4,0.0);
-	NumericMatrix Csigma(2,2,zeroes4.begin());
 	NumericVector total_sigma(10000,0.0);
 	NumericVector zeroes(20000,0.0);
 	NumericVector Z(1, 0.0);
@@ -443,7 +436,7 @@ Rcpp::List plaus_unbalanced_marginal_lmer(NumericVector thetaseq, NumericVector 
 	for(int j = 0; j < m_the; j++){
 		F_the[0] = 0.0;
 		for(int k = 0; k < 10000; k++){
-			if(total_sigma[k] < (xBy - thetaseq[j])){
+			if(total_sigma[k] < (xBy[0] - thetaseq[j])){
 				F_the[0] = F_the[0] + 1.0/10000.0;	
 			}
 		}
