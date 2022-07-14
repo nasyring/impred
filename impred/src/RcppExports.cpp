@@ -82,19 +82,15 @@ BEGIN_RCPP
 END_RCPP
 }
 
-Rcpp::List plaus_unbalanced_marginal_lmer(NumericVector thetaseq, NumericMatrix S, NumericMatrix C1, NumericMatrix C2, NumericVector By, NumericVector x, NumericVector ztz);
-RcppExport SEXP impred_plaus_unbalanced_marginal_lmer(SEXP thetaseqSEXP, SEXP SSEXP, SEXP C1SEXP, SEXP C2SEXP, SEXP BySEXP, SEXP xSEXP, SEXP ztzSEXP){
+Rcpp::List plaus_marginal_lmer(NumericVector thetaseq, NumericVector total_sigma, NumericVector xBy);
+RcppExport SEXP impred_plaus_marginal_lmer(SEXP thetaseqSEXP, SEXP total_sigmaSEXP, SEXP xBySEXP){
 BEGIN_RCPP
     Rcpp::RObject __result;
     Rcpp::RNGScope __rngScope;
     Rcpp::traits::input_parameter< NumericVector >::type thetaseq(thetaseqSEXP);
-    Rcpp::traits::input_parameter< NumericMatrix >::type S(SSEXP);
-    Rcpp::traits::input_parameter< NumericMatrix >::type C1(C1SEXP);
-    Rcpp::traits::input_parameter< NumericMatrix >::type C2(C2SEXP);
-    Rcpp::traits::input_parameter< NumericVector >::type By(BySEXP);
-    Rcpp::traits::input_parameter< NumericVector >::type x(xSEXP);
-    Rcpp::traits::input_parameter< NumericVector >::type ztz(ztzSEXP);
-    __result = Rcpp::wrap(plaus_unbalanced_marginal_lmer(thetaseq,S,C1,C2,By,x,ztz));
+    Rcpp::traits::input_parameter< NumericVector >::type total_sigma(total_sigmaSEXP);
+    Rcpp::traits::input_parameter< NumericVector >::type xBy(xBySEXP);
+    __result = Rcpp::wrap(plaus_marginal_lmer(thetaseq,total_sigma,xBy));
     return __result;
 END_RCPP
 }
