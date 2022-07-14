@@ -466,7 +466,7 @@ Rcpp::List plaus_unbalanced_marginal_lmer(NumericVector thetaseq, NumericMatrix 
 		plausestheta[j] = F_the[0];	
 	}
 	
-	result = Rcpp::List::create(Rcpp::Named("plausestheta") = plausestheta, Rcpp::Named("total_sigma") = total_sigma);
+	result = Rcpp::List::create(Rcpp::Named("plausestheta") = plausestheta, Rcpp::Named("total_sigma") = total_sigma, Rcpp::Named("Csigma") = Csigma, Rcpp::Named("Csigma2") = Csigma2, Rcpp::Named("Cxa") = Cxa );
 	return result;
 	
 }						   
