@@ -441,8 +441,6 @@ Rcpp::List plaus_unbalanced_marginal_lmer(NumericVector thetaseq, NumericMatrix 
 	NumericVector plausestheta(m_the,0.0);
 	NumericVector F_the(1,0.0);
 	
-	NumericVector H(10000,0.0);
-	H = Rcpp::runif(10000,0.0,1.0); 
 	
 	for(int j=0; j < 10000; j++){
 		Z[0] = R::rnorm(0.0,1.0);
@@ -464,15 +462,11 @@ Rcpp::List plaus_unbalanced_marginal_lmer(NumericVector thetaseq, NumericMatrix 
 				F_the[0] = F_the[0] + 1.0/10000.0;	
 			}
 		}
-		F_the[0] = (1.0-std::abs(2.0*F_the[0] - 1));
-		for(int k = 0; k < 10000; k++){
-			if(H[k] <= F_the[0]){
-				plausestheta[j] = plausestheta[j] + 1.0/10000.0;	
-			}
-		}
+		F_the[0] = (1.0-std::abs(2.0*F_the[0] - 1.0));
+		plausestheta[j] = F_the[0];	
 	}
 	
-	result = Rcpp::List::create(Rcpp::Named("plausestheta") = plausestheta);
+	result = Rcpp::List::create(Rcpp::Named("plausestheta") = plausestheta, Rcpp::Named("total_sigma") = total_sigma);
 	return result;
 	
 }						   
