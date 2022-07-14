@@ -439,6 +439,7 @@ Rcpp::List plaus_unbalanced_marginal_lmer(NumericVector thetaseq, NumericMatrix 
 	NumericVector zeroes(20000,0.0);
 	NumericVector Z(1, 0.0);
 	NumericVector plausestheta(m_the,0.0);
+	NumericVector F_the(1,0.0);
 	
 	NumericVector H(10000,0.0);
 	H = Rcpp::runif(10000,0.0,1.0); 
