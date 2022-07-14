@@ -428,10 +428,8 @@ Rcpp::List plaus_marginal_lmer(NumericVector thetaseq, NumericVector total_sigma
 
 	List result;
 	int m_the = thetaseq.length();
-	NumericVector total_sigma(10000,0.0);
-	NumericVector zeroes(20000,0.0);
-	NumericVector Z(1, 0.0);
 	NumericVector plausestheta(m_the,0.0);
+	NumericVector F_the(1,0.0);
 
 	for(int j = 0; j < m_the; j++){
 		F_the[0] = 0.0;
