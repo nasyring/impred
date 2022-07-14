@@ -424,6 +424,109 @@ Rcpp::List plaus_unbalanced_marginal(NumericVector thetaseq, NumericVector n, Nu
 }						   
 
 
+Rcpp::List plaus_unbalanced_marginal_lmer(NumericVector thetaseq, NumericMatrix S, NumericMatrix C1, NumericMatrix C2, NumericVector By, NumericVector x, NumericVector ztz){
+
+	List result;
+	int m_the = thetaseq.length();
+	arma::colvec xa = as<arma::colvec>(x);
+	arma::colvec Cxa; Cxa.zeros(2);
+	arma::colvec Bya = as<arma::colvec>(By);
+	double xBy = dot(xa, Bya);
+	arma::mat Csigma2;  Csigma2.zeros(2,2);
+	NumericVector zeroes4(4,0.0);
+	NumericMatrix Csigma(2,2,zeroes4.begin());
+	NumericVector total_sigma(10000,0.0);
+	NumericVector zeroes(20000,0.0);
+	NumericVector Z(1, 0.0);
+	NumericVector plausestheta(m_the,0.0);
+	
+	NumericVector H(10000,0.0);
+	H = Rcpp::runif(10000,0.0,1.0); 
+	
+	for(int j=0; j < 10000; j++){
+		Z[0] = R::rnorm(0.0,1.0);
+		for(int r = 0; r < 2; r++){
+			for(int s = 0; s < 2; s++){
+				Csigma(r,s) = S(j,1)*C1(r,s) + S(j,0)*C2(r,s);
+			}
+		}
+		Csigma2 = as<arma::mat>(Csigma);
+		Cxa = Csigma2*xa;
+		total_sigma[j] = dot(xa, Cxa) + S(j,0)*ztz[0];
+		total_sigma[j] = Z[0]*std::sqrt(total_sigma[0]);
+	}
+
+	for(int j = 0; j < m_the; j++){
+		F_the[0] = 0.0;
+		for(int k = 0; k < 10000; k++){
+			if(total_sigma[k] < (xBy - thetaseq[j])){
+				F_the[0] = F_the[0] + 1.0/10000.0;	
+			}
+		}
+		F_the[0] = (1.0-std::abs(2.0*F_the[0] - 1));
+		for(int k = 0; k < 10000; k++){
+			if(H[k] <= F_the[0]){
+				plausestheta[j] = plausestheta[j] + 1.0/10000.0;	
+			}
+		}
+	}
+	
+	result = Rcpp::List::create(Rcpp::Named("plausestheta") = plausestheta);
+	return result;
+	
+}						   
+
+
+
+
+Rcpp::List randsetspredlmer(NumericMatrix S, NumericVector dimS, NumericVector U, NumericMatrix C1, NumericMatrix C2, NumericVector By, NumericVector x, NumericVector ztz) {
+	
+	List result;
+	
+	arma::colvec xa = as<arma::colvec>(x);
+	arma::colvec Cxa; Cxa.zeros(2);
+	arma::colvec Bya = as<arma::colvec>(By);
+	double xBy = dot(xa, Bya);
+	arma::mat Csigma2;  Csigma2.zeros(2,2);
+	NumericVector zeroes4(4,0.0);
+	NumericMatrix Csigma(2,2,zeroes4.begin());
+	NumericVector total_sigma(1,0.0);
+	NumericVector Uu(1, 0.0); NumericVector Ul(1, 0.0);
+	NumericVector zeroes(20000,0.0);
+	NumericMatrix randsetpred = NumericMatrix(10000, 2, zeroes.begin());
+	NumericVector thetas(10000, 0.0);
+	NumericVector Z(1, 0.0);
+		
+	for(int j=0; j < 10000; j++){
+		Z[0] = R::rnorm(0.0,1.0);
+		for(int r = 0; r < 2; r++){
+			for(int s = 0; s < 2; s++){
+				Csigma(r,s) = S(j,1)*C1(r,s) + S(j,0)*C2(r,s);
+			}
+		}
+		Csigma2 = as<arma::mat>(Csigma);
+		Cxa = Csigma2*xa;
+		total_sigma[0] = dot(xa, Cxa) + S(j,0)*ztz[0];
+		total_sigma[0] = std::sqrt(total_sigma[0]);
+		thetas[j] = Z[0]*total_sigma[0] + xBy;
+	}
+
+	std::sort(thetas.begin(), thetas.end());
+	
+	for(int j=0; j < 10000; j++){
+		Ul[0] = 0.5-std::fabs(U[j]-0.5);
+		Uu[0] = 1.0-Ul[0];
+		randsetpred(j,0) = thetas[std::round(10000*Ul[0])];
+		randsetpred(j,1) = thetas[std::round(10000*Uu[0])];
+	}
+	
+	result = Rcpp::List::create(Rcpp::Named("randsetpred") = randsetpred);
+	
+	return result;
+}
+
+
+
 Rcpp::List randsetspred(NumericMatrix S, NumericVector dimS, NumericVector nsize, NumericVector n_i, NumericVector dimn_i, NumericVector k, NumericVector U, NumericVector Ybar) {
 	
 	List result;
@@ -521,53 +624,6 @@ result = Rcpp::List::create(Rcpp::Named("randsetpred") = randsetpred);
 	return result;
 	
 	
-}
-
-
-Rcpp::List randsetspredlmer(NumericMatrix S, NumericVector dimS, NumericVector U, NumericMatrix C1, NumericMatrix C2, NumericVector By, NumericVector x, NumericVector ztz) {
-	
-	List result;
-	
-	arma::colvec xa = as<arma::colvec>(x);
-	arma::colvec Cxa; Cxa.zeros(2);
-	arma::colvec Bya = as<arma::colvec>(By);
-	double xBy = dot(xa, Bya);
-	arma::mat Csigma2;  Csigma2.zeros(2,2);
-	NumericVector zeroes4(4,0.0);
-	NumericMatrix Csigma(2,2,zeroes4.begin());
-	NumericVector total_sigma(1,0.0);
-	NumericVector Uu(1, 0.0); NumericVector Ul(1, 0.0);
-	NumericVector zeroes(20000,0.0);
-	NumericMatrix randsetpred = NumericMatrix(10000, 2, zeroes.begin());
-	NumericVector thetas(10000, 0.0);
-	NumericVector Z(1, 0.0);
-		
-	for(int j=0; j < 10000; j++){
-		Z[0] = R::rnorm(0.0,1.0);
-		for(int r = 0; r < 2; r++){
-			for(int s = 0; s < 2; s++){
-				Csigma(r,s) = S(j,1)*C1(r,s) + S(j,0)*C2(r,s);
-			}
-		}
-		Csigma2 = as<arma::mat>(Csigma);
-		Cxa = Csigma2*xa;
-		total_sigma[0] = dot(xa, Cxa) + S(j,0)*ztz[0];
-		total_sigma[0] = std::sqrt(total_sigma[0]);
-		thetas[j] = Z[0]*total_sigma[0] + xBy;
-	}
-
-	std::sort(thetas.begin(), thetas.end());
-	
-	for(int j=0; j < 10000; j++){
-		Ul[0] = 0.5-std::fabs(U[j]-0.5);
-		Uu[0] = 1.0-Ul[0];
-		randsetpred(j,0) = thetas[std::round(10000*Ul[0])];
-		randsetpred(j,1) = thetas[std::round(10000*Uu[0])];
-	}
-	
-	result = Rcpp::List::create(Rcpp::Named("randsetpred") = randsetpred);
-	
-	return result;
 }
 
 
