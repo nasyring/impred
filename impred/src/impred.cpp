@@ -444,11 +444,10 @@ Rcpp::List plaus_unbalanced_marginal_lmer(NumericVector thetaseq, NumericMatrix 
 	
 	for(int j=0; j < 10000; j++){
 		Z[0] = R::rnorm(0.0,1.0);
-		for(int r = 0; r < 2; r++){
-			for(int s = 0; s < 2; s++){
-				Csigma(r,s) = S(j,1)*C1(r,s) + S(j,0)*C2(r,s);
-			}
-		}
+		Csigma(0,0) = S(j,1)*C1(0,0) + S(j,0)*C2(0,0);
+		Csigma(0,1) = S(j,1)*C1(0,1) + S(j,0)*C2(0,1);
+		Csigma(1,0) = S(j,1)*C1(1,0) + S(j,0)*C2(1,0);
+		Csigma(1,1) = S(j,1)*C1(1,1) + S(j,0)*C2(1,1);
 		Csigma2 = as<arma::mat>(Csigma);
 		Cxa = Csigma2*xa;
 		total_sigma[j] = dot(xa, Cxa) + S(j,0)*ztz[0];
