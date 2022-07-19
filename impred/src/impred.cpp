@@ -124,7 +124,7 @@ Rcpp::List plaus_balanced_aov(NumericVector theta, NumericVector Ybar, NumericVe
 	}
 	
 	NumericVector Z2(10000,0.0); NumericVector V1(10000,0.0); NumericVector V2(10000,0.0); 
-	Z2 = Rcpp::rnorm(10000,0.0,1.0);
+	Z2 = Rcpp::rchisq(10000,1.0);
 	V1 = Rcpp::rchisq(10000,r[0]);
 	V2 = Rcpp::rchisq(10000,r[1]);
 	
