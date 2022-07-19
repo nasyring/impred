@@ -206,25 +206,42 @@ Rcpp::List plaus_balanced_aov(NumericVector theta, NumericVector Ybar, NumericVe
 	NumericVector maxplaus_n(1, 0.0);
 	NumericVector plaus_e(m_the, 0.0);
 	NumericVector maxplaus_e(1, 0.0);
-	if(den[0] < 0){
+
+	if(den_t[0] < 0){
 		for(int i = 0; i < m_the; i++){
 			plaus_t[i] = F_max_t[i];
 			maxplaus_t[0] = std::max(maxplaus_t[0],plaus_t[i]);
-			plaus_n[i] = F_max_n[i];
-			maxplaus_n[0] = std::max(maxplaus_n[0],plaus_n[i]);
-			plaus_e[i] = F_max_e[i];
-			maxplaus_e[0] = std::max(maxplaus_e[0],plaus_e[i]);
 		}
 	}else {
 		for(int i = 0; i < m_the; i++){
 			plaus_t[i] = 1.0-F_min_t[i];
 			maxplaus_t[0] = std::max(maxplaus_t[0],plaus_t[i]);
+		}		
+	}
+
+	if(den_n[0] < 0){
+		for(int i = 0; i < m_the; i++){
+			plaus_n[i] = F_max_n[i];
+			maxplaus_n[0] = std::max(maxplaus_n[0],plaus_n[i]);
+		}
+	}else {
+		for(int i = 0; i < m_the; i++){
 			plaus_n[i] = 1.0-F_min_n[i];
 			maxplaus_n[0] = std::max(maxplaus_n[0],plaus_n[i]);
+		}		
+	}
+	
+	if(den_e[0] < 0){
+		for(int i = 0; i < m_the; i++){
+			plaus_e[i] = F_max_e[i];
+			maxplaus_e[0] = std::max(maxplaus_e[0],plaus_e[i]);
+		}
+	}else {
+		for(int i = 0; i < m_the; i++){
 			plaus_e[i] = 1.0-F_min_e[i];
 			maxplaus_e[0] = std::max(maxplaus_e[0],plaus_e[i]);
 		}		
-	}
+	}	
 	
 	for(int i = 0; i < m_the; i++){
 		plaus_t[i] = plaus_t[i]/maxplaus_t[0];
