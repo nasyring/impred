@@ -142,7 +142,7 @@ Rcpp::List plaus_balanced_aov(NumericVector theta, NumericVector Ybar, NumericVe
 	NumericMatrix F_eta = NumericMatrix(m_the, 101, zeroes.begin());
 	for(int i = 0; i < m_the; i++){
 		for(int j = 0; j < 101; j++){
-			for(int k = ; k < 10000; k++){
+			for(int k = 0; k < 10000; k++){
 				if(MC(k,j) < plausseq[i]){
 					F_eta(i,j) = F_eta(i,j) + 0.0001;
 				}
