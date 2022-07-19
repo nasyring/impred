@@ -106,21 +106,41 @@ Rcpp::List plaus_balanced_aov(NumericVector theta, NumericVector Ybar, NumericVe
 		sumn_i2[0] = sumn_i2[0] + n_i[j]*n_i[j];	
 	}
 	
-	NumericVector c1(1,0.0); NumericVector c2(1,0.0); NumericVector c(1,0.0);
-	c2[0] = 1/n[0];
-	c1[0] = 1+sumn_i2[0]*(c2[0]*c2[0]);
-	c[0] = (c2[0]*lambda[0]/c1[0]) - 1.0;
+	NumericVector c1t(1,0.0); NumericVector c2t(1,0.0); NumericVector ct(1,0.0);
+	NumericVector c1n(1,0.0); NumericVector c2n(1,0.0); NumericVector cn(1,0.0);
+	NumericVector c1e(1,0.0); NumericVector c2e(1,0.0); NumericVector ce(1,0.0);
+	c2t[0] = 1/n[0];
+	c1t[0] = 1+sumn_i2[0]*(c2t[0]*c2t[0]);
+	ct[0] = (c2t[0]*lambda[0]/c1t[0]) - 1.0;
+	c2n[0] = (1.0/n[0] + 1.0);
+	c1n[0] = 1+sumn_i2[0]/(n[0]*n[0]);
+	cn[0] = (c2n[0]*lambda[0]/c1n[0]) - 1.0;
+	c2e[0] = (1.0/n[0] + 1.0);
+	c1e[0] = 1+(sumn_i2[0]/(n[0]*n[0])) - (2.0*n_i[dn_i-1]/n[0]);
+	ce[0] = (c2e[0]*lambda[0]/c1e[0]) - 1.0;
+
+	
+	
+	
 	
 	NumericVector eta(101,0.0);
 	for(int j=0; j<101; j++){
 		eta[j] = j*0.01;	
 	}
 	
-	NumericVector plausseq(m_the, 0.0);
-	NumericVector den(1, 0.0);
-	den[0] = ((c1[0]/lambda[0])*((S[0]/r[0]) - (S[1]/r[1])) + (c2[0]*S[1]/r[1]));
+	NumericVector plausseq_t(m_the, 0.0);
+	NumericVector plausseq_n(m_the, 0.0);
+	NumericVector plausseq_e(m_the, 0.0);
+	NumericVector den_t(1, 0.0);NumericVector den_n(1, 0.0);NumericVector den_e(1, 0.0);
+	NumericVector num(1, 0.0);
+	den_t[0] = ((c1t[0]/lambda[0])*((S[0]/r[0]) - (S[1]/r[1])) + (c2t[0]*S[1]/r[1]));
+	den_n[0] = ((c1n[0]/lambda[0])*((S[0]/r[0]) - (S[1]/r[1])) + (c2n[0]*S[1]/r[1]));
+	den_e[0] = ((c1e[0]/lambda[0])*((S[0]/r[0]) - (S[1]/r[1])) + (c2e[0]*S[1]/r[1]));
 	for(int j=0; j<m_the; j++){
-		plausseq[j] = (theta[j] - Ybar[0])*(theta[j] - Ybar[0])/den[0];	
+		num[0] = (theta[j] - Ybar[0])*(theta[j] - Ybar[0]);
+		plausseq_t[j] = num[0]/den_t[0];
+		plausseq_n[j] = num[0]/den_n[0];
+		plausseq_e[j] = num[0]/den_e[0];
 	}
 	
 	NumericVector Z2(10000,0.0); NumericVector V1(10000,0.0); NumericVector V2(10000,0.0); 
@@ -128,56 +148,91 @@ Rcpp::List plaus_balanced_aov(NumericVector theta, NumericVector Ybar, NumericVe
 	V1 = Rcpp::rchisq(10000,r[0]);
 	V2 = Rcpp::rchisq(10000,r[1]);
 	
-	
 	NumericVector zeroes(10000*101,0.0);
-	NumericMatrix MC = NumericMatrix(10000, 101, zeroes.begin());
+	NumericMatrix MCt = NumericMatrix(10000, 101, zeroes.begin());
+	NumericMatrix MCn = NumericMatrix(10000, 101, zeroes.begin());
+	NumericMatrix MCe = NumericMatrix(10000, 101, zeroes.begin());
+
 	for(int i = 0; i < 10000; i++){
 		for(int j = 0; j < 101; j++){
-			MC(i,j) = Z2[i]/((V1[i]/r[0])*(1.0/(1.0+c[0]*eta[j])) + (V2[i]/r[1])*(c[0]*eta[j]/(1.0+c[0]*eta[j])));	
+			MCt(i,j) = Z2[i]/((V1[i]/r[0])*(1.0/(1.0+ct[0]*eta[j])) + (V2[i]/r[1])*(ct[0]*eta[j]/(1.0+ct[0]*eta[j])));
+			MCn(i,j) = Z2[i]/((V1[i]/r[0])*(1.0/(1.0+cn[0]*eta[j])) + (V2[i]/r[1])*(cn[0]*eta[j]/(1.0+cn[0]*eta[j])));
+			MCe(i,j) = Z2[i]/((V1[i]/r[0])*(1.0/(1.0+ce[0]*eta[j])) + (V2[i]/r[1])*(ce[0]*eta[j]/(1.0+ce[0]*eta[j])));
 		}
 	}
 	
 	
 	NumericVector zeroes2(m_the*101,0.0);
-	NumericMatrix F_eta = NumericMatrix(m_the, 101, zeroes.begin());
+	NumericMatrix F_eta_t = NumericMatrix(m_the, 101, zeroes.begin());
+	NumericMatrix F_eta_n = NumericMatrix(m_the, 101, zeroes.begin());
+	NumericMatrix F_eta_e = NumericMatrix(m_the, 101, zeroes.begin());
+
 	for(int i = 0; i < m_the; i++){
 		for(int j = 0; j < 101; j++){
 			for(int k = 0; k < 10000; k++){
-				if(MC(k,j) < plausseq[i]){
-					F_eta(i,j) = F_eta(i,j) + 0.0001;
+				if(MCt(k,j) < plausseq_t[i]){
+					F_eta_t(i,j) = F_eta_t(i,j) + 0.0001;
+				}
+				if(MCn(k,j) < plausseq_n[i]){
+					F_eta_n(i,j) = F_eta_n(i,j) + 0.0001;
+				}
+				if(MCe(k,j) < plausseq_e[i]){
+					F_eta_e(i,j) = F_eta_e(i,j) + 0.0001;
 				}
 			}
 		}
 	}
 	
-	NumericVector F_max(m_the, 0.0); 
-	NumericVector F_min(m_the, 1.0);
+	NumericVector F_max_t(m_the, 0.0); 
+	NumericVector F_min_t(m_the, 1.0);
+	NumericVector F_max_n(m_the, 0.0); 
+	NumericVector F_min_n(m_the, 1.0);
+	NumericVector F_max_e(m_the, 0.0); 
+	NumericVector F_min_e(m_the, 1.0);
 	for(int i = 0; i < m_the; i++){
 		for(int j = 0; j < 101; j++){
-			F_max[i] = std::max(F_max[i], F_eta(i, j));
-			F_min[i] = std::min(F_min[i], F_eta(i, j));
+			F_max_t[i] = std::max(F_max_t[i], F_eta_t(i, j));
+			F_min_t[i] = std::min(F_min_t[i], F_eta_t(i, j));
+			F_max_n[i] = std::max(F_max_n[i], F_eta_n(i, j));
+			F_min_n[i] = std::min(F_min_n[i], F_eta_n(i, j));
+			F_max_e[i] = std::max(F_max_e[i], F_eta_e(i, j));
+			F_min_e[i] = std::min(F_min_e[i], F_eta_e(i, j));
 		}
 	}
 	
-	NumericVector plaus(m_the, 0.0);
-	NumericVector maxplaus(1, 0.0);
+	NumericVector plaus_t(m_the, 0.0);
+	NumericVector maxplaus_t(1, 0.0);
+	NumericVector plaus_n(m_the, 0.0);
+	NumericVector maxplaus_n(1, 0.0);
+	NumericVector plaus_e(m_the, 0.0);
+	NumericVector maxplaus_e(1, 0.0);
 	if(den[0] < 0){
 		for(int i = 0; i < m_the; i++){
-			plaus[i] = F_max[i];
-			maxplaus[0] = std::max(maxplaus[0],plaus[i]);
+			plaus_t[i] = F_max_t[i];
+			maxplaus_t[0] = std::max(maxplaus_t[0],plaus_t[i]);
+			plaus_n[i] = F_max_n[i];
+			maxplaus_n[0] = std::max(maxplaus_n[0],plaus_n[i]);
+			plaus_e[i] = F_max_e[i];
+			maxplaus_e[0] = std::max(maxplaus_e[0],plaus_e[i]);
 		}
 	}else {
 		for(int i = 0; i < m_the; i++){
-			plaus[i] = 1.0-F_min[i];
-			maxplaus[0] = std::max(maxplaus[0],plaus[i]);
+			plaus_t[i] = 1.0-F_min_t[i];
+			maxplaus_t[0] = std::max(maxplaus_t[0],plaus_t[i]);
+			plaus_n[i] = 1.0-F_min_n[i];
+			maxplaus_n[0] = std::max(maxplaus_n[0],plaus_n[i]);
+			plaus_e[i] = 1.0-F_min_e[i];
+			maxplaus_e[0] = std::max(maxplaus_e[0],plaus_e[i]);
 		}		
 	}
 	
 	for(int i = 0; i < m_the; i++){
-		plaus[i] = plaus[i]/maxplaus[0];	
+		plaus_t[i] = plaus_t[i]/maxplaus_t[0];
+		plaus_n[i] = plaus_n[i]/maxplaus_n[0];
+		plaus_e[i] = plaus_e[i]/maxplaus_e[0];
 	}
 	
-	result = Rcpp::List::create(Rcpp::Named("plauses") = plaus);
+	result = Rcpp::List::create(Rcpp::Named("plauses.theta") = plaus_t, Rcpp::Named("plauses.new") = plaus_n, Rcpp::Named("plauses.exs") = plaus_e);
 	return result;
 	
 }
