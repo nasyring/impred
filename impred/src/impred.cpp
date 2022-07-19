@@ -95,6 +95,110 @@ result = Rcpp::List::create(Rcpp::Named("samples1") = postsamples0,Rcpp::Named("
 	
 }
 
+Rcpp::List plaus_balanced_aov(NumericVector theta, NumericVector Ybar, NumericVector S, NumericVector lambda, NumericVector r, NumericVector n, NumericVector n_i){
+
+	List result;
+	int m_the = theta.length();
+	int dn_i = n_i.length();
+
+	NumericVector sumn_i2(1, 0.0);
+	for(int j=0; j<dn_i; j++){
+		sumn_i2[0] = sumn_i2[0] + n_i[j]*n_i[j];	
+	}
+	
+	NumericVector c1(1,0.0); NumericVector c2(1,0.0); NumericVector c(1,0.0);
+	c2[0] = 1/n[0];
+	c1[0] = 1+sumn_i2[0]*(c2[0]*c2[0]);
+	c[0] = (c2[0]*lambda[0]/c1[0]) - 1.0;
+	
+	NumericVector eta(101,0.0);
+	for(int j=0; j<101; j++){
+		eta[j] = j*0.01;	
+	}
+	
+	NumericVector plausseq(m_the, 0.0);
+	NumericVector den(1, 0.0);
+	den[0] = ((c1[0]/lambda[0])*((S[0]/r[0]) - (S[1]/r[1])) + (c2[0]*S[1]/r[1]));
+	for(int j=0; j<m_the; j++){
+		plausseq[j] = (theta[j] - Ybar[0])/den[0];	
+	}
+	
+	NumericVector Z2(10000,0.0); NumericVector V1(10000,0.0); NumericVector V2(10000,0.0); 
+	Z2 = Rcpp::rnorm(10000,0.0,1.0);
+	V1 = Rcpp::rchisq(10000,r[0]);
+	V2 = Rcpp::rchisq(10000,r[1]);
+	
+	
+	NumericVector zeroes(10000*101,0.0);
+	NumericMatrix MC = NumericMatrix(10000, 101, zeroes.begin());
+	for(int i = 0; i < 10000; i++){
+		for(int j = 0; j < 101; j++){
+			MC(i,j) = Z2[i]/((V1[i]/r[0])*(1.0/(1.0+c[0]*eta[j])) + (V2[i]/r[1])*(c[0]*eta[j]/(1.0+c[0]*eta[j])));	
+		}
+	}
+	
+	
+	NumericVector zeroes2(m_the*101,0.0);
+	NumericMatrix F_eta = NumericMatrix(m_the, 101, zeroes.begin());
+	for(int i = 0; i < m_the; i++){
+		for(int j = 0; j < 101; j++){
+			for(int k = ; k < 10000; k++){
+				if(MC(k,j) < plausseq[i]){
+					F_eta(i,j) = F_eta(i,j) + 0.0001;
+				}
+			}
+		}
+	}
+	
+	NumericVector F_max(m_the, 0.0); 
+	NumericVector F_min(m_the, 1.0);
+	for(int i = 0; i < m_the; i++){
+		for(int j = 0; j < 101; j++){
+			F_max[i] = std::max(F_max[i], F_eta(i, j));
+			F_min[i] = std::min(F_min[i], F_eta(i, j));
+		}
+	}
+	
+	
+	
+	
+	
+	NumericVector envelope(m_the, 0.0); 
+	if(den[0] < 0){
+		for(int i = 0; i < m_the; i++){
+			if((F_min[i] >= 0.5) & (F_max[i] >= 0.5)){
+				envelope[i] = F_min[i];	
+			}else if(F_max[i] >= 0.5){
+				envelope[i] = 0.5;
+			}else {
+				envelope[i] = F_max[i];
+			}
+		}
+	}else {
+		for(int i = 0; i < m_the; i++){
+			if((F_min[i] <= 0.5) & (F_max[i] <= 0.5)){
+				envelope[i] = F_max[i];	
+			}else if(F_min[i] <= 0.5){
+				envelope[i] = 0.5;
+			}else {
+				envelope[i] = F_min[i];
+			}			
+		}		
+	}
+	
+	NumericVector plaus(m_the, 0.0);
+	for(int i = 0; i < m_the; i++){
+		plaus[i] = 1.0 - std::abs(2.0*envelope[i] - 1.0);	
+	}
+	
+	result = Rcpp::List::create(Rcpp::Named("plauses") = plaus);
+	return result;
+	
+}
+
+
+
+
 
 Rcpp::List plaus_balanced(NumericVector thetaseq, NumericVector saseq, NumericVector seseq, NumericVector n, NumericVector n_i, NumericVector S, NumericVector lambda, NumericVector r, NumericVector Ybar, NumericVector numk){
 	
