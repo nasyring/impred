@@ -299,9 +299,34 @@ Rcpp::List plaus_unbalanced_aov(NumericVector theta, NumericVector Ybar, Numeric
 		MCe[j] = MC[0]*(c1e[0]*s2a[0] + c2e[0]*s2e[0]);		
 	}
 	
+	NumericVector Ft(m_the, 0.0); 
+	NumericVector Fn(m_the, 0.0); 
+	NumericVector Fe(m_the, 0.0);	
+	for(int i = 0; i < m_the; i++){
+		for(int j = 0; j < m_samps; j++){
+			if(MCt[j] < plausseq[i]){
+				Ft[i] = Ft[i] + (1.0 / m_samps);	
+			}
+			if(MCn[j] < plausseq[i]){
+				Fn[i] = Fn[i] + (1.0 / m_samps);	
+			}
+			if(MCe[j] < plausseq[i]){
+				Fe[i] = Fe[i] + (1.0 / m_samps);	
+			}
+		}
+	}
 	
+	NumericVector plaus_t(m_the, 0.0); 
+	NumericVector plaus_n(m_the, 0.0); 
+	NumericVector plaus_e(m_the, 0.0);	
+	for(int i = 0; i < m_the; i++){
+		plaus_t[i] = 1.0 - Ft[i];
+		plaus_n[i] = 1.0 - Fn[i];
+		plaus_e[i] = 1.0 - Fe[i];
+	}
 	
-	
+	result = Rcpp::List::create(Rcpp::Named("plauses.theta") = plaus_t, Rcpp::Named("plauses.new") = plaus_n, Rcpp::Named("plauses.exs") = plaus_e);
+	return result;
 	
 }
 
