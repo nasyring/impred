@@ -275,7 +275,7 @@ Rcpp::List plaus_unbalanced_aov(NumericVector theta, NumericVector Ybar, Numeric
 	c1e[0] = 1+(sumn_i2[0]/(n[0]*n[0])) - (2.0*n_i[dn_i-1]/n[0]);
 
 	NumericVector prodS(1, 1.0);
-	NumericVector prodVar(1, 1.0);
+	NumericVector prodvar(1, 1.0);
 	for(int j = 0; j < (L-1); j++){
 		prodS[0] = prodS[0]*S[j];
 		prodvar[0] = prodvar[0]*(lambda[j]*s2a[0] + s2e[0]); 
