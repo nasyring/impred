@@ -15,6 +15,10 @@ plaus_unbalanced_aov <- function(theta, Ybar, S, lambda, n, n_i, auxiliary, s2a,
     .Call(`impred_plaus_unbalanced_aov`, theta, Ybar, S, lambda, n, n_i, auxiliary, s2a, s2e)
 }
 
+plaus_two_stage <- function(theta, xBy, S, lambda, auxiliary, csigma, s2a, s2e) {
+    .Call(`impred_plaus_two_stage`, theta, xBy, S, lambda, auxiliary, csigma, s2a, s2e)
+}
+
 plaus_marginal_lmer <- function(thetaseq,total_sigma,xBy) {
     .Call(`impred_plaus_marginal_lmer`, thetaseq,total_sigma,xBy)
 }
