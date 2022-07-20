@@ -43,7 +43,7 @@ Rcpp::List randsetsMCMC(NumericMatrix H, NumericMatrix A, NumericVector rL, Nume
 		U(h,0) = H(h,0);	
 	}
 
-for(int j=0; j<M; j++) {
+	for(int j=0; j<M; j++) {
 		for(int i=0; i<2; i++){
 			if( i==0 ){
 				propsd[0] = 10.0;	
@@ -88,7 +88,7 @@ for(int j=0; j<M; j++) {
 			logjointold[0] = 0.0; logjointnew[0] = 0.0;
 		}
 	}
-result = Rcpp::List::create(Rcpp::Named("samples1") = postsamples0,Rcpp::Named("samples2") = postsamples1,Rcpp::Named("logdens") = postsamplesdens);
+	result = Rcpp::List::create(Rcpp::Named("samples1") = postsamples0,Rcpp::Named("samples2") = postsamples1,Rcpp::Named("logdens") = postsamplesdens);
 
 	return result;
 	
@@ -118,10 +118,6 @@ Rcpp::List plaus_balanced_aov(NumericVector theta, NumericVector Ybar, NumericVe
 	c2e[0] = (1.0/n[0] + 1.0);
 	c1e[0] = 1+(sumn_i2[0]/(n[0]*n[0])) - (2.0*n_i[dn_i-1]/n[0]);
 	ce[0] = (c2e[0]*lambda[0]/c1e[0]) - 1.0;
-
-	
-	
-	
 	
 	NumericVector eta(101,0.0);
 	for(int j=0; j<101; j++){
@@ -251,6 +247,61 @@ Rcpp::List plaus_balanced_aov(NumericVector theta, NumericVector Ybar, NumericVe
 	
 	result = Rcpp::List::create(Rcpp::Named("plauses.theta") = plaus_t, Rcpp::Named("plauses.new") = plaus_n, Rcpp::Named("plauses.exs") = plaus_e);
 	return result;
+	
+}
+
+
+Rcpp::List plaus_unbalanced_aov(NumericVector theta, NumericVector Ybar, NumericVector S, NumericVector lambda, NumericVector n, NumericVector n_i, NumericMatrix auxiliary, NumericVector s2a, NumericVector s2e){
+
+	List result;
+	int L = S.length();
+	int m_the = theta.length();
+	int m_samps = auxiliary.nrow();
+	int dn_i = n_i.length();
+
+	NumericVector sumn_i2(1, 0.0);
+	for(int j=0; j<dn_i; j++){
+		sumn_i2[0] = sumn_i2[0] + n_i[j]*n_i[j];	
+	}
+	
+	NumericVector c1t(1,0.0); NumericVector c2t(1,0.0); 
+	NumericVector c1n(1,0.0); NumericVector c2n(1,0.0); 
+	NumericVector c1e(1,0.0); NumericVector c2e(1,0.0); 
+	c2t[0] = 1/n[0];
+	c1t[0] = 1+sumn_i2[0]*(c2t[0]*c2t[0]);
+	c2n[0] = (1.0/n[0] + 1.0);
+	c1n[0] = 1+sumn_i2[0]/(n[0]*n[0]);
+	c2e[0] = (1.0/n[0] + 1.0);
+	c1e[0] = 1+(sumn_i2[0]/(n[0]*n[0])) - (2.0*n_i[dn_i-1]/n[0]);
+
+	NumericVector prodS(1, 1.0);
+	NumericVector prodVar(1, 1.0);
+	for(int j = 0; j < (L-1); j++){
+		prodS[0] = prodS[0]*S[j];
+		prodvar[0] = prodvar[0]*(lambda[j]*s2a[0] + s2e[0]); 
+	}
+	
+	NumericVector plausseq(m_the, 0.0);
+	for(int j = 0; j < m_the; j++){
+		plausseq[j] = (theta[j] - Ybar[0])/(prodS[0] + S[L-1]);	
+	}
+	
+	NumericVector MC(1, 0.0);
+	NumericVector MCt(m_samps, 0.0);
+	NumericVector MCn(m_samps, 0.0);
+	NumericVector MCe(m_samps, 0.0);
+	NumericVector Z2(1, 0.0);
+	for(int j = 0; j < m_samps; j++){
+		Z2[0] = R::rchisq(1.0);
+		MC[0] = Z2[0]/(prodvar[0]*std::exp(auxiliary(j,0)) + s2e[0]*std::exp(auxiliary(j,1)));	
+		MCt[j] = MC[0]*(c1t[0]*s2a[0] + c2t[0]*s2e[0]);
+		MCn[j] = MC[0]*(c1n[0]*s2a[0] + c2n[0]*s2e[0]);
+		MCe[j] = MC[0]*(c1e[0]*s2a[0] + c2e[0]*s2e[0]);		
+	}
+	
+	
+	
+	
 	
 }
 
