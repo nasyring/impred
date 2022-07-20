@@ -283,7 +283,7 @@ Rcpp::List plaus_unbalanced_aov(NumericVector theta, NumericVector Ybar, Numeric
 	
 	NumericVector plausseq(m_the, 0.0);
 	for(int j = 0; j < m_the; j++){
-		plausseq[j] = (theta[j] - Ybar[0])/(prodS[0] + S[L-1]);	
+		plausseq[j] = (theta[j] - Ybar[0])*(theta[j] - Ybar[0])/(prodS[0] + S[L-1]);	
 	}
 	
 	NumericVector MC(1, 0.0);
