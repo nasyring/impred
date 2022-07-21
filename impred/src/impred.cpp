@@ -350,11 +350,11 @@ Rcpp::List plaus_two_stage(NumericVector theta, NumericVector xBy, NumericVector
 		plausseq[j] = (theta[j] - xBy[0])*(theta[j] - xBy[0])/(prodS[0] + S[L-1]);	
 	}
 	
-	NumericVector MC(1, 0.0);
+	NumericVector MC(m_samps, 0.0);
 	NumericVector Z2(1, 0.0);
 	for(int j = 0; j < m_samps; j++){
 		Z2[0] = R::rchisq(1.0);
-		MC[0] = (Z2[0]*csigma[0])/(prodvar[0]*std::exp(auxiliary(j,0)) + s2e[0]*std::exp(auxiliary(j,1)));	
+		MC[j] = (Z2[0]*csigma[0])/(prodvar[0]*std::exp(auxiliary(j,0)) + s2e[0]*std::exp(auxiliary(j,1)));	
 	}
 	
 	NumericVector F(m_the, 0.0); 
