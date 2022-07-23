@@ -118,10 +118,12 @@ Rcpp::List auxiliaryMCMC(NumericVector H, NumericMatrix A, NumericVector rL, Num
 	NumericVector u(1,0.0);
 	
 	
-	for(int j = 1; j < (L-1); j++){
-		taueta(j,0) = H[h];	
+	for(int j = 0; j < (L-2); j++){
+		taueta(j+1,0) = H[j];	
 	}
-	taueta(0,0) = H[0];
+	for(int j = 0; j < (L-1); j++){
+		taueta(0,0) = taueta(0,0) + R::rf(r[j],r[L-1]);	
+	}	
 	propsd[0] = std::min(0.25*taueta(0,0), 1.0);
 	
 	Uinv = Aa*taueta;
