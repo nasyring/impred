@@ -406,32 +406,35 @@ Rcpp::List plaus_unbalanced_aov(NumericVector theta, NumericVector Ybar, Numeric
 }
 
 
-Rcpp::List plaus_two_stage(NumericVector theta, NumericVector xBy, NumericVector S, NumericVector lambda, NumericMatrix auxiliary, NumericVector csigma, NumericVector s2a, NumericVector s2e){
+Rcpp::List plaus_two_stage(NumericVector theta, NumericVector xBy, NumericVector S, NumericVector lambda, NumericVector r, NumericVector auxiliary, NumericVector csigma, NumericVector rho){
 
 	List result;
 	int L = S.length();
 	int m_the = theta.length();
-	int m_samps = auxiliary.nrow();
+	int m_samps = auxiliary.length();
 
-	NumericVector prodS(1, 1.0);
-	NumericVector prodvar(1, 1.0);
+	NumericVector xi(1,0.0); xi[0] = (1.0 - rho[0]) / rho[0];	
+	
+	NumericVector den(1, 0.0);
+	NumericVector auxden(1, 0.0);
 	for(int j = 0; j < (L-1); j++){
-		prodS[0] = prodS[0]*S[j];
-		prodvar[0] = prodvar[0]*(lambda[j]*s2a[0] + s2e[0]); 
+		den[0] = den[0] + std::log(S[j]*r[L-1]/(S[L-1]*r[j]));
+		auxden[0] = auxden[0] + std::log(lambda[j]*xi[0]+1.0);
 	}
+	den[0] = std::pow(den[0],2.0);
 	
 	NumericVector plausseq(m_the, 0.0);
 	for(int j = 0; j < m_the; j++){
-		plausseq[j] = (theta[j] - xBy[0])*(theta[j] - xBy[0])/(prodS[0] + S[L-1]);	
-	}
-	
+		plausseq[j] = (theta[j] - xBy[0])*(theta[j] - xBy[0])/den[0];	
+	}	
+
 	NumericVector MC(1, 0.0);
 	NumericVector MCt(m_samps, 0.0);
 	NumericVector MCn(m_samps, 0.0);
 	NumericVector Z2(1, 0.0);
 	for(int j = 0; j < m_samps; j++){
 		Z2[0] = R::rchisq(1.0);
-		MC[0] = Z2[0]/(prodvar[0]*std::exp(auxiliary(j,0)) + s2e[0]*std::exp(auxiliary(j,1)));
+		MC[0] = Z2[0]/std::pow(auxden[0] + omega[j],2.0);
 		MCt[j] = MC[0]*csigma[0];
 		MCn[j] = MC[0]*(csigma[0]+s2e[0]);
 	}
