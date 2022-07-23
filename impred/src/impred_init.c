@@ -21,6 +21,7 @@ extern SEXP impred_plaus_marginal_lmer(SEXP, SEXP, SEXP);
 extern SEXP impred_plaus_balanced_aov(SEXP, SEXP, SEXP, SEXP, SEXP, SEXP, SEXP);
 extern SEXP impred_plaus_unbalanced_aov(SEXP, SEXP, SEXP, SEXP, SEXP, SEXP, SEXP, SEXP, SEXP);
 extern SEXP impred_plaus_two_stage(SEXP, SEXP, SEXP, SEXP, SEXP, SEXP, SEXP, SEXP);
+extern SEXP impred_auxiliaryMCMC(SEXP, SEXP, SEXP, SEXP);
 
 static const R_CallMethodDef CallEntries[] = {
     {"impred_randsetsMCMC", (DL_FUNC) &impred_randsetsMCMC, 5},
@@ -39,6 +40,7 @@ static const R_CallMethodDef CallEntries[] = {
   {"impred_plaus_balanced_aov", (DL_FUNC) &impred_plaus_balanced_aov, 7},
   {"impred_plaus_unbalanced_aov", (DL_FUNC) &impred_plaus_unbalanced_aov, 9},
   {"impred_plaus_two_stage", (DL_FUNC) &impred_plaus_two_stage, 8},
+    {"impred_auxiliaryMCMC", (DL_FUNC) &impred_auxiliaryMCMC, 4},
     {NULL, NULL, 0}
 };
 
