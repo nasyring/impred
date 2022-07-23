@@ -95,6 +95,74 @@ Rcpp::List randsetsMCMC(NumericMatrix H, NumericMatrix A, NumericVector rL, Nume
 	
 }
 
+Rcpp::List auxiliaryMCMC(NumericVector H, NumericMatrix A, NumericVector rL, NumericVector M_samp) {
+	
+	List result;
+	int M = int(M_samp[0]);
+	int L = 2+H.length();
+	
+	arma::mat Aa = as<arma::mat>(A);
+	NumericVector zeroes = NumericVector(L-1, 0.0); 
+        NumericMatrix U = NumericMatrix(L-1, 1, zeroes.begin());
+	arma::mat taueta = as<arma::mat>(U);
+	arma::mat proptaueta = as<arma::mat>(U);
+	arma::mat Uinv = as<arma::mat>(U);
+	NumericVector proptau(1, 0.0);
+	NumericVector propsd(1, 0.0);
+	NumericVector propsdnew(1, 0.0);
+	NumericVector logdens(1,0.0);
+	NumericVector logdensprop(1,0.0);
+	NumericVector logdensdiff(1,0.0);
+	NumericVector samples(M_samp,0.0);
+	NumericVector samples_dens(M_samp,0.0);
+	NumericVector u(1,0.0);
+	
+	
+	for(int j = 1; j < (L-1); j++){
+		taueta(j,0) = H[h];	
+	}
+	taueta(0,0) = H[0];
+	propsd[0] = std::min(0.25*taueta(0,0), 1.0);
+	
+	Uinv = Aa*taueta;
+	NumericVector num(1,0.0); NumericVector den(1,0.0); NumericVector sumrL(1,rL[L-1]);
+	for(int j = 0; j < (L-1); j++){
+		num[0] = num[0]+(Uinv(j,0)*0.5*rL[j]); 	
+		den[0] = den[0] + (rL[j]/rL[L-1])*std::exp(Uinv(j,0));
+		sumrL[0] = rumrL[0] + rL[j];	
+	}
+	logdens[0] = num[0] - 0.5*sumrL[0]*(1.0 + den[0]);
+	
+	for(int m = 0; m < M_samp[0]; m++){
+		propsdnew[0] = std::min(0.25*taueta(0,0), 1.0);	
+		proptau[0] = R::rnorm(taueta(0,0), propsdnew[0]);
+		proptaueta(0,0) = proptau[0];
+		Uinv = Aa*proptaueta;
+		num[0]=0.0;den[0]=0.0;
+		for(int j = 0; j < (L-1); j++){
+			num[0] = num[0]+(Uinv(j,0)*0.5*rL[j]); 	
+			den[0] = den[0] + (rL[j]/rL[L-1])*std::exp(Uinv(j,0));
+		}
+		logdensprop[0] = num[0] - 0.5*sumrL[0]*(1.0 + den[0]);		
+		logdensdiff[0] = logdensprop[0] - logdens[0] + R::dnorm(taueta(0,0), proptau[0], propsd[0], 1) - R::dnorm(proptau[0], taueta(0,0), propsdnew[0], 1);
+		
+		u[0] = R::runif(0.0,1.0);
+		if(u[0] <= std::exp(logdensdiff[0])){
+			taueta(0,0) = proptaueta(0,0);
+			propsd[0] = propsdnew[0];
+			logdens[0] = logdensprop[0];
+		}
+		samples[m] = taueta(0,0);
+		samples_dens[m] = logdens[0];
+	}
+
+	result = Rcpp::List::create(Rcpp::Named("samples") = samples,Rcpp::Named("logdens") = samples_dens);
+	return result;
+}
+
+
+
+
 Rcpp::List plaus_balanced_aov(NumericVector theta, NumericVector Ybar, NumericVector S, NumericVector lambda, NumericVector r, NumericVector n, NumericVector n_i){
 
 	List result;
