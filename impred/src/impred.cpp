@@ -367,9 +367,9 @@ Rcpp::List plaus_unbalanced_aov(NumericVector theta, NumericVector Ybar, Numeric
 	for(int j = 0; j < m_samps; j++){
 		Z2[0] = R::rchisq(1.0);
 		MC[0] = Z2[0]/std::pow(auxden[0] + omega[j],2.0);	
-		MCt[j] = MC[0]*(c1t[0]*s2a[0] + c2t[0]*s2e[0]);
-		MCn[j] = MC[0]*(c1n[0]*s2a[0] + c2n[0]*s2e[0]);
-		MCe[j] = MC[0]*(c1e[0]*s2a[0] + c2e[0]*s2e[0]);		
+		MCt[j] = MC[0]*(c1t[0]*xi[0] + c2t[0]);
+		MCn[j] = MC[0]*(c1n[0]*xi[0] + c2n[0]);
+		MCe[j] = MC[0]*(c1e[0]*xi[0] + c2e[0]);		
 	}
 	
 	NumericVector Ft(m_the, 0.0); 
@@ -436,7 +436,7 @@ Rcpp::List plaus_two_stage(NumericVector theta, NumericVector xBy, NumericVector
 		Z2[0] = R::rchisq(1.0);
 		MC[0] = Z2[0]/std::pow(auxden[0] + omega[j],2.0);
 		MCt[j] = MC[0]*csigma[0];
-		MCn[j] = MC[0]*(csigma[0]+s2e[0]);
+		MCn[j] = MC[0]*(csigma[0]+1.0);
 	}
 	
 	NumericVector Ft(m_the, 0.0);
