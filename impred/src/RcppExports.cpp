@@ -23,6 +23,23 @@ END_RCPP
 }
 
 
+Rcpp::List auxiliaryMCMC(NumericVector H, NumericMatrix A, NumericVector rL, NumericVector M_samp);
+RcppExport SEXP impred_auxiliaryMCMC(SEXP HSEXP, SEXP ASEXP, SEXP rLSEXP, SEXP M_sampSEXP){
+BEGIN_RCPP
+    Rcpp::RObject __result;
+    Rcpp::RNGScope __rngScope;
+    Rcpp::traits::input_parameter< NumericVector >::type H(HSEXP);
+    Rcpp::traits::input_parameter< NumericMatrix >::type A(ASEXP);
+    Rcpp::traits::input_parameter< NumericVector >::type rL(rLSEXP);
+    Rcpp::traits::input_parameter< NumericVector >::type M_samp(M_sampSEXP);
+    __result = Rcpp::wrap(auxiliaryMCMC(H,A,rL,M_samp));
+    return __result;
+END_RCPP
+} 
+    
+    
+
+
 Rcpp::List plaus_balanced_aov(NumericVector theta, NumericVector Ybar, NumericVector S, NumericVector lambda, NumericVector r, NumericVector n, NumericVector n_i);
 RcppExport SEXP impred_plaus_balanced_aov(SEXP thetaSEXP, SEXP YbarSEXP, SEXP SSEXP, SEXP lambdaSEXP, SEXP rSEXP, SEXP nSEXP, SEXP n_iSEXP){
 BEGIN_RCPP
