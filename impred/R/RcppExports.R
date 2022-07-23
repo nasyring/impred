@@ -15,8 +15,8 @@ plaus_balanced_aov <- function(theta, Ybar, S, lambda, r, n, n_i) {
     .Call(`impred_plaus_balanced_aov`, theta, Ybar, S, lambda, r, n, n_i)
 }
 
-plaus_unbalanced_aov <- function(theta, Ybar, S, lambda, n, n_i, auxiliary, s2a, s2e) {
-    .Call(`impred_plaus_unbalanced_aov`, theta, Ybar, S, lambda, n, n_i, auxiliary, s2a, s2e)
+plaus_unbalanced_aov <- function(theta, Ybar, S, lambda, r, n, n_i, auxiliary, rho) {
+    .Call(`impred_plaus_unbalanced_aov`, theta, Ybar, S, lambda, r, n, n_i, auxiliary, rho)
 }
 
 plaus_two_stage <- function(theta, xBy, S, lambda, auxiliary, csigma, s2a, s2e) {
