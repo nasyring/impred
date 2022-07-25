@@ -95,11 +95,12 @@ Rcpp::List randsetsMCMC(NumericMatrix H, NumericMatrix A, NumericVector rL, Nume
 	
 }
 
-Rcpp::List plaus_balanced_aov(NumericVector theta, NumericVector Ybar, NumericVector S, NumericVector lambda, NumericVector r, NumericVector n, NumericVector n_i){
+Rcpp::List plaus_balanced_aov(NumericVector theta, NumericVector Ybar, NumericVector S, NumericVector lambda, NumericVector r, NumericVector n, NumericVector n_i, NumericVector eta){
 
 	List result;
 	int m_the = theta.length();
 	int dn_i = n_i.length();
+	int m_eta = eta.length();
 
 	NumericVector sumn_i2(1, 0.0);
 	for(int j=0; j<dn_i; j++){
@@ -118,11 +119,6 @@ Rcpp::List plaus_balanced_aov(NumericVector theta, NumericVector Ybar, NumericVe
 	c2e[0] = (1.0/n[0] + 1.0);
 	c1e[0] = 1+(sumn_i2[0]/(n[0]*n[0])) - (2.0*n_i[dn_i-1]/n[0]);
 	ce[0] = (c2e[0]*lambda[0]/c1e[0]) - 1.0;
-	
-	NumericVector eta(101,0.0);
-	for(int j=0; j<101; j++){
-		eta[j] = j*0.01;	
-	}
 	
 	NumericVector plausseq_t(m_the, 0.0);
 	NumericVector plausseq_n(m_the, 0.0);
@@ -145,12 +141,12 @@ Rcpp::List plaus_balanced_aov(NumericVector theta, NumericVector Ybar, NumericVe
 	V2 = Rcpp::rchisq(10000,r[1]);
 	
 	NumericVector zeroes(10000*101,0.0);
-	NumericMatrix MCt = NumericMatrix(10000, 101, zeroes.begin());
-	NumericMatrix MCn = NumericMatrix(10000, 101, zeroes.begin());
-	NumericMatrix MCe = NumericMatrix(10000, 101, zeroes.begin());
+	NumericMatrix MCt = NumericMatrix(10000, m_eta, zeroes.begin());
+	NumericMatrix MCn = NumericMatrix(10000, m_eta, zeroes.begin());
+	NumericMatrix MCe = NumericMatrix(10000, m_eta, zeroes.begin());
 
 	for(int i = 0; i < 10000; i++){
-		for(int j = 0; j < 101; j++){
+		for(int j = 0; j < m_eta; j++){
 			MCt(i,j) = Z2[i]/((V1[i]/r[0])*(1.0/(1.0+ct[0]*eta[j])) + (V2[i]/r[1])*(ct[0]*eta[j]/(1.0+ct[0]*eta[j])));
 			MCn(i,j) = Z2[i]/((V1[i]/r[0])*(1.0/(1.0+cn[0]*eta[j])) + (V2[i]/r[1])*(cn[0]*eta[j]/(1.0+cn[0]*eta[j])));
 			MCe(i,j) = Z2[i]/((V1[i]/r[0])*(1.0/(1.0+ce[0]*eta[j])) + (V2[i]/r[1])*(ce[0]*eta[j]/(1.0+ce[0]*eta[j])));
@@ -159,12 +155,12 @@ Rcpp::List plaus_balanced_aov(NumericVector theta, NumericVector Ybar, NumericVe
 	
 	
 	NumericVector zeroes2(m_the*101,0.0);
-	NumericMatrix F_eta_t = NumericMatrix(m_the, 101, zeroes.begin());
-	NumericMatrix F_eta_n = NumericMatrix(m_the, 101, zeroes.begin());
-	NumericMatrix F_eta_e = NumericMatrix(m_the, 101, zeroes.begin());
+	NumericMatrix F_eta_t = NumericMatrix(m_the, m_eta, zeroes.begin());
+	NumericMatrix F_eta_n = NumericMatrix(m_the, m_eta, zeroes.begin());
+	NumericMatrix F_eta_e = NumericMatrix(m_the, m_eta, zeroes.begin());
 
 	for(int i = 0; i < m_the; i++){
-		for(int j = 0; j < 101; j++){
+		for(int j = 0; j < m_eta; j++){
 			for(int k = 0; k < 10000; k++){
 				if(MCt(k,j) < plausseq_t[i]){
 					F_eta_t(i,j) = F_eta_t(i,j) + 0.0001;
@@ -186,7 +182,7 @@ Rcpp::List plaus_balanced_aov(NumericVector theta, NumericVector Ybar, NumericVe
 	NumericVector F_max_e(m_the, 0.0); 
 	NumericVector F_min_e(m_the, 1.0);
 	for(int i = 0; i < m_the; i++){
-		for(int j = 0; j < 101; j++){
+		for(int j = 0; j < m_eta; j++){
 			F_max_t[i] = std::max(F_max_t[i], F_eta_t(i, j));
 			F_min_t[i] = std::min(F_min_t[i], F_eta_t(i, j));
 			F_max_n[i] = std::max(F_max_n[i], F_eta_n(i, j));
