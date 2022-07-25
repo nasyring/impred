@@ -122,7 +122,7 @@ Rcpp::List auxiliaryMCMC(NumericVector H, NumericMatrix A, NumericVector rL, Num
 		taueta(j+1,0) = H[j];	
 	}
 	for(int j = 0; j < (L-1); j++){
-		taueta(0,0) = taueta(0,0) + R::rf(r[j],r[L-1]);	
+		taueta(0,0) = taueta(0,0) + R::rf(rL[j],rL[L-1]);	
 	}	
 	propsd[0] = std::min(0.25*taueta(0,0), 1.0);
 	
@@ -135,7 +135,7 @@ Rcpp::List auxiliaryMCMC(NumericVector H, NumericMatrix A, NumericVector rL, Num
 	}
 	logdens[0] = num[0] - 0.5*sumrL[0]*(1.0 + den[0]);
 	
-	for(int m = 0; m < M_samp[0]; m++){
+	for(int m = 0; m < M; m++){
 		propsdnew[0] = std::min(0.25*taueta(0,0), 1.0);	
 		proptau[0] = R::rnorm(taueta(0,0), propsdnew[0]);
 		proptaueta(0,0) = proptau[0];
@@ -366,7 +366,7 @@ Rcpp::List plaus_unbalanced_aov(NumericVector theta, NumericVector Ybar, Numeric
 	NumericVector Z2(1, 0.0);
 	for(int j = 0; j < m_samps; j++){
 		Z2[0] = R::rchisq(1.0);
-		MC[0] = Z2[0]/std::pow(auxden[0] + omega[j],2.0);	
+		MC[0] = Z2[0]/std::pow(auxden[0] + auxiliary[j],2.0);	
 		MCt[j] = MC[0]*(c1t[0]*xi[0] + c2t[0]);
 		MCn[j] = MC[0]*(c1n[0]*xi[0] + c2n[0]);
 		MCe[j] = MC[0]*(c1e[0]*xi[0] + c2e[0]);		
@@ -434,7 +434,7 @@ Rcpp::List plaus_two_stage(NumericVector theta, NumericVector xBy, NumericVector
 	NumericVector Z2(1, 0.0);
 	for(int j = 0; j < m_samps; j++){
 		Z2[0] = R::rchisq(1.0);
-		MC[0] = Z2[0]/std::pow(auxden[0] + omega[j],2.0);
+		MC[0] = Z2[0]/std::pow(auxden[0] + auxiliary[j],2.0);
 		MCt[j] = MC[0]*csigma[0];
 		MCn[j] = MC[0]*(csigma[0]+1.0);
 	}
