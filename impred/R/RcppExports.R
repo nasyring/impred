@@ -7,20 +7,16 @@ randsetsMCMC <- function(H,A,rL,dimH,M_samp) {
     .Call(`impred_randsetsMCMC`, H,A,rL,dimH,M_samp)
 }
 
-auxiliaryMCMC <- function(H,A,rL,M_samp) {
-    .Call(`impred_auxiliaryMCMC`, H,A,rL,M_samp)
-}
-
 plaus_balanced_aov <- function(theta, Ybar, S, lambda, r, n, n_i) {
     .Call(`impred_plaus_balanced_aov`, theta, Ybar, S, lambda, r, n, n_i)
 }
 
-plaus_unbalanced_aov <- function(theta, Ybar, S, lambda, r, n, n_i, auxiliary, rho) {
-    .Call(`impred_plaus_unbalanced_aov`, theta, Ybar, S, lambda, r, n, n_i, auxiliary, rho)
+plaus_unbalanced_aov <- function(theta, Ybar, S, lambda, n, n_i, auxiliary, s2a, s2e) {
+    .Call(`impred_plaus_unbalanced_aov`, theta, Ybar, S, lambda, n, n_i, auxiliary, s2a, s2e)
 }
 
-plaus_two_stage <- function(theta, xBy, S, lambda, r, auxiliary, csigma, rho) {
-    .Call(`impred_plaus_two_stage`, theta, xBy, S, lambda, r, auxiliary, csigma, rho)
+plaus_two_stage <- function(theta, xBy, S, lambda, auxiliary, csigma, s2a, s2e) {
+    .Call(`impred_plaus_two_stage`, theta, xBy, S, lambda, auxiliary, csigma, s2a, s2e)
 }
 
 plaus_marginal_lmer <- function(thetaseq,total_sigma,xBy) {
