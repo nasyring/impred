@@ -122,9 +122,9 @@ Rcpp::List auxiliaryMCMC(NumericVector H, NumericMatrix A, NumericVector rL, Num
 		taueta(j+1,0) = H[j];	
 	}
 	for(int j = 0; j < (L-1); j++){
-		taueta(0,0) = taueta(0,0) + R::rf(rL[j],rL[L-1]);	
+		taueta(0,0) = taueta(0,0) + std::log(R::rf(rL[j],rL[L-1]));	
 	}	
-	propsd[0] = std::min(0.25*taueta(0,0), 1.0);
+	propsd[0] = 1.0;
 	
 	Uinv = Aa*taueta;
 	NumericVector num(1,0.0); NumericVector den(1,0.0); NumericVector sumrL(1,rL[L-1]);
@@ -133,10 +133,10 @@ Rcpp::List auxiliaryMCMC(NumericVector H, NumericMatrix A, NumericVector rL, Num
 		den[0] = den[0] + (rL[j]/rL[L-1])*std::exp(Uinv(j,0));
 		sumrL[0] = sumrL[0] + rL[j];	
 	}
-	logdens[0] = num[0] - 0.5*sumrL[0]*(1.0 + den[0]);
+	logdens[0] = num[0] - 0.5*sumrL[0]*std::log(1.0 + den[0]);
 	
 	for(int m = 0; m < M; m++){
-		propsdnew[0] = std::min(0.25*taueta(0,0), 1.0);	
+		propsdnew[0] = 1.0;	
 		proptau[0] = R::rnorm(taueta(0,0), propsdnew[0]);
 		proptaueta(0,0) = proptau[0];
 		Uinv = Aa*proptaueta;
@@ -145,7 +145,7 @@ Rcpp::List auxiliaryMCMC(NumericVector H, NumericMatrix A, NumericVector rL, Num
 			num[0] = num[0]+(Uinv(j,0)*0.5*rL[j]); 	
 			den[0] = den[0] + (rL[j]/rL[L-1])*std::exp(Uinv(j,0));
 		}
-		logdensprop[0] = num[0] - 0.5*sumrL[0]*(1.0 + den[0]);		
+		logdensprop[0] = num[0] - 0.5*sumrL[0]*std::log(1.0 + den[0]);		
 		logdensdiff[0] = logdensprop[0] - logdens[0] + R::dnorm(taueta(0,0), proptau[0], propsd[0], 1) - R::dnorm(proptau[0], taueta(0,0), propsdnew[0], 1);
 		
 		u[0] = R::runif(0.0,1.0);
