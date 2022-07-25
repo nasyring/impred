@@ -7,8 +7,8 @@ randsetsMCMC <- function(H,A,rL,dimH,M_samp) {
     .Call(`impred_randsetsMCMC`, H,A,rL,dimH,M_samp)
 }
 
-plaus_balanced_aov <- function(theta, Ybar, S, lambda, r, n, n_i) {
-    .Call(`impred_plaus_balanced_aov`, theta, Ybar, S, lambda, r, n, n_i)
+plaus_balanced_aov <- function(theta, Ybar, S, lambda, r, n, n_i, eta) {
+    .Call(`impred_plaus_balanced_aov`, theta, Ybar, S, lambda, r, n, n_i, eta)
 }
 
 plaus_unbalanced_aov <- function(theta, Ybar, S, lambda, n, n_i, auxiliary, s2a, s2e) {
