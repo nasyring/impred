@@ -131,7 +131,7 @@ Rcpp::List auxiliaryMCMC(NumericVector H, NumericMatrix A, NumericVector rL, Num
 	for(int j = 0; j < (L-1); j++){
 		num[0] = num[0]+(Uinv(j,0)*0.5*rL[j]); 	
 		den[0] = den[0] + (rL[j]/rL[L-1])*std::exp(Uinv(j,0));
-		sumrL[0] = rumrL[0] + rL[j];	
+		sumrL[0] = sumrL[0] + rL[j];	
 	}
 	logdens[0] = num[0] - 0.5*sumrL[0]*(1.0 + den[0]);
 	
