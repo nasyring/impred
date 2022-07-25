@@ -283,7 +283,7 @@ Rcpp::List plaus_unbalanced_aov(NumericVector theta, NumericVector Ybar, Numeric
 	NumericVector slogvar(1, 0.0);
 	for(int j = 0; j < (L-1); j++){
 		slogS[0] = slogS[0] + std::log(S[j]);
-		slogvar[0] = slogvar[0]+(lambda[j]*s2a[0] + s2e[0]); 
+		slogvar[0] = slogvar[0]+std::log(lambda[j]*s2a[0] + s2e[0]); 
 	}	
 	slogS[0] = slogS[0] + std::log(S[L-1]);
 	
