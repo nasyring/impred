@@ -124,7 +124,7 @@ Rcpp::List auxiliaryMCMC(NumericVector H, NumericMatrix A, NumericVector rL, Num
 	for(int j = 0; j < (L-1); j++){
 		taueta(0,0) = taueta(0,0) + std::log(R::rf(rL[j],rL[L-1]));	
 	}	
-	propsd[0] = 5.0;
+	propsd[0] = 8.0;
 	
 	Uinv = Aa*taueta;
 	NumericVector num(1,0.0); NumericVector den(1,0.0); NumericVector sumrL(1,rL[L-1]);
@@ -136,7 +136,7 @@ Rcpp::List auxiliaryMCMC(NumericVector H, NumericMatrix A, NumericVector rL, Num
 	logdens[0] = num[0] - 0.5*sumrL[0]*std::log(1.0 + den[0]);
 	
 	for(int m = 0; m < M; m++){
-		propsdnew[0] = 5.0;	
+		propsdnew[0] = 8.0;	
 		proptau[0] = R::rnorm(taueta(0,0), propsdnew[0]);
 		proptaueta(0,0) = proptau[0];
 		Uinv = Aa*proptaueta;
