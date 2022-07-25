@@ -113,8 +113,8 @@ Rcpp::List auxiliaryMCMC(NumericVector H, NumericMatrix A, NumericVector rL, Num
 	NumericVector logdens(1,0.0);
 	NumericVector logdensprop(1,0.0);
 	NumericVector logdensdiff(1,0.0);
-	NumericVector samples(M_samp,0.0);
-	NumericVector samples_dens(M_samp,0.0);
+	NumericVector samples(M,0.0);
+	NumericVector samples_dens(M,0.0);
 	NumericVector u(1,0.0);
 	
 	
