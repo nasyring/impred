@@ -20,6 +20,7 @@ extern SEXP impred_plaus_unbalanced_marginal(SEXP, SEXP, SEXP, SEXP, SEXP, SEXP,
 extern SEXP impred_plaus_marginal_lmer(SEXP, SEXP, SEXP);
 extern SEXP impred_plaus_balanced_aov(SEXP, SEXP, SEXP, SEXP, SEXP, SEXP, SEXP, SEXP);
 extern SEXP impred_plaus_unbalanced_aov(SEXP, SEXP, SEXP, SEXP, SEXP, SEXP, SEXP, SEXP, SEXP, SEXP);
+extern SEXP impred_plaus_unbalanced_aov_full(SEXP, SEXP, SEXP, SEXP, SEXP, SEXP, SEXP, SEXP);
 extern SEXP impred_plaus_two_stage(SEXP, SEXP, SEXP, SEXP, SEXP, SEXP, SEXP, SEXP, SEXP);
 
 static const R_CallMethodDef CallEntries[] = {
@@ -38,9 +39,11 @@ static const R_CallMethodDef CallEntries[] = {
     {"impred_plaus_marginal_lmer", (DL_FUNC) &impred_plaus_marginal_lmer, 3}, 
   {"impred_plaus_balanced_aov", (DL_FUNC) &impred_plaus_balanced_aov, 8},
   {"impred_plaus_unbalanced_aov", (DL_FUNC) &impred_plaus_unbalanced_aov, 10},
+    {"impred_plaus_unbalanced_aov_full", (DL_FUNC) &impred_plaus_unbalanced_aov_full, 8},
   {"impred_plaus_two_stage", (DL_FUNC) &impred_plaus_two_stage, 9},
     {NULL, NULL, 0}
 };
+
 
 void R_init_impred(DllInfo *dll)
 {
