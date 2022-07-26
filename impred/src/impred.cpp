@@ -448,6 +448,8 @@ Rcpp::List plaus_two_stage(NumericVector theta, NumericVector xBy, NumericVector
 	}
 	
 	result = Rcpp::List::create(Rcpp::Named("plauses.theta") = plaus_t, Rcpp::Named("plauses.new") = plaus_n);
+	return result;
+	
 }
 
 
