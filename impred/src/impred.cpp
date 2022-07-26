@@ -359,7 +359,8 @@ Rcpp::List plaus_two_stage(NumericVector theta, NumericVector xBy, NumericVector
 	
 	NumericVector plausseq(m_the, 0.0);
 	for(int j = 0; j < m_the; j++){
-		plausseq[j] = (theta[j] - xBy[0])*(theta[j] - xBy[0])/(slogS[0]*slogS[0]);	
+		//plausseq[j] = (theta[j] - xBy[0])*(theta[j] - xBy[0])/(slogS[0]*slogS[0]);
+		plausseq[j] = (theta[j] - xBy[0])/slogS[0];
 	}
 	
 	NumericVector MC(1, 0.0);
@@ -367,10 +368,11 @@ Rcpp::List plaus_two_stage(NumericVector theta, NumericVector xBy, NumericVector
 	NumericVector MCn(m_samps, 0.0);
 	NumericVector Z2(1, 0.0);
 	for(int j = 0; j < m_samps; j++){
-		Z2[0] = R::rchisq(1.0);
-		MC[0] = Z2[0]/std::pow(slogvar[0] + auxiliary(j,0) + std::log(s2e[0]) + auxiliary(j,1), 2.0);
-		MCt[j] = MC[0]*csigma[0];
-		MCn[j] = MC[0]*(csigma[0]+s2e[0]);
+		//Z2[0] = R::rchisq(1.0);
+		Z2[0] = R::rnorm(0.0,1.0);
+		MC[0] = Z2[0]/(slogvar[0] + auxiliary(j,0) + std::log(s2e[0]) + auxiliary(j,1));
+		MCt[j] = MC[0]*std::sqrt(csigma[0]);
+		MCn[j] = MC[0]*std::sqrt(csigma[0]+s2e[0]);
 	}
 	
 	NumericVector Ft(m_the, 0.0);
@@ -387,9 +389,13 @@ Rcpp::List plaus_two_stage(NumericVector theta, NumericVector xBy, NumericVector
 	}
 	
 	NumericVector plaus_t(m_the, 0.0); NumericVector plaus_n(m_the, 0.0); 
-	for(int i = 0; i < m_the; i++){
+	/*for(int i = 0; i < m_the; i++){
 		plaus_t[i] = 1.0 - Ft[i];
 		plaus_n[i] = 1.0 - Fn[i];
+	}*/
+	for(int i = 0; i < m_the; i++){
+		plaus_t[i] = 1.0 - std::abs(2.0*Ft[i]-1.0);
+		plaus_n[i] = 1.0 - std::abs(2.0*Fn[i]-1.0);
 	}
 	
 	result = Rcpp::List::create(Rcpp::Named("plauses.theta") = plaus_t, Rcpp::Named("plauses.new") = plaus_n);
