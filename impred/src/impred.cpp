@@ -364,42 +364,65 @@ Rcpp::List plaus_unbalanced_aov(NumericVector theta, NumericVector Ybar, Numeric
 }
 
 
-Rcpp::List plaus_two_stage(NumericVector theta, NumericVector xBy, NumericVector S, NumericVector lambda, NumericMatrix auxiliary, NumericVector csigma, NumericVector s2a, NumericVector s2e){
+Rcpp::List plaus_two_stage(NumericVector theta, NumericVector xBy, NumericVector S, NumericVector lambda, NumericMatrix auxiliary, NumericVector csigma, NumericVector s2a, NumericVector s2e, NumericVector assoc){
 
 	List result;
 	int L = S.length();
 	int m_the = theta.length();
 	int m_samps = auxiliary.nrow();
-
-	
-	NumericVector slogS(1, 0.0);
-	NumericVector slogvar(1, 0.0);
-	for(int j = 0; j < (L-1); j++){
-		slogS[0] = slogS[0] + std::log(S[j]);
-		slogvar[0] = slogvar[0]+std::log(lambda[j]*s2a[0] + s2e[0]); 
-	}	
-	slogS[0] = slogS[0] + std::log(S[L-1]);
-	
-	NumericVector plausseq(m_the, 0.0);
-	for(int j = 0; j < m_the; j++){
-		//plausseq[j] = (theta[j] - xBy[0])*(theta[j] - xBy[0])/(slogS[0]*slogS[0]);
-		plausseq[j] = (theta[j] - xBy[0])/slogS[0];
-	}
 	
 	NumericVector MC(1, 0.0);
 	NumericVector MCt(m_samps, 0.0);
 	NumericVector MCn(m_samps, 0.0);
 	NumericVector Z2(1, 0.0);
-	for(int j = 0; j < m_samps; j++){
-		//Z2[0] = R::rchisq(1.0);
-		Z2[0] = R::rnorm(0.0,1.0);
-		MC[0] = Z2[0]/(slogvar[0] + auxiliary(j,0) + std::log(s2e[0]) + auxiliary(j,1));
-		MCt[j] = MC[0]*std::sqrt(csigma[0]);
-		MCn[j] = MC[0]*std::sqrt(csigma[0]+s2e[0]);
+
+	if(assoc[0]==0.0){
+
+		NumericVector prodS(1, 1.0);
+		NumericVector prodvar(1, 1.0);
+		for(int j = 0; j < (L-1); j++){
+			prodS[0] = prodS[0]*S[j];
+			prodvar[0] = prodvar[0]*(lambda[j]*s2a[0] + s2e[0]); 
+		}	
+		prodS[0] = prodS[0] + S[L-1];	
+		
+		NumericVector plausseq(m_the, 0.0);
+		for(int j = 0; j < m_the; j++){
+			plausseq[j] = (theta[j] - xBy[0])*(theta[j] - xBy[0])/(prodS[0]);
+		}	
+		
+		for(int j = 0; j < m_samps; j++){
+			Z2[0] = R::rchisq(1.0);
+			MC[0] = Z2[0]/(prodvar[0]*std::exp(auxiliary(j,0)) + s2e[0]*std::exp(auxiliary(j,1)));
+			MCt[j] = MC[0]*csigma[0];
+			MCn[j] = MC[0]*(csigma[0]+s2e[0]);
+		}
+		
+	}else {
+		NumericVector slogS(1, 0.0);
+		NumericVector slogvar(1, 0.0);
+		for(int j = 0; j < (L-1); j++){
+			slogS[0] = slogS[0] + std::log(S[j]);
+			slogvar[0] = slogvar[0]+std::log(lambda[j]*s2a[0] + s2e[0]); 
+		}	
+		slogS[0] = slogS[0] + std::log(S[L-1]);		
+		
+		NumericVector plausseq(m_the, 0.0);
+		for(int j = 0; j < m_the; j++){
+			plausseq[j] = (theta[j] - xBy[0])/slogS[0];
+		}	
+		
+		for(int j = 0; j < m_samps; j++){
+			Z2[0] = R::rnorm(0.0,1.0);
+			MC[0] = Z2[0]/(slogvar[0] + auxiliary(j,0) + std::log(s2e[0]) + auxiliary(j,1));	
+			MCt[j] = MC[0]*std::sqrt(csigma[0])
+			MCn[j] = MC[0]*std::sqrt(csigma[0]+s2e[0]);
+		}
 	}
 	
-	NumericVector Ft(m_the, 0.0);
-	NumericVector Fn(m_the, 0.0);
+	
+	NumericVector Ft(m_the, 0.0); 
+	NumericVector Fn(m_the, 0.0); 
 	for(int i = 0; i < m_the; i++){
 		for(int j = 0; j < m_samps; j++){
 			if(MCt[j] < plausseq[i]){
@@ -411,19 +434,22 @@ Rcpp::List plaus_two_stage(NumericVector theta, NumericVector xBy, NumericVector
 		}
 	}
 	
-	NumericVector plaus_t(m_the, 0.0); NumericVector plaus_n(m_the, 0.0); 
-	/*for(int i = 0; i < m_the; i++){
-		plaus_t[i] = 1.0 - Ft[i];
-		plaus_n[i] = 1.0 - Fn[i];
-	}*/
-	for(int i = 0; i < m_the; i++){
-		plaus_t[i] = 1.0 - std::abs(2.0*Ft[i]-1.0);
-		plaus_n[i] = 1.0 - std::abs(2.0*Fn[i]-1.0);
+	NumericVector plaus_t(m_the, 0.0); 
+	NumericVector plaus_n(m_the, 0.0); 
+
+	if(assoc[0] == 0.0){
+		for(int i = 0; i < m_the; i++){
+			plaus_t[i] = 1.0 - Ft[i];
+			plaus_n[i] = 1.0 - Fn[i];
+		}
+	}else {
+		for(int i = 0; i < m_the; i++){
+			plaus_t[i] = 1.0 - std::abs(2.0*Ft[i]-1.0);
+			plaus_n[i] = 1.0 - std::abs(2.0*Fn[i]-1.0);
+		}
 	}
 	
-	result = Rcpp::List::create(Rcpp::Named("plauses.theta") = plaus_t, Rcpp::Named("plauses.new") = plaus_n);
-	return result;
-	
+	result = Rcpp::List::create(Rcpp::Named("plauses.theta") = plaus_t, Rcpp::Named("plauses.new") = plaus_n, Rcpp::Named("plauses.exs") = plaus_e);
 }
 
 
