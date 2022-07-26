@@ -41,8 +41,8 @@ BEGIN_RCPP
 END_RCPP
 }
 
-Rcpp::List plaus_unbalanced_aov(NumericVector theta, NumericVector Ybar, NumericVector S, NumericVector lambda, NumericVector n, NumericVector n_i, NumericMatrix auxiliary, NumericVector s2a, NumericVector s2e);
-RcppExport SEXP impred_plaus_unbalanced_aov(SEXP thetaSEXP, SEXP YbarSEXP, SEXP SSEXP, SEXP lambdaSEXP, SEXP nSEXP, SEXP n_iSEXP, SEXP auxiliarySEXP, SEXP s2aSEXP, SEXP s2eSEXP){
+Rcpp::List plaus_unbalanced_aov(NumericVector theta, NumericVector Ybar, NumericVector S, NumericVector lambda, NumericVector n, NumericVector n_i, NumericMatrix auxiliary, NumericVector s2a, NumericVector s2e, NumericVector assoc);
+RcppExport SEXP impred_plaus_unbalanced_aov(SEXP thetaSEXP, SEXP YbarSEXP, SEXP SSEXP, SEXP lambdaSEXP, SEXP nSEXP, SEXP n_iSEXP, SEXP auxiliarySEXP, SEXP s2aSEXP, SEXP s2eSEXP, SEXP assocSEXP){
 BEGIN_RCPP
     Rcpp::RObject __result;
     Rcpp::RNGScope __rngScope;
@@ -55,15 +55,16 @@ BEGIN_RCPP
     Rcpp::traits::input_parameter< NumericMatrix >::type auxiliary(auxiliarySEXP);
     Rcpp::traits::input_parameter< NumericVector >::type s2a(s2aSEXP);
     Rcpp::traits::input_parameter< NumericVector >::type s2e(s2eSEXP);
-    __result = Rcpp::wrap(plaus_unbalanced_aov(theta, Ybar, S, lambda, n, n_i, auxiliary, s2a, s2e));
+    Rcpp::traits::input_parameter< NumericVector >::type assoc(assocSEXP);
+    __result = Rcpp::wrap(plaus_unbalanced_aov(theta, Ybar, S, lambda, n, n_i, auxiliary, s2a, s2e, assoc));
     return __result;
 END_RCPP
 }
 
 
 
-Rcpp::List plaus_two_stage(NumericVector theta, NumericVector xBy, NumericVector S, NumericVector lambda, NumericMatrix auxiliary, NumericVector csigma, NumericVector s2a, NumericVector s2e);
-RcppExport SEXP impred_plaus_two_stage(SEXP thetaSEXP, SEXP xBySEXP, SEXP SSEXP, SEXP lambdaSEXP, SEXP auxiliarySEXP, SEXP csigmaSEXP, SEXP s2aSEXP, SEXP s2eSEXP){
+Rcpp::List plaus_two_stage(NumericVector theta, NumericVector xBy, NumericVector S, NumericVector lambda, NumericMatrix auxiliary, NumericVector csigma, NumericVector s2a, NumericVector s2e, NumericVector assoc);
+RcppExport SEXP impred_plaus_two_stage(SEXP thetaSEXP, SEXP xBySEXP, SEXP SSEXP, SEXP lambdaSEXP, SEXP auxiliarySEXP, SEXP csigmaSEXP, SEXP s2aSEXP, SEXP s2eSEXP, SEXP assocSEXP){
 BEGIN_RCPP
     Rcpp::RObject __result;
     Rcpp::RNGScope __rngScope;
@@ -75,7 +76,8 @@ BEGIN_RCPP
     Rcpp::traits::input_parameter< NumericVector >::type csigma(csigmaSEXP);
     Rcpp::traits::input_parameter< NumericVector >::type s2a(s2aSEXP);
     Rcpp::traits::input_parameter< NumericVector >::type s2e(s2eSEXP);
-    __result = Rcpp::wrap(plaus_two_stage(theta, xBy, S, lambda, auxiliary, csigma, s2a, s2e));
+    Rcpp::traits::input_parameter< NumericVector >::type assoc(assocSEXP); 
+    __result = Rcpp::wrap(plaus_two_stage(theta, xBy, S, lambda, auxiliary, csigma, s2a, s2e, assoc));
     return __result;
 END_RCPP
 }
