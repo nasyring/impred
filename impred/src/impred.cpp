@@ -413,7 +413,7 @@ Rcpp::List plaus_two_stage(NumericVector theta, NumericVector xBy, NumericVector
 		for(int j = 0; j < m_samps; j++){
 			Z2[0] = R::rnorm(0.0,1.0);
 			MC[0] = Z2[0]/(slogvar[0] + auxiliary(j,0) + std::log(s2e[0]) + auxiliary(j,1));	
-			MCt[j] = MC[0]*std::sqrt(csigma[0])
+			MCt[j] = MC[0]*std::sqrt(csigma[0]);
 			MCn[j] = MC[0]*std::sqrt(csigma[0]+s2e[0]);
 		}
 	}
