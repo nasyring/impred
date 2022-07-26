@@ -19,7 +19,7 @@ extern SEXP impred_plaus_balanced_marginal(SEXP, SEXP, SEXP, SEXP, SEXP, SEXP, S
 extern SEXP impred_plaus_unbalanced_marginal(SEXP, SEXP, SEXP, SEXP, SEXP, SEXP, SEXP, SEXP, SEXP, SEXP);
 extern SEXP impred_plaus_marginal_lmer(SEXP, SEXP, SEXP);
 extern SEXP impred_plaus_balanced_aov(SEXP, SEXP, SEXP, SEXP, SEXP, SEXP, SEXP, SEXP);
-extern SEXP impred_plaus_unbalanced_aov(SEXP, SEXP, SEXP, SEXP, SEXP, SEXP, SEXP, SEXP, SEXP);
+extern SEXP impred_plaus_unbalanced_aov(SEXP, SEXP, SEXP, SEXP, SEXP, SEXP, SEXP, SEXP, SEXP, SEXP);
 extern SEXP impred_plaus_two_stage(SEXP, SEXP, SEXP, SEXP, SEXP, SEXP, SEXP, SEXP);
 
 static const R_CallMethodDef CallEntries[] = {
