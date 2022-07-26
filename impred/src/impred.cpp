@@ -275,7 +275,8 @@ Rcpp::List plaus_unbalanced_aov(NumericVector theta, NumericVector Ybar, Numeric
 	NumericVector MCn(m_samps, 0.0);
 	NumericVector MCe(m_samps, 0.0);
 	NumericVector Z2(1, 0.0);
-
+	NumericVector plausseq(m_the, 0.0);
+	
 	if(assoc[0]==0.0){
 
 		NumericVector prodS(1, 1.0);
@@ -286,7 +287,6 @@ Rcpp::List plaus_unbalanced_aov(NumericVector theta, NumericVector Ybar, Numeric
 		}	
 		prodS[0] = prodS[0] + S[L-1];	
 		
-		NumericVector plausseq(m_the, 0.0);
 		for(int j = 0; j < m_the; j++){
 			plausseq[j] = (theta[j] - Ybar[0])*(theta[j] - Ybar[0])/(prodS[0]);
 		}	
@@ -308,7 +308,6 @@ Rcpp::List plaus_unbalanced_aov(NumericVector theta, NumericVector Ybar, Numeric
 		}	
 		slogS[0] = slogS[0] + std::log(S[L-1]);		
 		
-		NumericVector plausseq(m_the, 0.0);
 		for(int j = 0; j < m_the; j++){
 			plausseq[j] = (theta[j] - Ybar[0])/slogS[0];
 		}	
@@ -375,6 +374,7 @@ Rcpp::List plaus_two_stage(NumericVector theta, NumericVector xBy, NumericVector
 	NumericVector MCt(m_samps, 0.0);
 	NumericVector MCn(m_samps, 0.0);
 	NumericVector Z2(1, 0.0);
+	NumericVector plausseq(m_the, 0.0);	
 
 	if(assoc[0]==0.0){
 
@@ -386,7 +386,6 @@ Rcpp::List plaus_two_stage(NumericVector theta, NumericVector xBy, NumericVector
 		}	
 		prodS[0] = prodS[0] + S[L-1];	
 		
-		NumericVector plausseq(m_the, 0.0);
 		for(int j = 0; j < m_the; j++){
 			plausseq[j] = (theta[j] - xBy[0])*(theta[j] - xBy[0])/(prodS[0]);
 		}	
@@ -407,7 +406,6 @@ Rcpp::List plaus_two_stage(NumericVector theta, NumericVector xBy, NumericVector
 		}	
 		slogS[0] = slogS[0] + std::log(S[L-1]);		
 		
-		NumericVector plausseq(m_the, 0.0);
 		for(int j = 0; j < m_the; j++){
 			plausseq[j] = (theta[j] - xBy[0])/slogS[0];
 		}	
@@ -449,7 +447,7 @@ Rcpp::List plaus_two_stage(NumericVector theta, NumericVector xBy, NumericVector
 		}
 	}
 	
-	result = Rcpp::List::create(Rcpp::Named("plauses.theta") = plaus_t, Rcpp::Named("plauses.new") = plaus_n, Rcpp::Named("plauses.exs") = plaus_e);
+	result = Rcpp::List::create(Rcpp::Named("plauses.theta") = plaus_t, Rcpp::Named("plauses.new") = plaus_n);
 }
 
 
