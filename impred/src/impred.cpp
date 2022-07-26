@@ -280,7 +280,8 @@ Rcpp::List plaus_unbalanced_aov(NumericVector theta, NumericVector Ybar, Numeric
 	
 	NumericVector plausseq(m_the, 0.0);
 	for(int j = 0; j < m_the; j++){
-		plausseq[j] = (theta[j] - Ybar[0])*(theta[j] - Ybar[0])/(slogS[0]*slogS[0]);	
+		//plausseq[j] = (theta[j] - Ybar[0])*(theta[j] - Ybar[0])/(slogS[0]*slogS[0]);
+		plausseq[j] = (theta[j] - Ybar[0])/slogS[0];
 	}
 	
 	NumericVector MC(1, 0.0);
@@ -289,11 +290,16 @@ Rcpp::List plaus_unbalanced_aov(NumericVector theta, NumericVector Ybar, Numeric
 	NumericVector MCe(m_samps, 0.0);
 	NumericVector Z2(1, 0.0);
 	for(int j = 0; j < m_samps; j++){
-		Z2[0] = R::rchisq(1.0);
-		MC[0] = Z2[0]/std::pow(slogvar[0] + auxiliary(j,0) + std::log(s2e[0]) + auxiliary(j,1), 2.0);
-		MCt[j] = MC[0]*(c1t[0]*s2a[0] + c2t[0]*s2e[0]);
-		MCn[j] = MC[0]*(c1n[0]*s2a[0] + c2n[0]*s2e[0]);
-		MCe[j] = MC[0]*(c1e[0]*s2a[0] + c2e[0]*s2e[0]);		
+		//Z2[0] = R::rchisq(1.0);
+		Z2[0] = R::rnorm(0.0,1.0);
+		//MC[0] = Z2[0]/std::pow(slogvar[0] + auxiliary(j,0) + std::log(s2e[0]) + auxiliary(j,1), 2.0);
+		MC[0] = Z2[0]/(slogvar[0] + auxiliary(j,0) + std::log(s2e[0]) + auxiliary(j,1));
+		//MCt[j] = MC[0]*(c1t[0]*s2a[0] + c2t[0]*s2e[0]);
+		//MCn[j] = MC[0]*(c1n[0]*s2a[0] + c2n[0]*s2e[0]);
+		//MCe[j] = MC[0]*(c1e[0]*s2a[0] + c2e[0]*s2e[0]);	
+		MCt[j] = MC[0]*std::sqrt(c1t[0]*s2a[0] + c2t[0]*s2e[0]);
+		MCn[j] = MC[0]*std::sqrt(c1n[0]*s2a[0] + c2n[0]*s2e[0]);
+		MCe[j] = MC[0]*std::sqrt(c1e[0]*s2a[0] + c2e[0]*s2e[0]);
 	}
 	
 	NumericVector Ft(m_the, 0.0); 
@@ -316,11 +322,18 @@ Rcpp::List plaus_unbalanced_aov(NumericVector theta, NumericVector Ybar, Numeric
 	NumericVector plaus_t(m_the, 0.0); 
 	NumericVector plaus_n(m_the, 0.0); 
 	NumericVector plaus_e(m_the, 0.0);	
-	for(int i = 0; i < m_the; i++){
+	/*for(int i = 0; i < m_the; i++){
 		plaus_t[i] = 1.0 - Ft[i];
 		plaus_n[i] = 1.0 - Fn[i];
 		plaus_e[i] = 1.0 - Fe[i];
+	}*/
+	for(int i = 0; i < m_the; i++){
+		plaus_t[i] = 1.0 - std::abs(2.0*Ft[i]-1.0);
+		plaus_n[i] = 1.0 - std::abs(2.0*Fn[i]-1.0);
+		plaus_e[i] = 1.0 - std::abs(2.0*Fe[i]-1.0);
 	}
+	
+	
 	
 	result = Rcpp::List::create(Rcpp::Named("plauses.theta") = plaus_t, Rcpp::Named("plauses.new") = plaus_n, Rcpp::Named("plauses.exs") = plaus_e);
 	return result;
