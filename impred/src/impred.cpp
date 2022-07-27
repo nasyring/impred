@@ -447,6 +447,67 @@ Rcpp::List plaus_unbalanced_aov_full(NumericVector theta, NumericVector Ybar, Nu
 	
 }
 
+Rcpp::List plaus_two_stage_full(NumericVector theta, NumericVector xBy, NumericVector S, NumericVector lambda, NumericVector csigma, NumericVector ratio){
+
+	List result;
+	int L = S.length();
+	int m_the = theta.length();
+	int m_samps = 10000;
+	
+	NumericVector MC(1, 0.0);
+	NumericVector MCt(m_samps, 0.0);
+	NumericVector MCn(m_samps, 0.0);
+	NumericVector Z2(1, 0.0);
+	NumericVector plausseq(m_the, 0.0);
+	
+	NumericVector sumS(1, 0.0);
+	for(int j = 0; j < L; j++){
+		sumS[0] = sumS[0] + S[j];
+	}	
+
+	for(int j = 0; j < m_the; j++){
+		plausseq[j] = (theta[j] - xBy[0])*(theta[j] - xBy[0])/(sumS[0]);
+	}	
+	NumericVector den(1, 0.0);
+	NumericVector chisamp(1, 0.0);
+	for(int j = 0; j < m_samps; j++){
+		Z2[0] = R::rchisq(1.0);
+		den[0]=0.0;
+		for(int i = 0; i < L; i++){
+			chisamp[0] = R::rchisq(r[i]);
+			den[0] = den[0] + (lambda[i]*ratio[0]+1.0)*chisamp[0];
+		}
+		MC[0] = Z2[0]/den[0];
+		MCt[j] = MC[0]*csigma[0];
+		MCn[j] = MC[0]*(csigma[0]+s2e[0]);
+	}
+	
+	NumericVector Ft(m_the, 0.0); 
+	NumericVector Fn(m_the, 0.0); 	
+	for(int i = 0; i < m_the; i++){
+		for(int j = 0; j < m_samps; j++){
+			if(MCt[j] < plausseq[i]){
+				Ft[i] = Ft[i] + (1.0 / m_samps);	
+			}
+			if(MCn[j] < plausseq[i]){
+				Fn[i] = Fn[i] + (1.0 / m_samps);	
+			}
+		}
+	}
+	
+	NumericVector plaus_t(m_the, 0.0); 
+	NumericVector plaus_n(m_the, 0.0); 	
+	for(int i = 0; i < m_the; i++){
+		plaus_t[i] = 1.0 - Ft[i];
+		plaus_n[i] = 1.0 - Fn[i];
+	}
+
+	
+	result = Rcpp::List::create(Rcpp::Named("plauses.theta") = plaus_t, Rcpp::Named("plauses.new") = plaus_n);
+	return result;
+	
+}
+
 
 
 Rcpp::List plaus_two_stage(NumericVector theta, NumericVector xBy, NumericVector S, NumericVector lambda, NumericMatrix auxiliary, NumericVector csigma, NumericVector s2a, NumericVector s2e, NumericVector assoc){
