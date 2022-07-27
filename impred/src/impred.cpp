@@ -447,7 +447,7 @@ Rcpp::List plaus_unbalanced_aov_full(NumericVector theta, NumericVector Ybar, Nu
 	
 }
 
-Rcpp::List plaus_two_stage_full(NumericVector theta, NumericVector xBy, NumericVector S, NumericVector lambda, NumericVector csigma, NumericVector ratio){
+Rcpp::List plaus_two_stage_full(NumericVector theta, NumericVector xBy, NumericVector S, NumericVector lambda,  NumericVector r, NumericVector csigma, NumericVector ratio){
 
 	List result;
 	int L = S.length();
