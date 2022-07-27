@@ -40,7 +40,6 @@ BEGIN_RCPP
 END_RCPP
 }
 
-plaus_two_stage_full()
 Rcpp::List plaus_two_stage_full(NumericVector theta, NumericVector xBy, NumericVector S, NumericVector lambda, NumericVector r, NumericVector csigma, NumericVector ratio);
 RcppExport SEXP impred_plaus_two_stage_full(SEXP thetaSEXP, SEXP xBySEXP, SEXP SSEXP, SEXP lambdaSEXP, SEXP rSEXP, SEXP csigmaSEXP, SEXP ratioSEXP){
 BEGIN_RCPP
