@@ -479,7 +479,7 @@ Rcpp::List plaus_two_stage_full(NumericVector theta, NumericVector xBy, NumericV
 		}
 		MC[0] = Z2[0]/den[0];
 		MCt[j] = MC[0]*csigma[0];
-		MCn[j] = MC[0]*(csigma[0]+s2e[0]);
+		MCn[j] = MC[0]*(csigma[0]+1.0);
 	}
 	
 	NumericVector Ft(m_the, 0.0); 
