@@ -3,16 +3,8 @@
 
 
 
-randsetsMCMC <- function(H,A,rL,dimH,M_samp) {
-    .Call(`impred_randsetsMCMC`, H,A,rL,dimH,M_samp)
-}
-
 plaus_balanced_aov <- function(theta, Ybar, S, lambda, r, n, n_i, eta) {
     .Call(`impred_plaus_balanced_aov`, theta, Ybar, S, lambda, r, n, n_i, eta)
-}
-
-plaus_unbalanced_aov <- function(theta, Ybar, S, lambda, n, n_i, auxiliary, s2a, s2e, assoc) {
-    .Call(`impred_plaus_unbalanced_aov`, theta, Ybar, S, lambda, n, n_i, auxiliary, s2a, s2e, assoc)
 }
 
 plaus_unbalanced_aov_full <- function(theta, Ybar, S, lambda, r, n, n_i, ratio) {
@@ -21,58 +13,4 @@ plaus_unbalanced_aov_full <- function(theta, Ybar, S, lambda, r, n, n_i, ratio) 
 
 plaus_two_stage_full <- function(theta, xBy, S, lambda, r, csigma, ratio) {
     .Call(`impred_plaus_two_stage_full`, theta, xBy, S, lambda, r, csigma, ratio)
-}
-
-plaus_two_stage <- function(theta, xBy, S, lambda, auxiliary, csigma, s2a, s2e, assoc) {
-    .Call(`impred_plaus_two_stage`, theta, xBy, S, lambda, auxiliary, csigma, s2a, s2e, assoc)
-}
-
-plaus_marginal_lmer <- function(thetaseq,total_sigma,xBy) {
-    .Call(`impred_plaus_marginal_lmer`, thetaseq,total_sigma,xBy)
-}
-
-plaus_balanced <- function(thetaseq, saseq, seseq, n, n_i, S, lambda, r, Ybar, numk) {
-    .Call(`impred_plaus_balanced`, thetaseq, saseq, seseq, n, n_i, S, lambda, r, Ybar, numk)
-}
-
-plaus_balanced_marginal <- function(thetaseq, n, n_i, S, lambda, r, Ybar, numk, sa2, se2) {
-    .Call(`impred_plaus_balanced_marginal`, thetaseq, n, n_i, S, lambda, r, Ybar, numk, sa2, se2)
-}
-
-plaus_unbalanced_marginal <- function(thetaseq, n, n_i, S, lambda, r, Ybar, numk, sa2, se2) {
-    .Call(`impred_plaus_unbalanced_marginal`, thetaseq, n, n_i, S, lambda, r, Ybar, numk, sa2, se2)
-}
-
-plaus_unbalanced <- function(thetaseq, saseq, seseq, n, n_i, S, lambda, r, Ybar, numk, samples1, samples2) {
-    .Call(`impred_plaus_unbalanced`, thetaseq, saseq, seseq, n, n_i, S, lambda, r, Ybar, numk, samples1, samples2)
-}
-
-
-randsetspred <- function(S,dimS,nsize,n_i,dimn_i,k,U,Ybar) {
-    .Call(`impred_randsetspred`, S,dimS,nsize,n_i,dimn_i,k,U,Ybar)
-}
-
-randsetspredlmer <- function(S,dimS,U,C1,C2,By,x,ztz) {
-    .Call(`impred_randsetspredlmer`, S,dimS,U,C1,C2,By,x,ztz)
-}
-
-genIM <- function(Y,  Z,  museq,  saseq, seseq,  M) {
-    .Call(`impred_genIM`, Y,  Z,  museq,  saseq, seseq,  M)
-}
-
-
-randsetspreddens <- function(sigsampdens, dimS, nsize, n_i, dimn_i, k, Ybar, predgrid, dim_predgrid, localpt, logdenslocalpt) {
-    .Call(`impred_randsetspreddens`, sigsampdens, dimS, nsize, n_i, dimn_i, k, Ybar, predgrid, dim_predgrid, localpt, logdenslocalpt)    
-}
-
-sigmaSolve <- function(Sampsj, SL, aL, aM, lambdaL) {
-    .Call(`impred_sigmaSolve`, Sampsj, SL, aL, aM, lambdaL)
-}
-
-zeroin <- function(ax, bx, u, v, y, z, f, tol) {
-    .Call(`impred_zeroin`, ax, bx, u, v, y, z, f, tol)
-}
-
-root_function <- function(x, Sampsj, SL, aL, lambdaL) {
-    .Call(`impred_root_function`, x, Sampsj, SL, aL, lambdaL)
 }
