@@ -17,7 +17,6 @@ using namespace std;
 Rcpp::List IMTS_mh_sampler(NumericVector lU0, NumericVector V0, NumericVector H0, NumericMatrix Minv, NumericVector rL){
 
 	List result;
-	int stuff = 0;
 	int L = H0.length() + 2;
 	NumericVector prop1(1,0.0);
 	for(int j = 0; j < (L-1); j++){
@@ -55,7 +54,7 @@ Rcpp::List IMTS_mh_sampler(NumericVector lU0, NumericVector V0, NumericVector H0
 		lUn = as<arma::vec>(allLU);
 		lU = lUn*M;
 		lf1[0]=0.0; lf2[0]=0.0; lf3[0]=0.0;
-		for(int i = 0; i++; i < L){
+		for(int i = 0; i < L; i++){
 			lf1[0] = lf1[0] + lU[i]*rL[i];
 			lf2[0] = lf2[0] + 0.5*rL[i];
 			lf3[0] = lf3[0] + rL[i]*std::exp(lU[i])/rL[L];
