@@ -2,6 +2,9 @@
 # Generator token: 10BE3573-1514-4C36-9D1C-5A225CD40393
 
 
+IMTS_mh_sampler <- function(lU0, V0, H0, Minv, rL) {
+    .Call(`impred_IMTS_mh_sampler`, lU0, V0, H0, Minv, rL)
+}
 
 plaus_balanced_aov <- function(theta, Ybar, S, lambda, r, n, n_i, eta) {
     .Call(`impred_plaus_balanced_aov`, theta, Ybar, S, lambda, r, n, n_i, eta)
