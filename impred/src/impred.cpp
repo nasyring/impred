@@ -53,7 +53,7 @@ Rcpp::List IMTS_mh_sampler(NumericVector lU0, NumericVector V0, NumericVector H0
 
 		allLU[0] = unew[0]; allLU[1] = vnew[0];
 		lUn = as<arma::vec>(allLU);
-		lU = lUn*Minv;
+		lU = lUn*M;
 		lf1[0]=0.0; lf2[0]=0.0; lf3[0]=0.0;
 		for(int i = 0; i++; i < L){
 			lf1[0] = lf1[0] + lU[i]*rL[i];
