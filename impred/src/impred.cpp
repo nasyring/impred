@@ -33,7 +33,7 @@ Rcpp::List IMTS_mh_sampler(NumericVector lU0, NumericVector V0, NumericVector H0
 	arma::vec lU = lUn*M;
 	NumericVector lf(1,0.0);
 	NumericVector lf1(1,0.0);NumericVector lf2(1,0.0);NumericVector lf3(1,0.0);
-	for(int i = 0; i++; i < L){
+	for(int i = 0; i < L; i++){
 		lf1[0] = lf1[0] + lU[i]*rL[i];
 		lf2[0] = lf2[0] + 0.5*rL[i];
 		lf3[0] = lf3[0] + rL[i]*std::exp(lU[i])/rL[L];
