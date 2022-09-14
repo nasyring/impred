@@ -41,6 +41,8 @@ Rcpp::List IMTS_mh_sampler(NumericVector lU0, NumericVector V0, NumericVector H0
 	NumericVector uold(1, lU0[0]); NumericVector vold(1, V0[0]); 	
 	NumericVector unew(1, 0.0); NumericVector vnew(1, 0.0);
 	NumericVector unif1(1, 0.0); NumericVector unif2(1, 0.0);
+	NumericVector logdens(1000, 0.0);  
+	
 	for(int m = 0; m < 1000; m++){
 		unew[0] = Rcpp::rnorm(1,uold[0],1.0);	
 		vnew[0] = Rcpp::rnorm(1,vold[0],1.0);
@@ -60,16 +62,17 @@ Rcpp::List IMTS_mh_sampler(NumericVector lU0, NumericVector V0, NumericVector H0
 		unif1[0] = std::exp(lfnew[0] - lfold[0]);
 		unif2[0] = R::runif(0.0,1.0);
 		if(unif1[0] >= unif2[0]){
-			
-			
+			logdens[m] = lfnew[0];
+			lfold[0] = lfnew[0];
+			uold[0] = unew[0];
+			vold[0] = vnew[0];			
 		}else {
-			
-			
+			logdens[m] = lfold[0];
 		}
 		
 	}
 	
-	result = Rcpp::List::create(Rcpp::Named("stuff") = stuff);
+	result = Rcpp::List::create(Rcpp::Named("logdens") = logdens, Rcpp::Named("logdens0") = lf);
 	return result;
 	
 }
