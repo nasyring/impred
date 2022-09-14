@@ -6,6 +6,23 @@ using namespace std;
 
 
 
+    
+Rcpp::List IMTS_mh_sampler(NumericVector lU0, NumericVector V0, NumericVector H0, NumericMatrix Minv, NumericVector rL);
+RcppExport SEXP impred_IMTS_mh_sampler(SEXP lU0SEXP, SEXP V0SEXP, SEXP H0SEXP, SEXP MinvSEXP, SEXP rLSEXP){
+BEGIN_RCPP
+    Rcpp::RObject __result;
+    Rcpp::RNGScope __rngScope;
+    Rcpp::traits::input_parameter< NumericVector >::type lU0(lU0SEXP);
+    Rcpp::traits::input_parameter< NumericVector >::type V0(V0SEXP);
+    Rcpp::traits::input_parameter< NumericVector >::type H0(H0SEXP);
+    Rcpp::traits::input_parameter< NumericMatrix >::type Minv(MinvSEXP);
+    Rcpp::traits::input_parameter< NumericVector >::type rL(rLSEXP);
+    __result = Rcpp::wrap(IMTS_mh_sampler(lU0, V0, H0, Minv, rL));
+    return __result;
+END_RCPP
+}    
+    
+
 Rcpp::List plaus_unbalanced_aov_full(NumericVector theta, NumericVector Ybar, NumericVector S, NumericVector lambda, NumericVector r, NumericVector n, NumericVector n_i, NumericVector ratio);
 RcppExport SEXP impred_plaus_unbalanced_aov_full(SEXP thetaSEXP, SEXP YbarSEXP, SEXP SSEXP, SEXP lambdaSEXP, SEXP rSEXP, SEXP nSEXP, SEXP n_iSEXP, SEXP ratioSEXP){
 BEGIN_RCPP
