@@ -14,6 +14,37 @@ using namespace std;
 #include <cmath>
 #include <algorithm>
 
+Rcpp::List IMTS_mh_sampler(NumericVector lU0, NumericVector V0, NumericVector H0, NumericMatrix Minv, NumericVector rL){
+
+	List result;
+	int stuff = 0;
+	int L = H0.length() + 2;
+	arma::mat M = as<arma::mat>(Minv);
+	NumericVector allLU(L+1,0.0);
+	allLU[0] = lU0[0]; allLU[1] = V0[0];
+	for(int i = 2; i < (L); i++){
+		allLU[i] = H0[i-2];	
+	}
+	arma::vec lUn = as<arma::vec>(allLU);
+	arma::vec lU = lUn*Minv;
+	NumericVector lf(1,0.0);
+	NumericVector lf1(1,0.0);NumericVector lf2(1,0.0);NumericVector lf3(1,0.0);
+	for(int i = 0; i++; i < L){
+		lf1[0] = lf1[0] + lUnv[i]*rL[i];
+		lf2[0] = lf2[0] + 0.5*rL[i];
+		lf3[0] = lf3[0] + rL[i]*std::exp(lU[i])/rL[L];
+	}
+	lf2[0] = lf2[0] + 0.5*rL[L];
+	lf[0] = lf1[0] - lf2[0]*(0.5+0.5*lf3[0]);
+	
+	
+	
+	result = Rcpp::List::create(Rcpp::Named("stuff") = stuff);
+	return result;
+	
+}
+
+
 
 
 Rcpp::List plaus_balanced_aov(NumericVector theta, NumericVector Ybar, NumericVector S, NumericVector lambda, NumericVector r, NumericVector n, NumericVector n_i, NumericVector eta){
