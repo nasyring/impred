@@ -30,14 +30,33 @@ Rcpp::List IMTS_mh_sampler(NumericVector lU0, NumericVector V0, NumericVector H0
 	NumericVector lf(1,0.0);
 	NumericVector lf1(1,0.0);NumericVector lf2(1,0.0);NumericVector lf3(1,0.0);
 	for(int i = 0; i++; i < L){
-		lf1[0] = lf1[0] + lUnv[i]*rL[i];
+		lf1[0] = lf1[0] + lU[i]*rL[i];
 		lf2[0] = lf2[0] + 0.5*rL[i];
 		lf3[0] = lf3[0] + rL[i]*std::exp(lU[i])/rL[L];
 	}
 	lf2[0] = lf2[0] + 0.5*rL[L];
 	lf[0] = lf1[0] - lf2[0]*(0.5+0.5*lf3[0]);
 	
-	
+	NumericVector lfold(1, lf[0]); NumericVector lfnew(1, 0.0);
+	NumericVector uold(1, lU0[0]); NumericVector vold(1, V0[0]); 	
+	NumericVector unew(1, 0.0); NumericVector vnew(1, 0.0); 
+	for(int m = 0; m < 1000; m++){
+		unew[0] = Rcpp::rnorm(1,uold[0],1.0);	
+		vnew[0] = Rcpp::rnorm(1,vold[0],1.0);
+
+		allLU[0] = unew[0]; allLU[1] = vnew[0];
+		lUn = as<arma::vec>(allLU);
+		lU = lUn*Minv;
+		lf1[0]=0.0; lf2[0]=0.0; lf3[0]=0.0;
+		for(int i = 0; i++; i < L){
+			lf1[0] = lf1[0] + lU[i]*rL[i];
+			lf2[0] = lf2[0] + 0.5*rL[i];
+			lf3[0] = lf3[0] + rL[i]*std::exp(lU[i])/rL[L];
+		}
+		lf2[0] = lf2[0] + 0.5*rL[L];
+		lfnew[0] = lf1[0] - lf2[0]*(0.5+0.5*lf3[0]);		
+		
+	}
 	
 	result = Rcpp::List::create(Rcpp::Named("stuff") = stuff);
 	return result;
