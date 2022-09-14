@@ -39,7 +39,8 @@ Rcpp::List IMTS_mh_sampler(NumericVector lU0, NumericVector V0, NumericVector H0
 	
 	NumericVector lfold(1, lf[0]); NumericVector lfnew(1, 0.0);
 	NumericVector uold(1, lU0[0]); NumericVector vold(1, V0[0]); 	
-	NumericVector unew(1, 0.0); NumericVector vnew(1, 0.0); 
+	NumericVector unew(1, 0.0); NumericVector vnew(1, 0.0);
+	NumericVector unif1(1, 0.0); NumericVector unif2(1, 0.0);
 	for(int m = 0; m < 1000; m++){
 		unew[0] = Rcpp::rnorm(1,uold[0],1.0);	
 		vnew[0] = Rcpp::rnorm(1,vold[0],1.0);
@@ -55,6 +56,16 @@ Rcpp::List IMTS_mh_sampler(NumericVector lU0, NumericVector V0, NumericVector H0
 		}
 		lf2[0] = lf2[0] + 0.5*rL[L];
 		lfnew[0] = lf1[0] - lf2[0]*(0.5+0.5*lf3[0]);		
+		
+		unif1[0] = std::exp(lfnew[0] - lfold[0]);
+		unif2[0] = R::runif(0.0,1.0);
+		if(unif1[0] >= unif2[0]){
+			
+			
+		}else {
+			
+			
+		}
 		
 	}
 	
