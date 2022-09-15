@@ -105,6 +105,94 @@ Rcpp::List IMTS_mh_sampler(NumericVector lU0, NumericVector V0, NumericVector H0
 }
 
 
+Rcpp::List IMTS_mh_sampler2(NumericVector lU0, NumericVector V0, NumericVector H0, NumericMatrix Minv, NumericVector rL, NumericVector thetau0s, NumericVector propsd1, NumericVector propsd2){
+
+	List result;
+	int L = H0.length() + 2;
+	int T = thetau0s.length();
+	arma::mat M = as<arma::mat>(Minv); M = M.t();
+	NumericVector allLU(L,0.0);
+	allLU[0] = lU0[0]; allLU[1] = V0[0];
+	for(int i = 0; i < (L-2); i++){
+		allLU[i+2] = H0[i];	
+	}
+	arma::vec lUn = as<arma::vec>(allLU);
+	arma::vec lU = M*lUn;
+	NumericVector lf(1,0.0);
+	NumericVector lf1(1,0.0);NumericVector lf2(1,0.0);NumericVector lf3(1,0.0);
+	for(int i = 0; i < (L-1); i++){
+		lf1[0] = lf1[0] + 0.5*lU[i+1]*rL[i];
+		lf2[0] = lf2[0] + rL[i];
+		lf3[0] = lf3[0] + std::exp(lU[i+1])*rL[i];
+	}
+	lf2[0] = lf2[0] + 1.0 + rL[L-1];
+	lf3[0] = ((std::pow(lU[0],2.0)+lf3[0])/rL[L-1])+1;
+	lf[0] = lf1[0] - 0.25*lf2[0]*lf3[0];
+	
+	
+	NumericVector lfold(1, lf[0]); NumericVector lfnew(1, 0.0);
+	NumericVector uold(1, lU0[0]); NumericVector vold(1, V0[0]); 	
+	NumericVector unew(1, 0.0); NumericVector vnew(1, 0.0);
+	NumericVector unif1(1, 0.0); NumericVector unif2(1, 0.0);
+	NumericVector logdens(5000, 0.0); 
+	NumericVector samples1(5000, 0.0);
+	NumericVector samples2(5000, 0.0);
+	
+	for(int m = 0; m < 5000; m++){
+		unew[0] = R::rnorm(uold[0],propsd1[0]);	
+		vnew[0] = R::rnorm(vold[0],propsd2[0]);
+
+		allLU[0] = unew[0]; allLU[1] = vnew[0];
+		lUn = as<arma::vec>(allLU);
+		lU = M*lUn;
+		lf1[0]=0.0; lf2[0]=0.0; lf3[0]=0.0;
+		for(int i = 0; i < (L-1); i++){
+			lf1[0] = lf1[0] + 0.5*lU[i+1]*rL[i];
+			lf2[0] = lf2[0] + rL[i];
+			lf3[0] = lf3[0] + std::exp(lU[i+1])*rL[i];
+		}
+		lf2[0] = lf2[0] + 1.0 + rL[L-1];
+		lf3[0] = ((std::pow(lU[0],2.0)+lf3[0])/rL[L-1])+1;
+		lfnew[0] = lf1[0] - 0.25*lf2[0]*lf3[0];
+		
+		unif1[0] = std::exp(lfnew[0] - lfold[0]);
+		unif2[0] = R::runif(0.0,1.0);
+		if(unif1[0] >= unif2[0]){
+			logdens[m] = lfnew[0];
+			lfold[0] = lfnew[0];
+			uold[0] = unew[0];
+			vold[0] = vnew[0];			
+		}else {
+			logdens[m] = lfold[0];
+		}
+		samples1[m] = uold[0];samples2[m] = vold[0];
+		
+	}
+	
+	
+	NumericVector lfseq(T,0.0);
+	allLU[1] = V0[0];
+	for(int t = 0; t < T; t++){
+		allLU[0] = thetau0s[t]; 
+		lUn = as<arma::vec>(allLU);
+		lU = M*lUn;
+		for(int i = 0; i < (L-1); i++){
+			lf1[0] = lf1[0] + 0.5*lU[i+1]*rL[i];
+			lf2[0] = lf2[0] + rL[i];
+			lf3[0] = lf3[0] + std::exp(lU[i+1])*rL[i];
+		}
+		lf2[0] = lf2[0] + 1.0 + rL[L-1];
+		lf3[0] = ((std::pow(lU[0],2.0)+lf3[0])/rL[L-1])+1;
+		lfseq[t] = lf1[0] - 0.25*lf2[0]*lf3[0];
+	}
+	
+	
+	result = Rcpp::List::create(Rcpp::Named("samples1") = samples1, Rcpp::Named("samples2") = samples2, Rcpp::Named("logdensthetas") = lfseq, Rcpp::Named("logdenssamps") = logdens);
+	return result;
+	
+}
+
+
 
 
 Rcpp::List plaus_balanced_aov(NumericVector theta, NumericVector Ybar, NumericVector S, NumericVector lambda, NumericVector r, NumericVector n, NumericVector n_i, NumericVector eta){
