@@ -23,7 +23,7 @@ Rcpp::List IMTS_mh_sampler(NumericVector lU0, NumericVector V0, NumericVector H0
 		prop1[0] = prop1[0] + std::log(rL[j]);	
 	}
 	arma::mat M = as<arma::mat>(Minv);
-	NumericVector allLU(L+1,0.0);
+	NumericVector allLU(L,0.0);
 	allLU[0] = lU0[0]; allLU[1] = V0[0];
 	for(int i = 0; i < (L-2); i++){
 		allLU[i+2] = H0[i];	
