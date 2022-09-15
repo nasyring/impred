@@ -14,10 +14,11 @@ using namespace std;
 #include <cmath>
 #include <algorithm>
 
-Rcpp::List IMTS_mh_sampler(NumericVector lU0, NumericVector V0, NumericVector H0, NumericMatrix Minv, NumericVector rL, NumericVector propsd1, NumericVector propsd2){
+Rcpp::List IMTS_mh_sampler(NumericVector lU0, NumericVector V0, NumericVector H0, NumericMatrix Minv, NumericVector rL, NumericVector thetau0s, NumericVector propsd1, NumericVector propsd2){
 
 	List result;
 	int L = H0.length() + 2;
+	int T = thetau0s.length();
 	NumericVector rL0(L+1, 0.0); rL0[0] = 1.0; rL0[L] = rL[L-1];
 	NumericVector prop1(1,0.0);
 	for(int j = 0; j < (L-1); j++){
@@ -46,9 +47,9 @@ Rcpp::List IMTS_mh_sampler(NumericVector lU0, NumericVector V0, NumericVector H0
 	NumericVector uold(1, lU0[0]); NumericVector vold(1, V0[0]); 	
 	NumericVector unew(1, 0.0); NumericVector vnew(1, 0.0);
 	NumericVector unif1(1, 0.0); NumericVector unif2(1, 0.0);
-	NumericVector logdens(1000, 0.0);  
+	NumericVector logdens(5000, 0.0);  
 	
-	for(int m = 0; m < 1000; m++){
+	for(int m = 0; m < 5000; m++){
 		unew[0] = R::rnorm(uold[0],propsd1[0]);	
 		vnew[0] = R::rnorm(vold[0],propsd2[0]);
 
@@ -77,7 +78,25 @@ Rcpp::List IMTS_mh_sampler(NumericVector lU0, NumericVector V0, NumericVector H0
 		
 	}
 	
-	result = Rcpp::List::create(Rcpp::Named("logdens") = logdens, Rcpp::Named("logdens0") = lf);
+	
+	NumericVector lfseq(T,0.0);
+	allLU[1] = V0[0];
+	for(int t = 0; t < T; t++){
+		allLU[0] = thetau0s[t]; 
+		lUn = as<arma::vec>(allLU);
+		lU = M*lUn;
+		lf1[0]=0.0; lf2[0]=0.0; lf3[0]=0.0;
+		for(int i = 0; i < L; i++){
+			lf1[0] = lf1[0] + 0.5*lU[i]*rL0[i];
+			lf2[0] = lf2[0] + 0.5*rL0[i];
+			lf3[0] = lf3[0] + rL0[i]*std::exp(lU[i])/rL0[L];
+		}
+		lf2[0] = lf2[0] + 0.5*rL0[L];
+		lfseq[t] = lf1[0] - lf2[0]*(0.5+0.5*lf3[0]);
+	}
+	
+	
+	result = Rcpp::List::create(Rcpp::Named("logdenssamps") = logdens, Rcpp::Named("logdens0") = lf, Rcpp::Named("logdensthetas") = lfseq);
 	return result;
 	
 }
