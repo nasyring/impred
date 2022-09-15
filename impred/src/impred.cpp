@@ -47,7 +47,9 @@ Rcpp::List IMTS_mh_sampler(NumericVector lU0, NumericVector V0, NumericVector H0
 	NumericVector uold(1, lU0[0]); NumericVector vold(1, V0[0]); 	
 	NumericVector unew(1, 0.0); NumericVector vnew(1, 0.0);
 	NumericVector unif1(1, 0.0); NumericVector unif2(1, 0.0);
-	NumericVector logdens(5000, 0.0);  
+	NumericVector logdens(5000, 0.0); 
+	NumericVector samples1(5000, 0.0);
+	NumericVector samples2(5000, 0.0);
 	
 	for(int m = 0; m < 5000; m++){
 		unew[0] = R::rnorm(uold[0],propsd1[0]);	
@@ -75,10 +77,11 @@ Rcpp::List IMTS_mh_sampler(NumericVector lU0, NumericVector V0, NumericVector H0
 		}else {
 			logdens[m] = lfold[0];
 		}
+		samples1[m] = uold[0];samples2[m] = vold[0];
 		
 	}
 	
-	
+	/*
 	NumericVector lfseq(T,0.0);
 	allLU[1] = V0[0];
 	for(int t = 0; t < T; t++){
@@ -94,9 +97,9 @@ Rcpp::List IMTS_mh_sampler(NumericVector lU0, NumericVector V0, NumericVector H0
 		lf2[0] = lf2[0] + 0.5*rL0[L];
 		lfseq[t] = lf1[0] - lf2[0]*(0.5+0.5*lf3[0]);
 	}
+	*/
 	
-	
-	result = Rcpp::List::create(Rcpp::Named("logdenssamps") = logdens, Rcpp::Named("logdens0") = lf, Rcpp::Named("logdensthetas") = lfseq);
+	result = Rcpp::List::create(Rcpp::Named("samples1") = samples1, Rcpp::Named("samples2") = samples2);
 	return result;
 	
 }
