@@ -6,6 +6,24 @@ using namespace std;
 
 
 
+
+Rcpp::List IMTS_mh_sampler2(NumericVector lU0, NumericVector V0, NumericVector H0, NumericMatrix Minv, NumericVector rL, NumericVector thetau0s, NumericVector prosd1, NumericVector prosd2);
+RcppExport SEXP impred_IMTS_mh_sampler2(SEXP lU0SEXP, SEXP V0SEXP, SEXP H0SEXP, SEXP MinvSEXP, SEXP rLSEXP, SEXP thetau0sSEXP, SEXP propsd1SEXP, SEXP propsd2SEXP){
+BEGIN_RCPP
+    Rcpp::RObject __result;
+    Rcpp::RNGScope __rngScope;
+    Rcpp::traits::input_parameter< NumericVector >::type lU0(lU0SEXP);
+    Rcpp::traits::input_parameter< NumericVector >::type V0(V0SEXP);
+    Rcpp::traits::input_parameter< NumericVector >::type H0(H0SEXP);
+    Rcpp::traits::input_parameter< NumericMatrix >::type Minv(MinvSEXP);
+    Rcpp::traits::input_parameter< NumericVector >::type rL(rLSEXP);
+    Rcpp::traits::input_parameter< NumericVector >::type thetau0s(thetau0sSEXP);
+    Rcpp::traits::input_parameter< NumericVector >::type propsd1(propsd1SEXP);
+    Rcpp::traits::input_parameter< NumericVector >::type propsd2(propsd2SEXP);
+    __result = Rcpp::wrap(IMTS_mh_sampler2(lU0, V0, H0, Minv, rL, thetau0s, propsd1, propsd2));
+    return __result;
+END_RCPP
+} 
     
 Rcpp::List IMTS_mh_sampler(NumericVector lU0, NumericVector V0, NumericVector H0, NumericMatrix Minv, NumericVector rL, NumericVector thetau0s, NumericVector prosd1, NumericVector prosd2);
 RcppExport SEXP impred_IMTS_mh_sampler(SEXP lU0SEXP, SEXP V0SEXP, SEXP H0SEXP, SEXP MinvSEXP, SEXP rLSEXP, SEXP thetau0sSEXP, SEXP propsd1SEXP, SEXP propsd2SEXP){
