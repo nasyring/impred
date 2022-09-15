@@ -18,8 +18,10 @@ Rcpp::List IMTS_mh_sampler(NumericVector lU0, NumericVector V0, NumericVector H0
 
 	List result;
 	int L = H0.length() + 2;
+	NumericVector rL0(L+1, 0.0); rL0[0] = 1.0;
 	NumericVector prop1(1,0.0);
 	for(int j = 0; j < (L-1); j++){
+		rL0[j+1] = rL[j];
 		prop1[0] = prop1[0] + std::log(rL[j]);	
 	}
 	arma::mat M = as<arma::mat>(Minv);
@@ -33,11 +35,11 @@ Rcpp::List IMTS_mh_sampler(NumericVector lU0, NumericVector V0, NumericVector H0
 	NumericVector lf(1,0.0);
 	NumericVector lf1(1,0.0);NumericVector lf2(1,0.0);NumericVector lf3(1,0.0);
 	for(int i = 0; i < L; i++){
-		lf1[0] = lf1[0] + lU[i]*rL[i];
-		lf2[0] = lf2[0] + 0.5*rL[i];
-		lf3[0] = lf3[0] + rL[i]*std::exp(lU[i])/rL[L];
+		lf1[0] = lf1[0] + 0.5*lU[i]*rL0[i];
+		lf2[0] = lf2[0] + 0.5*rL0[i];
+		lf3[0] = lf3[0] + rL0[i]*std::exp(lU[i])/rL0[L];
 	}
-	lf2[0] = lf2[0] + 0.5*rL[L];
+	lf2[0] = lf2[0] + 0.5*rL0[L];
 	lf[0] = lf1[0] - lf2[0]*(0.5+0.5*lf3[0]);
 	
 	NumericVector lfold(1, lf[0]); NumericVector lfnew(1, 0.0);
@@ -55,11 +57,11 @@ Rcpp::List IMTS_mh_sampler(NumericVector lU0, NumericVector V0, NumericVector H0
 		lU = M*lUn;
 		lf1[0]=0.0; lf2[0]=0.0; lf3[0]=0.0;
 		for(int i = 0; i < L; i++){
-			lf1[0] = lf1[0] + lU[i]*rL[i];
-			lf2[0] = lf2[0] + 0.5*rL[i];
-			lf3[0] = lf3[0] + rL[i]*std::exp(lU[i])/rL[L];
+			lf1[0] = lf1[0] + 0.5*lU[i]*rL0[i];
+			lf2[0] = lf2[0] + 0.5*rL0[i];
+			lf3[0] = lf3[0] + rL0[i]*std::exp(lU[i])/rL0[L];
 		}
-		lf2[0] = lf2[0] + 0.5*rL[L];
+		lf2[0] = lf2[0] + 0.5*rL0[L];
 		lfnew[0] = lf1[0] - lf2[0]*(0.5+0.5*lf3[0]);		
 		
 		unif1[0] = std::exp(lfnew[0] - lfold[0]);
