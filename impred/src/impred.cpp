@@ -18,7 +18,7 @@ Rcpp::List IMTS_mh_sampler(NumericVector lU0, NumericVector V0, NumericVector H0
 
 	List result;
 	int L = H0.length() + 2;
-	NumericVector rL0(L+1, 0.0); rL0[0] = 1.0;
+	NumericVector rL0(L+1, 0.0); rL0[0] = 1.0; rL0[L] = rL[L-1];
 	NumericVector prop1(1,0.0);
 	for(int j = 0; j < (L-1); j++){
 		rL0[j+1] = rL[j];
@@ -78,7 +78,7 @@ Rcpp::List IMTS_mh_sampler(NumericVector lU0, NumericVector V0, NumericVector H0
 	}
 	*/
 	//result = Rcpp::List::create(Rcpp::Named("logdens") = logdens, Rcpp::Named("logdens0") = lf);
-	result = Rcpp::List::create(Rcpp::Named("lf") = lf,Rcpp::Named("lf1") = lf1,Rcpp::Named("lf2") = lf2,Rcpp::Named("lf3") = lf3,Rcpp::Named("lU") = lU,Rcpp::Named("rL0") = rL0);
+	result = Rcpp::List::create(Rcpp::Named("lf") = lf,Rcpp::Named("lf1") = lf1,Rcpp::Named("lf2") = lf2,Rcpp::Named("lf3") = lf3,Rcpp::Named("lU") = lU,Rcpp::Named("rL0") = rL0, Rcpp::Named("allLU") = allLU, Rcpp::Named("lUn") = lUn);
 	return result;
 	
 }
