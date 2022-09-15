@@ -25,11 +25,11 @@ Rcpp::List IMTS_mh_sampler(NumericVector lU0, NumericVector V0, NumericVector H0
 	arma::mat M = as<arma::mat>(Minv);
 	NumericVector allLU(L+1,0.0);
 	allLU[0] = lU0[0]; allLU[1] = V0[0];
-	for(int i = 2; i < (L); i++){
-		allLU[i] = H0[i-2];	
+	for(int i = 0; i < (L-2); i++){
+		allLU[i+2] = H0[i];	
 	}
 	arma::vec lUn = as<arma::vec>(allLU);
-	arma::vec lU = lUn*M;
+	arma::vec lU = M*lUn;
 	NumericVector lf(1,0.0);
 	NumericVector lf1(1,0.0);NumericVector lf2(1,0.0);NumericVector lf3(1,0.0);
 	for(int i = 0; i < L; i++){
@@ -52,7 +52,7 @@ Rcpp::List IMTS_mh_sampler(NumericVector lU0, NumericVector V0, NumericVector H0
 
 		allLU[0] = unew[0]; allLU[1] = vnew[0];
 		lUn = as<arma::vec>(allLU);
-		lU = lUn*M;
+		lU = M*lUn;
 		lf1[0]=0.0; lf2[0]=0.0; lf3[0]=0.0;
 		for(int i = 0; i < L; i++){
 			lf1[0] = lf1[0] + lU[i]*rL[i];
