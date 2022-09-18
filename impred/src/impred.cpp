@@ -148,12 +148,12 @@ Rcpp::List IMTS_mh_sampler2(NumericVector lU0, NumericVector V0, NumericVector H
 		lU = M*lUn;
 		lf1[0]=0.0; lf2[0]=0.0; lf3[0]=0.0;
 		for(int i = 0; i < (L-1); i++){
-			lf1[0] = lf1[0] + 0.5*lU[i+1]*rL[i];
+			lf1[0] = lf1[0] + 0.5*lU[i+1]*(rL[i]-2.0);
 			lf2[0] = lf2[0] + rL[i];
 			lf3[0] = lf3[0] + std::exp(lU[i+1])*rL[i];
 		}
 		lf2[0] = lf2[0] + 1.0 + rL[L-1];
-		lf3[0] = ((std::pow(lU[0],2.0)+lf3[0])/rL[L-1])+1;
+		lf3[0] = ((std::pow(lU[0],2.0)+lf3[0])/rL[L-1])+1.0;
 		lfnew[0] = lf1[0] - 0.25*lf2[0]*lf3[0];
 		
 		unif1[0] = std::exp(lfnew[0] - lfold[0]);
@@ -179,7 +179,7 @@ Rcpp::List IMTS_mh_sampler2(NumericVector lU0, NumericVector V0, NumericVector H
 		lU = M*lUn;
 		lf1[0]=0.0; lf2[0]=0.0; lf3[0]=0.0;
 		for(int i = 0; i < (L-1); i++){
-			lf1[0] = lf1[0] + 0.5*lU[i+1]*rL[i];
+			lf1[0] = lf1[0] + 0.5*lU[i+1]*(rL[i]-2.0);
 			lf2[0] = lf2[0] + rL[i];
 			lf3[0] = lf3[0] + std::exp(lU[i+1])*rL[i];
 		}
@@ -196,7 +196,7 @@ Rcpp::List IMTS_mh_sampler2(NumericVector lU0, NumericVector V0, NumericVector H
 		lU = M*lUn;
 		lf1[0]=0.0; lf2[0]=0.0; lf3[0]=0.0;
 		for(int i = 0; i < (L-1); i++){
-			lf1[0] = lf1[0] + 0.5*lU[i+1]*rL[i];
+			lf1[0] = lf1[0] + 0.5*lU[i+1]*(rL[i]-2.0);
 			lf2[0] = lf2[0] + rL[i];
 			lf3[0] = lf3[0] + std::exp(lU[i+1])*rL[i];
 		}
