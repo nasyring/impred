@@ -106,7 +106,7 @@ Rcpp::List IMTS_mh_sampler(NumericVector lU0, NumericVector V0, NumericVector H0
 }
 
 
-Rcpp::List IMTS_mh_sampler2(NumericVector lU0, NumericVector V0, NumericVector H0, NumericMatrix Minv, NumericVector rL, NumericVector thetau0s, NumericVector propsd1, NumericVector propsd2, NumericVector sampsize){
+Rcpp::List IMTS_mh_sampler2(NumericVector lU0, NumericVector V0, NumericVector H0, NumericMatrix Minv, NumericVector rL, NumericVector thetau0s, NumericVector y0s, NumericVector propsd1, NumericVector propsd2, NumericVector sampsize){
 
 	List result;
 	int L = H0.length() + 2;
@@ -188,8 +188,25 @@ Rcpp::List IMTS_mh_sampler2(NumericVector lU0, NumericVector V0, NumericVector H
 		lfseq[t] = lf1[0] - 0.25*lf2[0]*lf3[0];
 	}
 	
+	NumericVector lfyseq(T,0.0);
+	allLU[1] = V0[0];
+	for(int t = 0; t < T; t++){
+		allLU[0] = y0s[t]; 
+		lUn = as<arma::vec>(allLU);
+		lU = M*lUn;
+		lf1[0]=0.0; lf2[0]=0.0; lf3[0]=0.0;
+		for(int i = 0; i < (L-1); i++){
+			lf1[0] = lf1[0] + 0.5*lU[i+1]*rL[i];
+			lf2[0] = lf2[0] + rL[i];
+			lf3[0] = lf3[0] + std::exp(lU[i+1])*rL[i];
+		}
+		lf2[0] = lf2[0] + 1.0 + rL[L-1];
+		lf3[0] = ((std::pow(lU[0],2.0)+lf3[0])/rL[L-1])+1;
+		lfyseq[t] = lf1[0] - 0.25*lf2[0]*lf3[0];
+	}
 	
-	result = Rcpp::List::create(Rcpp::Named("samples1") = samples1, Rcpp::Named("samples2") = samples2, Rcpp::Named("logdensthetas") = lfseq, Rcpp::Named("logdenssamps") = logdens);
+	
+	result = Rcpp::List::create(Rcpp::Named("samples1") = samples1, Rcpp::Named("samples2") = samples2, Rcpp::Named("logdensthetas") = lfseq, Rcpp::Named("logdensys") = lfyseq, Rcpp::Named("logdenssamps") = logdens);
 	return result;
 	
 }
