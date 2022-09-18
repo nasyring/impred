@@ -131,7 +131,7 @@ Rcpp::List IMTS_mh_sampler2(NumericVector lU0, NumericVector V0, NumericVector H
 	lf3[0] = ((std::pow(lU[0],2.0)+lf3[0])/rL[L-1])+1;
 	lf[0] = lf1[0] - 0.25*lf2[0]*lf3[0];
 	
-	
+/*	
 	NumericVector lfold(1, lf[0]); NumericVector lfnew(1, 0.0);
 	NumericVector uold(1, lU0[0]); NumericVector vold(1, V0[0]); 	
 	NumericVector unew(1, 0.0); NumericVector vnew(1, 0.0);
@@ -190,6 +190,8 @@ Rcpp::List IMTS_mh_sampler2(NumericVector lU0, NumericVector V0, NumericVector H
 	
 	
 	result = Rcpp::List::create(Rcpp::Named("samples1") = samples1, Rcpp::Named("samples2") = samples2, Rcpp::Named("logdensthetas") = lfseq, Rcpp::Named("logdenssamps") = logdens);
+*/
+	result = Rcpp::List::create(Rcpp::Named("lf") = lf, Rcpp::Named("lf1") = lf1, Rcpp::Named("lf2") = lf2, Rcpp::Named("lf3") = lf3, Rcpp::Named("lUn") = lUn, Rcpp::Named("lU") = lU);
 	return result;
 	
 }
