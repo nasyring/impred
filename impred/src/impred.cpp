@@ -14,11 +14,12 @@ using namespace std;
 #include <cmath>
 #include <algorithm>
 
-Rcpp::List IMTS_mh_sampler(NumericVector lU0, NumericVector V0, NumericVector H0, NumericMatrix Minv, NumericVector rL, NumericVector thetau0s, NumericVector propsd1, NumericVector propsd2){
+Rcpp::List IMTS_mh_sampler(NumericVector lU0, NumericVector V0, NumericVector H0, NumericMatrix Minv, NumericVector rL, NumericVector thetau0s, NumericVector propsd1, NumericVector propsd2, NumericVector sampsize){
 
 	List result;
 	int L = H0.length() + 2;
 	int T = thetau0s.length();
+	int numsamps = round(sampsize[0]);
 	NumericVector rL0(L+1, 0.0); rL0[0] = 1.0; rL0[L] = rL[L-1];
 	NumericVector prop1(1,0.0);
 	for(int j = 0; j < (L-1); j++){
@@ -47,11 +48,11 @@ Rcpp::List IMTS_mh_sampler(NumericVector lU0, NumericVector V0, NumericVector H0
 	NumericVector uold(1, lU0[0]); NumericVector vold(1, V0[0]); 	
 	NumericVector unew(1, 0.0); NumericVector vnew(1, 0.0);
 	NumericVector unif1(1, 0.0); NumericVector unif2(1, 0.0);
-	NumericVector logdens(5000, 0.0); 
-	NumericVector samples1(5000, 0.0);
-	NumericVector samples2(5000, 0.0);
+	NumericVector logdens(numsamps, 0.0); 
+	NumericVector samples1(numsamps, 0.0);
+	NumericVector samples2(numsamps, 0.0);
 	
-	for(int m = 0; m < 5000; m++){
+	for(int m = 0; m < numsamps; m++){
 		unew[0] = R::rnorm(uold[0],propsd1[0]);	
 		vnew[0] = R::rnorm(vold[0],propsd2[0]);
 
@@ -105,11 +106,12 @@ Rcpp::List IMTS_mh_sampler(NumericVector lU0, NumericVector V0, NumericVector H0
 }
 
 
-Rcpp::List IMTS_mh_sampler2(NumericVector lU0, NumericVector V0, NumericVector H0, NumericMatrix Minv, NumericVector rL, NumericVector thetau0s, NumericVector propsd1, NumericVector propsd2){
+Rcpp::List IMTS_mh_sampler2(NumericVector lU0, NumericVector V0, NumericVector H0, NumericMatrix Minv, NumericVector rL, NumericVector thetau0s, NumericVector propsd1, NumericVector propsd2, NumericVector sampsize){
 
 	List result;
 	int L = H0.length() + 2;
 	int T = thetau0s.length();
+	int numsamps = round(sampsize[0]);	
 	arma::mat M = as<arma::mat>(Minv); M = M.t();
 	NumericVector allLU(L,0.0);
 	allLU[0] = lU0[0]; allLU[1] = V0[0];
@@ -134,11 +136,11 @@ Rcpp::List IMTS_mh_sampler2(NumericVector lU0, NumericVector V0, NumericVector H
 	NumericVector uold(1, lU0[0]); NumericVector vold(1, V0[0]); 	
 	NumericVector unew(1, 0.0); NumericVector vnew(1, 0.0);
 	NumericVector unif1(1, 0.0); NumericVector unif2(1, 0.0);
-	NumericVector logdens(5000, 0.0); 
-	NumericVector samples1(5000, 0.0);
-	NumericVector samples2(5000, 0.0);
+	NumericVector logdens(numsamps, 0.0); 
+	NumericVector samples1(numsamps, 0.0);
+	NumericVector samples2(numsamps, 0.0);
 	
-	for(int m = 0; m < 5000; m++){
+	for(int m = 0; m < numsamps; m++){
 		unew[0] = R::rnorm(uold[0],propsd1[0]);	
 		vnew[0] = R::rnorm(vold[0],propsd2[0]);
 
