@@ -7,8 +7,8 @@ using namespace std;
 
 
 
-Rcpp::List IMTS_mh_sampler2(NumericVector lU0, NumericVector V0, NumericVector H0, NumericMatrix Minv, NumericVector rL, NumericVector thetau0s, NumericVector prosd1, NumericVector prosd2);
-RcppExport SEXP impred_IMTS_mh_sampler2(SEXP lU0SEXP, SEXP V0SEXP, SEXP H0SEXP, SEXP MinvSEXP, SEXP rLSEXP, SEXP thetau0sSEXP, SEXP propsd1SEXP, SEXP propsd2SEXP){
+Rcpp::List IMTS_mh_sampler2(NumericVector lU0, NumericVector V0, NumericVector H0, NumericMatrix Minv, NumericVector rL, NumericVector thetau0s, NumericVector prosd1, NumericVector prosd2, NumericVector sampsize);
+RcppExport SEXP impred_IMTS_mh_sampler2(SEXP lU0SEXP, SEXP V0SEXP, SEXP H0SEXP, SEXP MinvSEXP, SEXP rLSEXP, SEXP thetau0sSEXP, SEXP propsd1SEXP, SEXP propsd2SEXP, SEXP sampsizeSEXP){
 BEGIN_RCPP
     Rcpp::RObject __result;
     Rcpp::RNGScope __rngScope;
@@ -20,13 +20,14 @@ BEGIN_RCPP
     Rcpp::traits::input_parameter< NumericVector >::type thetau0s(thetau0sSEXP);
     Rcpp::traits::input_parameter< NumericVector >::type propsd1(propsd1SEXP);
     Rcpp::traits::input_parameter< NumericVector >::type propsd2(propsd2SEXP);
-    __result = Rcpp::wrap(IMTS_mh_sampler2(lU0, V0, H0, Minv, rL, thetau0s, propsd1, propsd2));
+    Rcpp::traits::input_parameter< NumericVector >::type sampsize(sampsizeSEXP);
+    __result = Rcpp::wrap(IMTS_mh_sampler2(lU0, V0, H0, Minv, rL, thetau0s, propsd1, propsd2, sampsize));
     return __result;
 END_RCPP
 } 
     
-Rcpp::List IMTS_mh_sampler(NumericVector lU0, NumericVector V0, NumericVector H0, NumericMatrix Minv, NumericVector rL, NumericVector thetau0s, NumericVector prosd1, NumericVector prosd2);
-RcppExport SEXP impred_IMTS_mh_sampler(SEXP lU0SEXP, SEXP V0SEXP, SEXP H0SEXP, SEXP MinvSEXP, SEXP rLSEXP, SEXP thetau0sSEXP, SEXP propsd1SEXP, SEXP propsd2SEXP){
+Rcpp::List IMTS_mh_sampler(NumericVector lU0, NumericVector V0, NumericVector H0, NumericMatrix Minv, NumericVector rL, NumericVector thetau0s, NumericVector prosd1, NumericVector prosd2, NumericVector sampsize);
+RcppExport SEXP impred_IMTS_mh_sampler(SEXP lU0SEXP, SEXP V0SEXP, SEXP H0SEXP, SEXP MinvSEXP, SEXP rLSEXP, SEXP thetau0sSEXP, SEXP propsd1SEXP, SEXP propsd2SEXP, SEXP sampsizeSEXP){
 BEGIN_RCPP
     Rcpp::RObject __result;
     Rcpp::RNGScope __rngScope;
@@ -38,11 +39,11 @@ BEGIN_RCPP
     Rcpp::traits::input_parameter< NumericVector >::type thetau0s(thetau0sSEXP);
     Rcpp::traits::input_parameter< NumericVector >::type propsd1(propsd1SEXP);
     Rcpp::traits::input_parameter< NumericVector >::type propsd2(propsd2SEXP);
-    __result = Rcpp::wrap(IMTS_mh_sampler(lU0, V0, H0, Minv, rL, thetau0s, propsd1, propsd2));
+    Rcpp::traits::input_parameter< NumericVector >::type sampsize(sampsizeSEXP);
+    __result = Rcpp::wrap(IMTS_mh_sampler(lU0, V0, H0, Minv, rL, thetau0s, propsd1, propsd2, sampsize));
     return __result;
 END_RCPP
-}    
-    
+}     
 
 Rcpp::List plaus_unbalanced_aov_full(NumericVector theta, NumericVector Ybar, NumericVector S, NumericVector lambda, NumericVector r, NumericVector n, NumericVector n_i, NumericVector ratio);
 RcppExport SEXP impred_plaus_unbalanced_aov_full(SEXP thetaSEXP, SEXP YbarSEXP, SEXP SSEXP, SEXP lambdaSEXP, SEXP rSEXP, SEXP nSEXP, SEXP n_iSEXP, SEXP ratioSEXP){
