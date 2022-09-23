@@ -129,7 +129,7 @@ Rcpp::List IMTS_mh_sampler2(NumericVector lU0, NumericVector V0, NumericVector H
 	}
 	lf2[0] = lf2[0] + 1.0 + rL[L-1];
 	lf3[0] = ((std::pow(lU[0],2.0)+lf3[0])/rL[L-1])+1;
-	lf[0] = lf1[0] - 0.25*lf2[0]*std::log(lf3[0]);
+	lf[0] = lf1[0] - 0.5*lf2[0]*std::log(0.5*lf3[0]);
 		
 	NumericVector lfold(1, lf[0]); NumericVector lfnew(1, 0.0);
 	NumericVector uold(1, lU0[0]); NumericVector vold(1, V0[0]); 	
@@ -154,7 +154,7 @@ Rcpp::List IMTS_mh_sampler2(NumericVector lU0, NumericVector V0, NumericVector H
 		}
 		lf2[0] = lf2[0] + 1.0 + rL[L-1];
 		lf3[0] = ((std::pow(lU[0],2.0)+lf3[0])/rL[L-1])+1.0;
-		lfnew[0] = lf1[0] - 0.25*lf2[0]*std::log(lf3[0]);
+		lfnew[0] = lf1[0] - 0.5*lf2[0]*std::log(0.5*lf3[0]);
 		
 		unif1[0] = std::exp(lfnew[0] - lfold[0]);
 		unif2[0] = R::runif(0.0,1.0);
@@ -185,7 +185,7 @@ Rcpp::List IMTS_mh_sampler2(NumericVector lU0, NumericVector V0, NumericVector H
 		}
 		lf2[0] = lf2[0] + 1.0 + rL[L-1];
 		lf3[0] = ((std::pow(lU[0],2.0)+lf3[0])/rL[L-1])+1;
-		lfseq[t] = lf1[0] - 0.25*lf2[0]*std::log(lf3[0]);
+		lfseq[t] = lf1[0] - 0.5*lf2[0]*std::log(0.5*lf3[0]);
 	}
 	
 	NumericVector lfyseq(T,0.0);
@@ -202,7 +202,7 @@ Rcpp::List IMTS_mh_sampler2(NumericVector lU0, NumericVector V0, NumericVector H
 		}
 		lf2[0] = lf2[0] + 1.0 + rL[L-1];
 		lf3[0] = ((std::pow(lU[0],2.0)+lf3[0])/rL[L-1])+1;
-		lfyseq[t] = lf1[0] - 0.25*lf2[0]*std::log(lf3[0]);
+		lfyseq[t] = lf1[0] - 0.5*lf2[0]*std::log(0.5*lf3[0]);
 	}
 	
 	
